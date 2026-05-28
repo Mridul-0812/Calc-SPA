@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Masterclass | First Principles</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a; --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1); --accent-primary: #3b82f6;
+            --accent-success: #10b981; --accent-warning: #f59e0b;
+            --accent-danger: #ef4444; --accent-purple: #8b5cf6;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+        .app-container { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--glass-bg); border-right: 1px solid var(--glass-border); padding: 24px; display: flex; flex-direction: column; backdrop-filter: blur(12px); flex-shrink: 0; }
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .logo-icon { font-size: 28px; color: var(--accent-primary); font-family: 'Lexend', sans-serif; }
+        .logo-container h2 { font-family: 'Lexend', sans-serif; font-size: 24px; font-weight: 700; }
+        .syllabus-tag { font-size: 12px; color: var(--accent-success); background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 32px; }
+        .nav-section { margin-bottom: 24px; }
+        .section-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; display: block; margin-bottom: 12px; }
+        .nav-link { display: block; padding: 10px 12px; color: var(--text-muted); text-decoration: none; border-radius: 8px; transition: all 0.2s; margin-bottom: 4px; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .nav-link.active { background: var(--accent-primary); color: white; font-weight: 500; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
+        .hero-header { margin-bottom: 40px; text-align: center; }
+        .hero-header h1 { font-family: 'Lexend', sans-serif; font-size: 42px; margin-bottom: 16px; }
+        .text-accent { color: var(--accent-primary); }
+        .hero-subtitle { font-size: 18px; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* Story Text */
+        .story-section { font-size: 18px; line-height: 1.8; margin-bottom: 40px; background: rgba(255,255,255,0.02); padding: 24px; border-radius: 12px; border-left: 4px solid var(--accent-primary); }
+        .story-section p { margin-bottom: 16px; }
+        .story-section p:last-child { margin-bottom: 0; }
+        .highlight { background: rgba(59, 130, 246, 0.15); padding: 2px 6px; border-radius: 4px; color: #60a5fa; font-weight: 500; }
+        .formula-box { background: rgba(0,0,0,0.3); padding: 24px; border-radius: 12px; text-align: center; border: 1px dashed var(--accent-primary); margin: 30px 0; }
+
+        /* Interactive Playground Cards */
+        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 32px; backdrop-filter: blur(12px); margin-bottom: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; }
+        .playground-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .playground-header h3 { font-family: 'Lexend', sans-serif; font-size: 22px; }
+        .badge { background: rgba(59, 130, 246, 0.2); color: var(--accent-primary); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .svg-container { width: 100%; background: #0f172a; border-radius: 12px; border: 1px solid #334155; padding: 20px; position: relative; overflow: hidden; }
+        
+        /* Sliders */
+        .controls-panel { margin-top: 24px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); }
+        .slider-label { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 500; font-size: 16px; }
+        input[type=range] { width: 100%; appearance: none; height: 8px; border-radius: 4px; background: #334155; outline: none; transition: 0.2s; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-primary); cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        
+        /* Data Dashboards */
+        .live-data { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-top: 24px; }
+        .data-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 8px; text-align: center; }
+        .data-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        .data-value { font-family: 'Lexend', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); }
+        .data-value.success { color: var(--accent-success); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+
+        /* Step-by-step UI */
+        .step-container { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+        .math-step { background: rgba(0,0,0,0.2); border: 1px solid #334155; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.2rem; display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+        .math-step.visible { display: block; opacity: 1; transform: translateY(0); }
+        .btn-action { background: var(--accent-primary); color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; display: inline-block; margin: 20px auto 0; font-family: 'Inter', sans-serif; }
+        .btn-action:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+        .btn-action:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Confetti */
+        .confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <span class="logo-icon">∫</span>
+                    <h2>CalcSPA</h2>
+                </div>
+                <p class="syllabus-tag">NSW Year 11 Advanced</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="section-title">Foundations</span>
+                    <a href="index.html" class="nav-link">Introduction</a>
+                    <a href="limits.html" class="nav-link">Limits</a>
+                    <a href="first-principles.html" class="nav-link active">First Principles</a>
+                    <a href="derivatives-library.html" class="nav-link">Derivatives Library</a>
+                </div>
+                <div class="nav-section">
+                    <span class="section-title">Core Techniques</span>
+                    <a href="power-rule.html" class="nav-link">The Power Rule</a>
+                    <a href="product-rule.html" class="nav-link">The Product Rule</a>
+                    <a href="quotient-rule.html" class="nav-link">The Quotient Rule</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="hero-header">
+                <h1>The Magic of <span class="text-accent">"Right Now"</span></h1>
+                <p class="hero-subtitle">To master calculus, you must forget everything you know about average speed over time. We are here to calculate exactly what is happening in a single, frozen moment.</p>
+            </header>
+
+            <div class="story-section">
+                <p>Imagine tracking a race car. Finding its average speed over a 10-second window is easy—just measure the distance it traveled and divide by 10. That's basic geometry.</p>
+                <p>But what if you want to know the car's speed at exactly <span class="highlight">second 4.000?</span> You need the time gap to be <strong>zero</strong>. But you can't divide by zero; math breaks. So, how do we cheat the system? <strong>We use Limits to shrink the gap infinitely.</strong></p>
+            </div>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Interactive 1: The Gap Shrinker</h3>
+                    <span class="badge">Visualiser</span>
+                </div>
+
+                <div class="svg-container">
+                    <canvas class="confetti-canvas" id="confetti-1"></canvas>
+                    <svg viewBox="0 0 600 400" style="width: 100%; height: auto;">
+                        <g stroke="#1e293b" stroke-width="1">
+                            <line x1="0" y1="100" x2="600" y2="100"/>
+                            <line x1="0" y1="200" x2="600" y2="200"/>
+                            <line x1="0" y1="300" x2="600" y2="300"/>
+                            <line x1="150" y1="0" x2="150" y2="400"/>
+                        </g>
+                        <path id="curve-path-1" fill="transparent" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+                        <line id="dynamic-line-1" x1="0" y1="0" x2="0" y2="0" stroke="#f59e0b" stroke-width="3" stroke-dasharray="8,8" />
+                        <path id="gap-triangle-1" fill="rgba(59, 130, 246, 0.1)" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle id="point-a-1" cx="0" cy="0" r="8" fill="#10b981" />
+                        <text id="label-a-1" x="0" y="0" fill="#f8fafc" font-size="14" font-weight="bold">x</text>
+                        <circle id="point-b-1" cx="0" cy="0" r="8" fill="#ef4444" />
+                        <text id="label-b-1" x="0" y="0" fill="#f8fafc" font-size="14" font-weight="bold">x + h</text>
+                    </svg>
+                </div>
+
+                <div class="controls-panel">
+                    <div class="slider-label">
+                        <span>Shrink the time gap ($h \to 0$)</span>
+                        <span id="h-status-1" style="color: #f59e0b;">Secant (Average)</span>
+                    </div>
+                    <input type="range" id="slider-1" min="0" max="250" value="250" step="1">
+                </div>
+
+                <div class="live-data">
+                    <div class="data-box"><span class="data-label">Gap ($h$)</span><span class="data-value" id="val-gap-1">250.0</span></div>
+                    <div class="data-box"><span class="data-label">Current Steepness</span><span class="data-value" id="val-slope-1">--</span></div>
+                </div>
+            </section>
+
+            <div class="story-section">
+                <p>When the gap ($h$) reached zero, the two dots merged. The average speed line (secant) snapped into the instant speed line (tangent). <strong>That slope is the derivative.</strong></p>
+                <p>But knowing the slope at just <i>one</i> point isn't enough. What if we want to know the exact slope at <i>every</i> point along the curve without doing the math over and over? We graph the slopes!</p>
+            </div>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Interactive 2: The Slope Tracker</h3>
+                    <span class="badge">Dynamic Grapher</span>
+                </div>
+                
+                <p style="margin-bottom: 20px; color: var(--text-muted);">Move the point along the original curve $f(x) = x^2$. The bottom graph will actively map the <i>steepness</i> of the tangent line at that exact moment, creating a brand new function: $f'(x)$.</p>
+
+                <div class="svg-container" style="padding: 0; background: #0f172a;">
+                    <div style="padding: 10px 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #334155; font-family: 'Lexend', sans-serif;">Original Function: $f(x)$</div>
+                    <svg viewBox="0 0 600 200" style="width: 100%; height: auto; border-bottom: 2px dashed #475569;">
+                        <line x1="300" y1="0" x2="300" y2="200" stroke="#334155" stroke-width="2"/>
+                        <line x1="0" y1="180" x2="600" y2="180" stroke="#334155" stroke-width="2"/>
+                        <path id="curve-path-2" fill="transparent" stroke="#3b82f6" stroke-width="4"/>
+                        <line id="tangent-line-2" x1="0" y1="0" x2="0" y2="0" stroke="#10b981" stroke-width="3" />
+                        <circle id="point-2" cx="0" cy="0" r="7" fill="#f8fafc" />
+                    </svg>
+
+                    <div style="padding: 10px 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #334155; font-family: 'Lexend', sans-serif;">The Derivative: $f'(x)$ (Plotted Slopes)</div>
+                    <svg viewBox="0 0 600 200" style="width: 100%; height: auto;">
+                        <line x1="300" y1="0" x2="300" y2="200" stroke="#334155" stroke-width="2"/>
+                        <line x1="0" y1="100" x2="600" y2="100" stroke="#334155" stroke-width="2"/>
+                        <path id="derivative-path-2" fill="transparent" stroke="#ef4444" stroke-width="4" stroke-dasharray="6,6"/>
+                        <line x1="300" id="tracker-line-2" y1="0" x2="300" y2="200" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+                        <circle id="deriv-point-2" cx="0" cy="0" r="7" fill="#ef4444" />
+                    </svg>
+                </div>
+
+                <div class="controls-panel">
+                    <div class="slider-label">
+                        <span>Drag point along X-axis</span>
+                        <span id="coord-status-2" style="color: #3b82f6;">X = 0</span>
+                    </div>
+                    <input type="range" id="slider-2" min="-250" max="250" value="0" step="1">
+                </div>
+
+                <div class="live-data">
+                    <div class="data-box"><span class="data-label">Current Steepness (Slope)</span><span class="data-value" id="val-slope-2" style="color: #10b981;">0.00</span></div>
+                    <div class="data-box"><span class="data-label">Derivative Function</span><span class="data-value" id="val-func-2" style="color: #ef4444;">$y = 2x$</span></div>
+                </div>
+            </section>
+
+            <div class="story-section">
+                <p>Notice how the red line mapped exactly to a straight diagonal line? That proves that the slope of $x^2$ is governed by the rule $2x$.</p>
+                <p>But mathematicians hate relying on graphs to find answers. We use algebra. Here is the master formula that calculates exactly what happens when the gap ($h$) becomes zero:</p>
+                
+                <div class="formula-box">
+                    <p style="margin-bottom: 10px; color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">The Master Limit Formula</p>
+                    $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+                </div>
+            </div>
+
+            <section class="glass-card" style="text-align: center;">
+                <canvas class="confetti-canvas" id="confetti-3"></canvas>
+                <div class="playground-header">
+                    <h3 style="margin: 0 auto;">Interactive 3: Beating the "Divide by Zero" Boss</h3>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Let's prove algebraically that the derivative of $f(x) = x^2$ is indeed $2x$. Click to perform the algebra.</p>
+
+                <div class="step-container" id="algebra-steps">
+                    <div class="math-step visible" id="step-0">
+                        $$f'(x) = \lim_{h \to 0} \frac{(x+h)^2 - x^2}{h}$$
+                        <p style="font-size: 14px; color: var(--text-muted); margin-top: 10px;">We substituted $x^2$ into the formula. We can't make $h=0$ yet, or we divide by zero!</p>
+                    </div>
+
+                    <div class="math-step" id="step-1">
+                        $$= \lim_{h \to 0} \frac{(x^2 + 2xh + h^2) - x^2}{h}$$
+                        <p style="font-size: 14px; color: var(--text-muted); margin-top: 10px;">We expanded the perfect square brackets.</p>
+                    </div>
+
+                    <div class="math-step" id="step-2">
+                        $$= \lim_{h \to 0} \frac{2xh + h^2}{h}$$
+                        <p style="font-size: 14px; color: var(--text-muted); margin-top: 10px;">The $x^2$ and $-x^2$ perfectly canceled each other out.</p>
+                    </div>
+
+                    <div class="math-step" id="step-3">
+                        $$= \lim_{h \to 0} (2x + h)$$
+                        <p style="font-size: 14px; color: var(--text-muted); margin-top: 10px;">We factored out $h$ from the top and bottom. The "divide by zero" trap is destroyed!</p>
+                    </div>
+
+                    <div class="math-step" id="step-4">
+                        <h2 style="color: var(--accent-success); margin-bottom: 10px;">$$f'(x) = 2x$$</h2>
+                        <p style="font-size: 14px; color: var(--text-muted);">Now that it's safe, we let $h$ become zero. The algebra perfectly matches our graphs!</p>
+                    </div>
+                </div>
+
+                <button class="btn-action" id="btn-next-step">Expand the brackets!</button>
+            </section>
+
+            <section class="glass-card" style="margin-top: 60px;"></section>
+                <div class="playground-header">
+                    <h3>Finding Derivatives via First Principles</h3>
+                    <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple);">Worked Solutions</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Let's put the master formula to work. Here is how you strictly calculate the derivative formula $f'(x)$ for different types of functions, purely using algebra.</p>
+
+                <div style="background: rgba(16, 185, 129, 0.05); border-left: 4px solid var(--accent-success); padding: 24px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+                    <h4 style="color: var(--accent-success); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span>🟢</span> Easy: A Linear Function
+                    </h4>
+                    <p style="margin-bottom: 16px;"><strong>Question:</strong> Find the derivative of $f(x) = 3x + 2$ from first principles.</p>
+                    <div style="font-size: 0.95em;">
+                        <p>1. Substitute $f(x+h)$ and $f(x)$ into the master formula:</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{(3(x+h) + 2) - (3x + 2)}{h}$$
+                        <p>2. Expand the brackets carefully:</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{3x + 3h + 2 - 3x - 2}{h}$$
+                        <p>3. Cancel matching terms ($3x$ with $-3x$, and $2$ with $-2$):</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{3h}{h}$$
+                        <p>4. Divide by $h$ to finish:</p>
+                        $$f'(x) = 3$$
+                    </div>
+                </div>
+
+                <div style="background: rgba(245, 158, 11, 0.05); border-left: 4px solid var(--accent-warning); padding: 24px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+                    <h4 style="color: var(--accent-warning); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span>🟡</span> Medium: A Quadratic with a Coefficient
+                    </h4>
+                    <p style="margin-bottom: 16px;"><strong>Question:</strong> Find the derivative of $f(x) = 5x^2$ from first principles.</p>
+                    <div style="font-size: 0.95em;">
+                        <p>1. Substitute into the formula (remember the $5$ stays outside the square!):</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{5(x+h)^2 - 5x^2}{h}$$
+                        <p>2. Expand $(x+h)^2$ first, then multiply by 5:</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{5(x^2 + 2xh + h^2) - 5x^2}{h}$$
+                        $$f'(x) = \lim_{h \to 0} \frac{5x^2 + 10xh + 5h^2 - 5x^2}{h}$$
+                        <p>3. Cancel the $5x^2$ terms, then factor out $h$:</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{h(10x + 5h)}{h}$$
+                        <p>4. Cancel $h$ and let the remaining $h \to 0$:</p>
+                        $$f'(x) = \lim_{h \to 0} (10x + 5h) = 10x + 0 = 10x$$
+                    </div>
+                </div>
+
+                <div style="background: rgba(239, 68, 68, 0.05); border-left: 4px solid var(--accent-danger); padding: 24px; border-radius: 0 8px 8px 0;">
+                    <h4 style="color: var(--accent-danger); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span>🔴</span> Hard: Multiple Terms & Cubics
+                    </h4>
+                    <p style="margin-bottom: 16px;"><strong>Question:</strong> Find the derivative of $f(x) = x^3 - 4x$ from first principles.</p>
+                    
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-left: 2px solid var(--accent-danger); margin-bottom: 20px; font-size: 0.9em; color: var(--text-muted);">
+                        <strong>Beginner's Guide to Multiple Terms:</strong> The biggest mistake students make is substituting incorrectly. When evaluating $f(x+h)$, you must replace <em>every single</em> $x$ in the equation with $(x+h)$ in brackets. For $x^3 - 4x$, it becomes $(x+h)^3 - 4(x+h)$. Do not just slap an "$+h$" at the end! Also, note that $(x+h)^3 = x^3 + 3x^2h + 3xh^2 + h^3$.
+                    </div>
+
+                    <div style="font-size: 0.95em;">
+                        <p>1. Substitute safely into the limit definition, using large brackets for the second part:</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{((x+h)^3 - 4(x+h)) - (x^3 - 4x)}{h}$$
+                        <p>2. Expand absolutely everything:</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{(x^3 + 3x^2h + 3xh^2 + h^3 - 4x - 4h) - x^3 + 4x}{h}$$
+                        <p>3. The magic step: every term <em>without</em> an $h$ must cancel out. ($x^3$ cancels $-x^3$, and $-4x$ cancels $+4x$):</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{3x^2h + 3xh^2 + h^3 - 4h}{h}$$
+                        <p>4. Factor out $h$ from the top:</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{h(3x^2 + 3xh + h^2 - 4)}{h}$$
+                        <p>5. Cancel the $h$ fractions, then let the remaining $h$s become zero:</p>
+                        $$f'(x) = \lim_{h \to 0} (3x^2 + 3xh + h^2 - 4) = 3x^2 - 4$$
+                    </div>
+                </div>
+            </section>
+
+            <section style="text-align: center; margin: 80px 0 40px; padding: 40px; background: rgba(139, 92, 246, 0.05); border: 1px dashed var(--accent-purple); border-radius: 16px;">
+                <h2 style="font-family: 'Lexend', sans-serif; font-size: 32px; margin-bottom: 16px;">Ready to go Deeper?</h2>
+                <p style="font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto 32px;">You've mastered the theory and the algebra. Now let's see how we use these "instant gradients" to solve real-world problems in physics and economics.</p>
+                
+                <a href="first-principles-applications.html" style="display: inline-flex; align-items: center; gap: 12px; background: var(--accent-purple); color: white; text-decoration: none; padding: 16px 32px; font-size: 18px; font-weight: 600; border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s;">
+                    Continue: Real World Applications <span style="font-size: 24px;">→</span>
+                </a>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- INTERACTIVE 1: GAP SHRINKER LOGIC ---
+            const a1 = 0.003, fixedX1 = 150;
+            const getY1 = (x) => a1 * (x * x);
+            const mapY1 = (y) => 400 - y - 30; // SVG space
+            
+            const pathCurve1 = document.getElementById("curve-path-1");
+            const dynamicLine1 = document.getElementById("dynamic-line-1");
+            const slider1 = document.getElementById("slider-1");
+            const pointA1 = document.getElementById("point-a-1"), pointB1 = document.getElementById("point-b-1");
+            const labelA1 = document.getElementById("label-a-1"), labelB1 = document.getElementById("label-b-1");
+            const gapTriangle1 = document.getElementById("gap-triangle-1");
+            
+            let d1 = `M 0 ${mapY1(getY1(0))}`;
+            for(let x=10; x<=600; x+=10) d1 += ` L ${x} ${mapY1(getY1(x))}`;
+            pathCurve1.setAttribute("d", d1);
+
+            function updateInteractive1() {
+                const h = parseFloat(slider1.value);
+                const effH = h === 0 ? 0.0001 : h;
+                const movingX = fixedX1 + effH;
+                const yA = mapY1(getY1(fixedX1)), yB = mapY1(getY1(movingX));
+                
+                pointA1.setAttribute("cx", fixedX1); pointA1.setAttribute("cy", yA);
+                pointB1.setAttribute("cx", movingX); pointB1.setAttribute("cy", yB);
+                labelA1.setAttribute("x", fixedX1 - 25); labelA1.setAttribute("y", yA - 15);
+                
+                if(h < 15) {
+                    labelB1.setAttribute("opacity", 0); gapTriangle1.setAttribute("opacity", 0);
+                } else {
+                    labelB1.setAttribute("opacity", 1); labelB1.setAttribute("x", movingX + 15); labelB1.setAttribute("y", yB - 10);
+                    gapTriangle1.setAttribute("opacity", 1);
+                    gapTriangle1.setAttribute("d", `M ${fixedX1} ${yA} L ${movingX} ${yA} L ${movingX} ${yB} Z`);
+                }
+
+                const slope = (yB - yA) / (movingX - fixedX1);
+                dynamicLine1.setAttribute("x1", 0); dynamicLine1.setAttribute("y1", yA - slope * (fixedX1 - 0));
+                dynamicLine1.setAttribute("x2", 600); dynamicLine1.setAttribute("y2", yA + slope * (600 - fixedX1));
+                
+                document.getElementById("val-gap-1").innerText = h === 0 ? "0" : h.toFixed(1);
+                document.getElementById("val-slope-1").innerText = ((getY1(movingX) - getY1(fixedX1)) / effH).toFixed(2);
+                
+                if(h === 0) {
+                    dynamicLine1.setAttribute("stroke-dasharray", "0"); dynamicLine1.setAttribute("stroke", "#3b82f6");
+                    document.getElementById("h-status-1").innerText = "Tangent (Instant)"; document.getElementById("h-status-1").style.color = "#10b981";
+                    document.getElementById("val-slope-1").classList.add("success");
+                    triggerConfetti("confetti-1");
+                } else {
+                    dynamicLine1.setAttribute("stroke-dasharray", "8,8"); dynamicLine1.setAttribute("stroke", "#f59e0b");
+                    document.getElementById("h-status-1").innerText = "Secant (Average)"; document.getElementById("h-status-1").style.color = "#f59e0b";
+                    document.getElementById("val-slope-1").classList.remove("success");
+                    document.getElementById("confetti-1").style.display = "none";
+                }
+            }
+            slider1.addEventListener("input", updateInteractive1);
+            updateInteractive1();
+
+            // --- INTERACTIVE 2: SLOPE TRACKER LOGIC ---
+            const slider2 = document.getElementById("slider-2");
+            const curvePath2 = document.getElementById("curve-path-2"), derivPath2 = document.getElementById("derivative-path-2");
+            const tangentLine2 = document.getElementById("tangent-line-2"), trackerLine2 = document.getElementById("tracker-line-2");
+            const point2 = document.getElementById("point-2"), derivPoint2 = document.getElementById("deriv-point-2");
+            
+            // Draw Parabola (Top) y = a * x^2
+            const a2 = 0.0015;
+            let dTop = `M 0 ${180 - a2*(-300*-300)}`;
+            for(let x=-300; x<=300; x+=10) dTop += ` L ${x+300} ${180 - a2*(x*x)}`;
+            curvePath2.setAttribute("d", dTop);
+            
+            // Draw Straight Line (Bottom) y = 2ax
+            let dBot = `M 0 ${100 - (2*a2*-300)*50}`;
+            for(let x=-300; x<=300; x+=10) dBot += ` L ${x+300} ${100 - (2*a2*x)*50}`;
+            derivPath2.setAttribute("d", dBot);
+
+            function updateInteractive2() {
+                const mathX = parseFloat(slider2.value);
+                const svgX = mathX + 300;
+                
+                // Top Graph Update
+                const mathYTop = a2 * (mathX * mathX);
+                const svgYTop = 180 - mathYTop;
+                point2.setAttribute("cx", svgX); point2.setAttribute("cy", svgYTop);
+                
+                const slope = 2 * a2 * mathX;
+                tangentLine2.setAttribute("x1", 0); tangentLine2.setAttribute("y1", svgYTop - (-slope) * (svgX - 0));
+                tangentLine2.setAttribute("x2", 600); tangentLine2.setAttribute("y2", svgYTop + (-slope) * (600 - svgX));
+                
+                // Bottom Graph Update
+                const svgYBot = 100 - (slope * 50); // Scaled visual slope
+                derivPoint2.setAttribute("cx", svgX); derivPoint2.setAttribute("cy", svgYBot);
+                trackerLine2.setAttribute("x1", svgX); trackerLine2.setAttribute("x2", svgX);
+                
+                document.getElementById("coord-status-2").innerText = `X = ${mathX}`;
+                document.getElementById("val-slope-2").innerText = (slope * 10).toFixed(2); // Multiplied for legible numbers
+            }
+            slider2.addEventListener("input", updateInteractive2);
+            updateInteractive2();
+
+            // --- INTERACTIVE 3: ALGEBRA REVEALER ---
+            const btnNext = document.getElementById("btn-next-step");
+            let currentStep = 0;
+            const stepTexts = ["Cancel the terms!", "Divide everything by h!", "Apply the limit (h = 0)!", "Journey Complete!"];
+            
+            btnNext.addEventListener("click", () => {
+                currentStep++;
+                const nextDiv = document.getElementById(`step-${currentStep}`);
+                if(nextDiv) {
+                    nextDiv.classList.add("visible");
+                    // Typeset the new math via MathJax
+                    if(window.MathJax) { MathJax.typesetPromise([nextDiv]); }
+                }
+                
+                if(currentStep < 4) {
+                    btnNext.innerText = stepTexts[currentStep - 1];
+                } else {
+                    btnNext.innerText = stepTexts[3];
+                    btnNext.disabled = true;
+                    btnNext.style.background = "#10b981";
+                    triggerConfetti("confetti-3");
+                }
+            });
+
+            // --- REUSABLE CONFETTI ENGINE ---
+            function triggerConfetti(canvasId) {
+                const canvas = document.getElementById(canvasId);
+                canvas.style.display = "block";
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+                
+                let particles = [];
+                for(let i=0; i<60; i++) {
+                    particles.push({
+                        x: canvas.width / 2, y: canvas.height / 2,
+                        vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 1) * 15,
+                        color: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'][Math.floor(Math.random()*4)]
+                    });
+                }
+                
+                function animate() {
+                    ctx.clearRect(0,0, canvas.width, canvas.height);
+                    let active = false;
+                    particles.forEach(p => {
+                        p.x += p.vx; p.y += p.vy; p.vy += 0.4;
+                        if(p.y < canvas.height) {
+                            active = true;
+                            ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+                        }
+                    });
+                    if(active) requestAnimationFrame(animate);
+                }
+                animate();
+            }
+        });
+    </script>
+</body>
+</html>

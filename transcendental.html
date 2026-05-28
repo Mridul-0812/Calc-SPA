@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exponentials & Logs | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' },
+            startup: { typeset: false } // Manual trigger for dynamic text
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            /* CalcSPA Exact Color Palette from Image */
+            --bg-body: #0f111a;
+            --bg-sidebar: #161b22;
+            --bg-card: #1c212b;
+            --bg-card-hover: #222834;
+            --bg-input: #0d1117;
+            
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --text-category: #6e7681;
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.2);
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            
+            --success: #2ea043;
+            --warning: #d29922;
+            --danger: #f85149;
+            
+            --border-color: #30363d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ==========================================================================
+           2. SIDEBAR NAVIGATION (Matched to image_9def25.jpg)
+           ========================================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            padding-left: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .brand-icon { color: var(--accent-blue); font-size: 28px; }
+
+        .nav-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-category);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            padding-left: 12px;
+            margin-top: 24px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        .nav-link.active {
+            background-color: var(--accent-purple);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* ==========================================================================
+           3. MAIN CONTENT LAYOUT
+           ========================================================================== */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 1200px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .hero-title span { color: var(--accent-purple); }
+
+        .hero-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .info-box {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--accent-purple);
+            padding: 24px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        /* ==========================================================================
+           4. INTERACTIVE CARDS & CANVASES
+           ========================================================================== */
+        .interactive-section { margin-bottom: 80px; }
+        
+        .interactive-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            background-color: var(--accent-purple-glow);
+            color: var(--accent-purple);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            background-color: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        canvas { width: 100%; height: 100%; display: block; }
+
+        .accuracy-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 17, 26, 0.9);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .accuracy-val {
+            font-size: 2rem;
+            font-family: 'Space Grotesk';
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        /* --- Controls & Sliders --- */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            background-color: var(--bg-body);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        
+        .math-readout {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.25rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ==========================================================================
+           5. EXAMPLES AND PRACTICE
+           ========================================================================== */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .example-box {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            border-top: 4px solid var(--accent-blue);
+        }
+
+        .example-box.hard { border-top-color: var(--warning); }
+        .example-box.ln { border-top-color: var(--accent-pink); }
+
+        .step-list {
+            margin-top: 16px;
+            list-style: none;
+            color: var(--text-muted);
+        }
+
+        .step-list li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+        .step-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent-purple); }
+
+        .practice-container {
+            background-color: var(--bg-card);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px dashed var(--border-color);
+            margin-bottom: 60px;
+        }
+
+        .question { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid var(--border-color); }
+        .question:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+        .input-row { display: flex; gap: 12px; margin-top: 16px; }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus { outline: none; border-color: var(--accent-purple); }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            color: white;
+        }
+
+        .btn:hover { opacity: 0.9; }
+        .btn-submit { background-color: var(--accent-purple); }
+        .btn-hint { background-color: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+
+        .feedback {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.success { background-color: rgba(46, 160, 67, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .feedback.error { background-color: rgba(248, 81, 73, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+        .feedback.hint-msg { background-color: rgba(210, 153, 34, 0.1); border: 1px solid var(--warning); color: var(--warning); }
+
+        /* ==========================================================================
+           6. FOOTER NAV
+           ========================================================================== */
+        .footer-nav {
+            text-align: center;
+            padding-top: 60px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+
+        .btn-massive {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            text-decoration: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .btn-massive:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">∫</span> CalcSPA
+        </div>
+
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+        <a href="practice.html" class="nav-link">Practice & Mastery</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">The Power Rule</a>
+        <a href="product-rule.html" class="nav-link">The Product Rule</a>
+        <a href="quotient-rule.html" class="nav-link">The Quotient Rule</a>
+        <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+
+        <div class="nav-category">Advanced</div>
+        <a href="transcendental.html" class="nav-link active">Exponentials & Logs</a>
+    </aside>
+
+    <main class="main-wrapper">
+        <h1 class="hero-title">Transcendental <span>Functions</span></h1>
+        <p class="hero-subtitle">Algebra limits what we can model. To understand continuous growth, decay, and the geometry of nature, we need to step into the calculus of $e^x$ and $\ln(x)$.</p>
+
+        <div class="info-box">
+            <strong>The Most Important Number in Math:</strong> $e \approx 2.71828...$<br>
+            It is the unique base where the rate of growth of the function is exactly equal to the value of the function itself.
+        </div>
+
+        <section class="interactive-section">
+            <h2>1. The Search for Base $e$</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Move the slider to change the base $a$ of the exponential function $y = a^x$. The blue line is the function, the pink dotted line is its derivative. Find the base where they overlap perfectly.</p>
+
+            <div class="interactive-card">
+                <div class="card-header">
+                    <h3>Visualizing $a^x$ vs $\frac{d}{dx}[a^x]$</h3>
+                    <span class="badge">Convergence Tool</span>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="canvas-find-e"></canvas>
+                    <div class="accuracy-overlay">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Match Accuracy</div>
+                        <div class="accuracy-val" id="acc-meter">0.0%</div>
+                    </div>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="slider-group">
+                        <div class="slider-labels">
+                            <span>Base $a$</span>
+                            <span id="base-val" style="color: var(--accent-blue);">2.000</span>
+                        </div>
+                        <input type="range" id="slider-base" min="1.5" max="4.0" step="0.001" value="2.0">
+                    </div>
+                    <div class="math-readout" id="math-find-e">
+                        $f(x) = 2.000^x \quad \implies \quad f'(x) = \ln(2.000) \cdot 2.000^x$
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="interactive-section">
+            <h2>2. The Exponential Chain Rule</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">When we have $e^{f(x)}$, the derivative is simply the derivative of the exponent multiplied by the original function: $f'(x)e^{f(x)}$.</p>
+
+            <div class="interactive-card">
+                <div class="card-header">
+                    <h3>Interactive 2: The Chain Rule in $e^{kx}$</h3>
+                    <span class="badge">Live Visualizer</span>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="canvas-ekx"></canvas>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="slider-group">
+                        <div class="slider-labels">
+                            <span>Frequency $k$</span>
+                            <span id="k-val" style="color: var(--accent-blue);">1.0</span>
+                        </div>
+                        <input type="range" id="slider-k" min="-3.0" max="3.0" step="0.1" value="1.0">
+                    </div>
+                    <div class="math-readout" id="math-ekx">
+                        If $y = e^{1.0x}$ then $\frac{dy}{dx} = 1.0e^{1.0x}$
+                    </div>
+                </div>
+            </div>
+
+            <h3>Worked Examples: Exponential</h3>
+            <div class="examples-grid">
+                <div class="example-box">
+                    <h4>🟢 Easy: Standard Chain</h4>
+                    <p style="margin-top: 10px;">Differentiate $y = e^{4x^3}$</p>
+                    <ul class="step-list">
+                        <li>Inside function $f(x) = 4x^3$</li>
+                        <li>Derivative $f'(x) = 12x^2$</li>
+                        <li>Multiply to front: $y' = 12x^2 \cdot e^{4x^3}$</li>
+                    </ul>
+                </div>
+                <div class="example-box hard">
+                    <h4>🔴 Hard: Product Rule Hybrid</h4>
+                    <p style="margin-top: 10px;">Differentiate $y = x^3 e^{-2x}$</p>
+                    <ul class="step-list">
+                        <li>$u = x^3 \implies u' = 3x^2$</li>
+                        <li>$v = e^{-2x} \implies v' = -2e^{-2x}$</li>
+                        <li>$y' = 3x^2 e^{-2x} - 2x^3 e^{-2x}$</li>
+                        <li>Factor: $y' = x^2 e^{-2x}(3 - 2x)$</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="practice-container">
+                <h3 style="margin-bottom: 20px;">Test Your Knowledge: Exponentials</h3>
+                
+                <div class="question">
+                    <p><strong>1. Easy:</strong> Find the derivative of $y = e^{7x}$</p>
+                    <div class="input-row">
+                        <input type="text" id="ans-e1" placeholder="Type your answer...">
+                        <button class="btn btn-submit" onclick="checkAnswer('e1', ['7e^(7x)', '7*e^(7x)', '7e^{7x}'])">Check</button>
+                        <button class="btn btn-hint" onclick="showHint('e1', 'Just bring the derivative of 7x down to the front.')">Hint</button>
+                    </div>
+                    <div id="fb-e1" class="feedback"></div>
+                </div>
+
+                <div class="question">
+                    <p><strong>2. Hard:</strong> Find the derivative of $y = e^{\cos(x)}$</p>
+                    <div class="input-row">
+                        <input type="text" id="ans-e2" placeholder="Type your answer...">
+                        <button class="btn btn-submit" onclick="checkAnswer('e2', ['-sin(x)e^cos(x)', '-sin(x)*e^(cos(x))', '-sin(x)e^(cos(x))'])">Check</button>
+                        <button class="btn btn-hint" onclick="showHint('e2', 'What is the derivative of cos(x)? Multiply that by the original function.')">Hint</button>
+                    </div>
+                    <div id="fb-e2" class="feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="interactive-section">
+            <h2>3. The Natural Logarithm $\ln(x)$</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">The derivative of $\ln(x)$ is simply $\frac{1}{x}$. If there is a function inside, like $\ln(f(x))$, the derivative is $\frac{f'(x)}{f(x)}$.</p>
+
+            <div class="interactive-card">
+                <div class="card-header">
+                    <h3>Interactive 3: The $\frac{1}{x}$ Tangent</h3>
+                    <span class="badge" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-pink);">Tangent Explorer</span>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="canvas-lnx"></canvas>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="slider-group">
+                        <div class="slider-labels">
+                            <span>x-coordinate</span>
+                            <span id="x-val" style="color: var(--accent-pink);">2.0</span>
+                        </div>
+                        <input type="range" id="slider-x" min="0.5" max="8.0" step="0.1" value="2.0" style="background: var(--bg-card);">
+                    </div>
+                    <div class="math-readout" id="math-lnx">
+                        At $x = 2.0$, Slope $m = \frac{1}{2.0} = 0.50$
+                    </div>
+                </div>
+            </div>
+
+            <h3>Worked Examples: Natural Logs</h3>
+            <div class="examples-grid">
+                <div class="example-box ln">
+                    <h4>🟢 Easy: Composite Log</h4>
+                    <p style="margin-top: 10px;">Differentiate $y = \ln(x^4 + 1)$</p>
+                    <ul class="step-list">
+                        <li>Rule: $\frac{f'(x)}{f(x)}$</li>
+                        <li>Inside $f(x) = x^4 + 1$</li>
+                        <li>Deriv $f'(x) = 4x^3$</li>
+                        <li>Result: $y' = \frac{4x^3}{x^4 + 1}$</li>
+                    </ul>
+                </div>
+                <div class="example-box hard">
+                    <h4>🔴 Hard: Log Laws First!</h4>
+                    <p style="margin-top: 10px;">Differentiate $y = \ln(\sqrt{3x+2})$</p>
+                    <ul class="step-list">
+                        <li>Rewrite root: $y = \ln((3x+2)^{1/2})$</li>
+                        <li>Bring down power: $y = \frac{1}{2}\ln(3x+2)$</li>
+                        <li>Differentiate: $y' = \frac{1}{2} \cdot \frac{3}{3x+2}$</li>
+                        <li>Result: $y' = \frac{3}{6x+4}$</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="practice-container">
+                <h3 style="margin-bottom: 20px;">Test Your Knowledge: Logarithms</h3>
+                
+                <div class="question">
+                    <p><strong>3. Easy:</strong> Find the derivative of $y = \ln(8x)$</p>
+                    <div class="input-row">
+                        <input type="text" id="ans-ln1" placeholder="Type your answer...">
+                        <button class="btn btn-submit" onclick="checkAnswer('ln1', ['1/x', '8/8x'])">Check</button>
+                        <button class="btn btn-hint" onclick="showHint('ln1', 'Use f\'(x)/f(x). Note that the 8s will cancel out!')">Hint</button>
+                    </div>
+                    <div id="fb-ln1" class="feedback"></div>
+                </div>
+
+                <div class="question">
+                    <p><strong>4. Hard:</strong> Find the derivative of $y = \ln(e^x + x)$</p>
+                    <div class="input-row">
+                        <input type="text" id="ans-ln2" placeholder="Type your answer...">
+                        <button class="btn btn-submit" onclick="checkAnswer('ln2', ['(e^x+1)/(e^x+x)', '(1+e^x)/(e^x+x)'])">Check</button>
+                        <button class="btn btn-hint" onclick="showHint('ln2', 'The inside is e^x + x. What is the derivative of that? Put it over the original.')">Hint</button>
+                    </div>
+                    <div id="fb-ln2" class="feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <h2 style="font-size: 2rem;">Ready for the next step?</h2>
+            <p style="color: var(--text-muted); margin: 10px 0 20px;">You've mastered the most common rules. Now, let's learn to apply differential calculus in triginometry.</p>
+            <a href="trig-calculus.html" class="btn-massive">Next: Trigonometric Differentiation →</a>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. UTILITIES ---
+        function setupCanvas(id) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            return { canvas, ctx, width: rect.width, height: rect.height };
+        }
+
+        let mathTimeout = null;
+        function updateMathjax(id, tex) {
+            const el = document.getElementById(id);
+            el.innerHTML = tex;
+            clearTimeout(mathTimeout);
+            mathTimeout = setTimeout(() => {
+                if(window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise([el]);
+                }
+            }, 50);
+        }
+
+        // --- 2. INTERACTIVE 1: FIND E (a^x) ---
+        function initFindE() {
+            const { ctx, width, height } = setupCanvas('canvas-find-e');
+            const slider = document.getElementById('slider-base');
+            const valSpan = document.getElementById('base-val');
+            const meter = document.getElementById('acc-meter');
+            
+            const oX = width / 2;
+            const oY = height - 40;
+            const sX = 60;
+            const sY = 40;
+
+            function draw() {
+                const a = parseFloat(slider.value);
+                valSpan.innerText = a.toFixed(3);
+                updateMathjax('math-find-e', `$f(x) = ${a.toFixed(3)}^x \\implies f'(x) = \\ln(${a.toFixed(3)}) \\cdot ${a.toFixed(3)}^x$`);
+
+                ctx.clearRect(0, 0, width, height);
+                
+                // Axes
+                ctx.strokeStyle = '#30363d';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(oX, 0); ctx.lineTo(oX, height);
+                ctx.moveTo(0, oY); ctx.lineTo(width, oY);
+                ctx.stroke();
+
+                // f(x) = a^x (Solid Blue)
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let x = -5; x <= 5; x += 0.05) {
+                    const y = Math.pow(a, x);
+                    const px = oX + x * sX;
+                    const py = oY - y * sY;
+                    if (x === -5) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+
+                // f'(x) = ln(a)*a^x (Dashed Pink)
+                ctx.strokeStyle = '#ec4899';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                const lna = Math.log(a);
+                for (let x = -5; x <= 5; x += 0.05) {
+                    const y = lna * Math.pow(a, x);
+                    const px = oX + x * sX;
+                    const py = oY - y * sY;
+                    if (x === -5) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Accuracy calculation logic (Approaching e = 2.718)
+                const error = Math.abs(1 - lna); 
+                let acc = Math.max(0, 100 - (error * 150));
+                if (a.toFixed(3) === "2.718") acc = 99.9;
+                
+                meter.innerText = acc.toFixed(1) + "%";
+                if(acc > 99) meter.style.color = 'var(--success)';
+                else if(acc > 80) meter.style.color = 'var(--warning)';
+                else meter.style.color = 'var(--text-main)';
+            }
+            slider.addEventListener('input', draw);
+            window.addEventListener('resize', () => { initFindE(); });
+            draw();
+        }
+
+        // --- 3. INTERACTIVE 2: e^kx ---
+        function initEkx() {
+            const { ctx, width, height } = setupCanvas('canvas-ekx');
+            const slider = document.getElementById('slider-k');
+            const valSpan = document.getElementById('k-val');
+            
+            const oX = width / 2;
+            const oY = height - 20;
+            const sX = 40;
+            const sY = 30;
+
+            function draw() {
+                const k = parseFloat(slider.value);
+                valSpan.innerText = k.toFixed(1);
+                updateMathjax('math-ekx', `If $y = e^{${k.toFixed(1)}x}$ then $\\frac{dy}{dx} = ${k.toFixed(1)}e^{${k.toFixed(1)}x}$`);
+
+                ctx.clearRect(0, 0, width, height);
+
+                // Axes
+                ctx.strokeStyle = '#30363d';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(oX, 0); ctx.lineTo(oX, height);
+                ctx.moveTo(0, oY); ctx.lineTo(width, oY);
+                ctx.stroke();
+
+                // Curve
+                ctx.strokeStyle = '#8b5cf6';
+                ctx.lineWidth = 4;
+                ctx.shadowColor = 'rgba(139, 92, 246, 0.4)';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                let first = true;
+                for (let x = -8; x <= 8; x += 0.05) {
+                    const y = Math.exp(k * x);
+                    const px = oX + x * sX;
+                    const py = oY - y * sY;
+                    if (py > -50 && py < height + 50) {
+                        if (first) { ctx.moveTo(px, py); first = false; }
+                        else { ctx.lineTo(px, py); }
+                    }
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+            slider.addEventListener('input', draw);
+            window.addEventListener('resize', () => { initEkx(); });
+            draw();
+        }
+
+        // --- 4. INTERACTIVE 3: ln(x) ---
+        function initLnx() {
+            const { ctx, width, height } = setupCanvas('canvas-lnx');
+            const slider = document.getElementById('slider-x');
+            const valSpan = document.getElementById('x-val');
+            
+            const oX = 40;
+            const oY = height - 60;
+            const sX = 80;
+            const sY = 60;
+
+            function draw() {
+                const xVal = parseFloat(slider.value);
+                valSpan.innerText = xVal.toFixed(1);
+                const slope = 1 / xVal;
+                updateMathjax('math-lnx', `At $x = ${xVal.toFixed(1)}$, Slope $m = \\frac{1}{${xVal.toFixed(1)}} = ${slope.toFixed(2)}$`);
+
+                ctx.clearRect(0, 0, width, height);
+
+                // Axes
+                ctx.strokeStyle = '#30363d';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(oX, 0); ctx.lineTo(oX, height);
+                ctx.moveTo(0, oY); ctx.lineTo(width, oY);
+                ctx.stroke();
+
+                // Curve y = ln(x)
+                ctx.strokeStyle = '#6e7681';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                let first = true;
+                for (let x = 0.01; x <= 15; x += 0.1) {
+                    const y = Math.log(x);
+                    const px = oX + x * sX;
+                    const py = oY - y * sY;
+                    if (py < height + 50) {
+                        if (first) { ctx.moveTo(px, py); first = false; }
+                        else ctx.lineTo(px, py);
+                    }
+                }
+                ctx.stroke();
+
+                // Tangent Math
+                const curY = Math.log(xVal);
+                const px = oX + xVal * sX;
+                const py = oY - curY * sY;
+
+                // Tangent Line
+                ctx.strokeStyle = '#ec4899';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                const dx = 2;
+                ctx.moveTo(oX + (xVal - dx)*sX, py - (-dx * slope)*sY);
+                ctx.lineTo(oX + (xVal + dx)*sX, py - (dx * slope)*sY);
+                ctx.stroke();
+
+                // Dot
+                ctx.fillStyle = '#ec4899';
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, Math.PI*2);
+                ctx.fill();
+            }
+            slider.addEventListener('input', draw);
+            window.addEventListener('resize', () => { initLnx(); });
+            draw();
+        }
+
+        // --- 5. QUIZ LOGIC ---
+        function checkAnswer(id, validAnswers) {
+            const input = document.getElementById(`ans-${id}`).value;
+            const cleanedInput = input.replace(/\s+/g, '').toLowerCase();
+            const fb = document.getElementById(`fb-${id}`);
+            
+            fb.style.display = 'block';
+            fb.className = 'feedback';
+
+            let isCorrect = validAnswers.some(ans => ans.replace(/\s+/g, '').toLowerCase() === cleanedInput);
+            
+            if (isCorrect) {
+                fb.classList.add('success');
+                fb.innerHTML = `✅ <strong>Correct!</strong> Great job.`;
+            } else {
+                fb.classList.add('error');
+                fb.innerHTML = `❌ <strong>Incorrect.</strong> Check your derivative rules again.`;
+            }
+        }
+
+        function showHint(id, msg) {
+            const fb = document.getElementById(`fb-${id}`);
+            fb.style.display = 'block';
+            fb.className = 'feedback hint-msg';
+            fb.innerHTML = `💡 <strong>Hint:</strong> ${msg}`;
+        }
+
+        // --- BOOT ---
+        window.onload = function() {
+            if(window.MathJax) MathJax.typesetPromise();
+            initFindE();
+            initEkx();
+            initLnx();
+        };
+    </script>
+</body>
+</html>

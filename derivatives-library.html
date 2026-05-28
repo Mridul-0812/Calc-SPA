@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Masterclass | Formula Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                // GLOBAL FIX: Forces csc to render as cosec site-wide
+                macros: {
+                    csc: '{\\text{cosec}}',
+                    cosec: '{\\text{cosec}}'
+                }
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async 
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="bg-gradient-layer"></div>
+
+    <div class="app-container">
+        
+        <aside class="sidebar glass">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <span class="logo-icon">📖</span>
+                    <h2>CalcSPA</h2>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="section-title">Reference Hub</span>
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="limits.html" class="nav-link">Limits</a>
+                    <a href="derivatives-library.html" class="nav-link active">Formula Vault</a>
+                </div>
+                <div class="nav-section">
+                    <span class="section-title">Navigation</span>
+                    <a href="first-principles.html" class="nav-link">First Principles</a>
+                    <a href="trig-calculus.html" class="nav-link">Trig Calculus</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <div class="breadcrumb">Reference / Formula Vault</div>
+                <h1 class="page-title">The <span class="text-accent">Grand Table</span> of Derivatives</h1>
+                <p class="lead-text">
+                    The definitive repository for HSC Advanced and Extension 1. All trigonometric functions are defined in radians. 
+                </p>
+            </header>
+
+            <section class="content-section">
+                <h2>Standard Trigonometric Functions</h2>
+                <div class="card glass">
+                    <table class="math-table">
+                        <thead>
+                            <tr>
+                                <th>Function $f(x)$</th>
+                                <th>Derivative $f'(x)$</th>
+                                <th>Chain Rule Form: $\frac{d}{dx}[g(f(x))]$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>$\sin x$</td>
+                                <td>$\cos x$</td>
+                                <td>$f'(x)\cos(f(x))$</td>
+                            </tr>
+                            <tr>
+                                <td>$\cos x$</td>
+                                <td>$-\sin x$</td>
+                                <td>$-f'(x)\sin(f(x))$</td>
+                            </tr>
+                            <tr>
+                                <td>$\tan x$</td>
+                                <td>$\sec^2 x$</td>
+                                <td>$f'(x)\sec^2(f(x))$</td>
+                            </tr>
+                            <tr>
+                                <td>$\csc x$</td>
+                                <td>$-\csc x \cot x$</td>
+                                <td>$-f'(x)\csc(f(x))\cot(f(x))$</td>
+                            </tr>
+                            <tr>
+                                <td>$\sec x$</td>
+                                <td>$\sec x \tan x$</td>
+                                <td>$f'(x)\sec(f(x))\tan(f(x))$</td>
+                            </tr>
+                            <tr>
+                                <td>$\cot x$</td>
+                                <td>$-\csc^2 x$</td>
+                                <td>$-f'(x)\csc^2(f(x))$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Inverse Trigonometric Functions <span class="tag-ext1">Ext 1</span></h2>
+                <div class="card glass">
+                    <table class="math-table">
+                        <thead>
+                            <tr>
+                                <th>Function</th>
+                                <th>Derivative $\frac{dy}{dx}$</th>
+                                <th>Domain Constraints</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>$\sin^{-1} \frac{x}{a}$</td>
+                                <td>$\frac{1}{\sqrt{a^2 - x^2}}$</td>
+                                <td>$-a < x < a$</td>
+                            </tr>
+                            <tr>
+                                <td>$\cos^{-1} \frac{x}{a}$</td>
+                                <td>$-\frac{1}{\sqrt{a^2 - x^2}}$</td>
+                                <td>$-a < x < a$</td>
+                            </tr>
+                            <tr>
+                                <td>$\tan^{-1} \frac{x}{a}$</td>
+                                <td>$\frac{a}{a^2 + x^2}$</td>
+                                <td>All real $x$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Algebraic, Exponential & Logs</h2>
+                <div class="card glass">
+                    <table class="math-table">
+                        <thead>
+                            <tr>
+                                <th>Function</th>
+                                <th>Derivative</th>
+                                <th>Logic Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>$x^n$</td>
+                                <td>$nx^{n-1}$</td>
+                                <td>General Power Rule</td>
+                            </tr>
+                            <tr>
+                                <td>$e^{f(x)}$</td>
+                                <td>$f'(x)e^{f(x)}$</td>
+                                <td>Base $e$ remains unchanged</td>
+                            </tr>
+                            <tr>
+                                <td>$\ln(f(x))$</td>
+                                <td>$\frac{f'(x)}{f(x)}$</td>
+                                <td>Log of a function</td>
+                            </tr>
+                            <tr>
+                                <td>$a^{x}$</td>
+                                <td>$a^{x} \ln a$</td>
+                                <td>General Exponential (Ext 1)</td>
+                            </tr>
+                            <tr>
+                                <td>$\log_a x$</td>
+                                <td>$\frac{1}{x \ln a}$</td>
+                                <td>Change of base required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="challenge-arena">
+                <h2>Formula Practice</h2>
+                
+                <div class="challenge-card glass">
+                    <p class="q-text">What is the derivative of $y = \csc(3x)$?</p>
+                    <div class="q-actions">
+                        <button class="btn-reveal" onclick="toggleDisplay('lib-q-ans')">Check Answer</button>
+                    </div>
+                    <div id="lib-q-ans" class="ans-box" style="display:none;">
+                        <p>Using the chain rule and the table above:</p>
+                        <p>$\frac{dy}{dx} = -3 \csc(3x) \cot(3x)$</p>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <a href="index.html" class="btn-primary">Return to Dashboard</a>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        function toggleDisplay(id) {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === "none") ? "block" : "none";
+            if (window.MathJax) MathJax.typesetPromise([el]);
+        }
+    </script>
+</body>
+</html>

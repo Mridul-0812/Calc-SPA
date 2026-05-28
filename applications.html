@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications of Calculus | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                macros: {
+                    cosec: '\\operatorname{cosec}'
+                }
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. COLOUR PALETTE & CORE STYLES
+           ========================================================================== */
+        :root {
+            --bg-body: #0f111a;
+            --bg-sidebar: #161b22;
+            --bg-card: #1c212b;
+            --bg-card-hover: #222834;
+            --bg-input: #0d1117;
+            
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --text-category: #6e7681;
+            
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --accent-teal: #14b8a6;
+            --accent-orange: #f97316;
+            --accent-gold: #e3b341;
+            
+            --success: #2ea043;
+            --danger: #f85149;
+            --border-color: #30363d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ==========================================================================
+           2. NAVIGATION SIDEBAR
+           ========================================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-category);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 24px 0 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover { background-color: var(--bg-card); color: var(--text-main); }
+        .nav-link.active { background-color: var(--accent-purple); color: white; }
+
+        /* ==========================================================================
+           3. MAIN LAYOUT
+           ========================================================================== */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 1300px; /* Increased max-width to allow more breathing room */
+        }
+
+        .hero-title { font-size: 3.5rem; margin-bottom: 10px; }
+        .hero-title span { color: var(--accent-orange); }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            word-wrap: break-word; /* Prevents text from exceeding the box */
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 4px solid var(--accent-blue);
+            padding: 24px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 30px;
+        }
+
+        /* ==========================================================================
+           4. INTERACTIVE GRAPHING TOOL
+           ========================================================================== */
+        .interactive-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+
+        .canvas-container {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            height: 480px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas { width: 100%; height: 100%; cursor: crosshair; }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .func-btn {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .func-btn.active {
+            border-color: var(--accent-orange);
+            color: var(--text-main);
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        .slider-wrap { margin-top: 10px; }
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 5px;
+            -webkit-appearance: none;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            cursor: pointer;
+        }
+
+        .readout {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            color: var(--accent-teal);
+        }
+
+        /* ==========================================================================
+           5. WORKED SOLUTIONS
+           ========================================================================== */
+        .solutions-grid {
+            display: grid;
+            /* Increased min-width to 360px to make boxes larger and text less cramped */
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+        }
+
+        .step-list { list-style: none; margin-top: 20px; }
+        .step-list li {
+            padding-left: 28px;
+            position: relative;
+            margin-bottom: 16px; /* Increased spacing between steps */
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .step-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--accent-orange);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* ==========================================================================
+           6. PRACTISE SECTION
+           ========================================================================== */
+        .practise-container {
+            background: var(--bg-input);
+            border: 1px dashed var(--border-color);
+            padding: 30px;
+            border-radius: 16px;
+        }
+
+        .question-block {
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        input[type=text] {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-check { background: var(--accent-teal); color: white; }
+        .btn-hint { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+
+        .feedback-box {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        /* ==========================================================================
+           7. FOOTER & NAVIGATION
+           ========================================================================== */
+        .footer-nav {
+            margin-top: 60px;
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .massive-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink));
+            color: white;
+            text-decoration: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .massive-btn:hover { transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">∫ CalcSPA</div>
+        
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">The Power Rule</a>
+        <a href="trig-calculus.html" class="nav-link">Trigonometric Calculus</a>
+
+        <div class="nav-category">Mastery</div>
+        <a href="applications.html" class="nav-link active">Applications: Tangents</a>
+        <a href="applications2.html" class="nav-link">Applications v2</a>
+    </aside>
+
+    <main class="main-wrapper">
+        <h1 class="hero-title">Real World <span>Calculus</span></h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px;">
+            Differentiation isn't just about moving numbers around. It allows us to find the <strong>exact steepness</strong> of any curve at any point. 
+            Once we have that, we can draw the <strong>Tangent Line</strong>—the straight path that mimics the curve's direction at that precise moment.
+        </p>
+
+        <section class="card">
+            <h2>Tangents & Gradients</h2>
+            <p>
+                A tangent is a straight line that "just touches" a curve at a single point. It doesn't cut through the curve like a chord; 
+                it glides past it, sharing the exact same gradient as the curve at that specific location. 
+            </p>
+            <div class="info-box">
+                <strong>Standard Recipe for a Tangent:</strong>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Differentiate:</strong> Get $f'(x)$ to find the universal formula for the gradient.</li>
+                    <li><strong>Get $m$:</strong> Substitute your specific $x$-value into the derivative to find the exact numerical gradient.</li>
+                    <li><strong>Get $y_1$:</strong> If you are only given an $x$-coordinate, find the $y$-coordinate by plugging $x$ into the <em>original</em> function.</li>
+                    <li><strong>Construct:</strong> You now have a gradient ($m$) and a point $(x_1, y_1)$. Use the straight-line equation: $y - y_1 = m(x - x_1)$.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Visualise the Tangent</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Use the slider to move the point. Observe how the orange tangent line touches the curve once at that specific point and stays perfectly straight.</p>
+            
+            <div class="interactive-grid">
+                <div class="canvas-container">
+                    <canvas id="mainCanvas"></canvas>
+                </div>
+                <div class="controls-panel">
+                    <div class="control-card">
+                        <label style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--text-category);">Function Selector</label>
+                        <div style="margin-top: 10px;">
+                            <button class="func-btn active" onclick="changeFunc('parabola')">$y = x^2$ (Parabola)</button>
+                            <button class="func-btn" onclick="changeFunc('sine')">$y = 3\sin(x)$ (Oscillation)</button>
+                            <button class="func-btn" onclick="changeFunc('cubic')">$y = 0.2x^3$ (Cubic Curve)</button>
+                        </div>
+                    </div>
+                    <div class="control-card">
+                        <label style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--text-category);">$x$-Coordinate</label>
+                        <div class="slider-wrap">
+                            <input type="range" id="xSlider" min="-5" max="5" step="0.1" value="1">
+                        </div>
+                        <div class="readout" id="mathReadout">Gradient $m = 2.00$</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Worked Solutions</h2>
+            <div class="solutions-grid">
+                <div class="card" style="border-top: 4px solid var(--accent-teal);">
+                    <h4 style="color: var(--accent-teal); font-size: 1.2rem; margin-bottom: 10px;">🟢 Easy: Basic Gradient</h4>
+                    <p style="color: white; font-weight: 500;">Find the gradient of the curve $y = x^4$ at the specific point where $x = 2$.</p>
+                    <ul class="step-list">
+                        <li><strong>Find the Derivative:</strong> First, we need the general formula for the gradient. Using the Power Rule (bring the 4 down, subtract 1 from the power), we get $\frac{dy}{dx} = 4x^3$.</li>
+                        <li><strong>Substitute the Value:</strong> We want the gradient specifically when $x$ is 2. Plug 2 into our derivative formula: $m = 4(2)^3$.</li>
+                        <li><strong>Calculate:</strong> Work out the math: $2^3 = 8$, and $4 \times 8 = 32$.</li>
+                        <li><strong>Final Result:</strong> The steepness (gradient) of the curve exactly at $x = 2$ is 32.</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-blue);">
+                    <h4 style="color: var(--accent-blue); font-size: 1.2rem; margin-bottom: 10px;">🟡 Medium: Building The Tangent</h4>
+                    <p style="color: white; font-weight: 500;">Find the full equation of the tangent line for $y = \sin(x)$ at $x = \pi$.</p>
+                    <ul class="step-list">
+                        <li><strong>Find the Full Point:</strong> A line needs a full coordinate. Plug $x = \pi$ into the original function: $y = \sin(\pi) = 0$. Our starting point is $(\pi, 0)$.</li>
+                        <li><strong>Find the Gradient Formula:</strong> Differentiate the original function. The derivative of $\sin(x)$ is $\cos(x)$. So, $\frac{dy}{dx} = \cos(x)$.</li>
+                        <li><strong>Calculate the Exact Gradient ($m$):</strong> Plug our $x$-value into the derivative: $m = \cos(\pi) = -1$.</li>
+                        <li><strong>Assemble the Line:</strong> Use $y - y_1 = m(x - x_1)$. Substituting our values gives $y - 0 = -1(x - \pi)$. Simplifying this yields $y = -x + \pi$.</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-pink);">
+                    <h4 style="color: var(--accent-pink); font-size: 1.2rem; margin-bottom: 10px;">🔴 Hard: Exponential Tangent</h4>
+                    <p style="color: white; font-weight: 500;">Find the equation of the tangent to $y = e^{2x}$ at $x = 0$.</p>
+                    <ul class="step-list">
+                        <li><strong>Find the Full Point:</strong> We need the $y$-value. Plug $x = 0$ into the original curve: $y = e^{2(0)} = e^0$. Anything to the power of 0 is 1. Our point is $(0, 1)$.</li>
+                        <li><strong>Differentiate (Chain Rule):</strong> The derivative of an exponential keeps the $e^{2x}$, but we must multiply by the derivative of the inside power ($2x$). This gives us $\frac{dy}{dx} = 2e^{2x}$.</li>
+                        <li><strong>Calculate the Exact Gradient ($m$):</strong> Substitute $x = 0$ into the derivative. $m = 2e^{2(0)} = 2 \times 1 = 2$.</li>
+                        <li><strong>Assemble the Line:</strong> Using $y - y_1 = m(x - x_1)$, we get $y - 1 = 2(x - 0)$. Expanding this out gives $y = 2x + 1$.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="border: 2px solid var(--accent-gold); background: rgba(227, 179, 65, 0.03);">
+                <h4 style="color: var(--accent-gold); display: flex; align-items: center; gap: 8px;">
+                    👑 Legend: The Weird Curve Intercepts
+                </h4>
+                <p style="margin-top: 10px;">Find the $x$ and $y$-intercepts of the tangent to the curve $y = \tan(x)$ at the point $x = \frac{\pi}{4}$. Leave answers in <strong>exact form</strong>.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                    <div>
+                        <ul class="step-list">
+                            <li><strong>Step 1 (Coordinates):</strong> $y = \tan(\frac{\pi}{4}) = 1$. Point is $(\frac{\pi}{4}, 1)$.</li>
+                            <li><strong>Step 2 (Gradient):</strong> $\frac{dy}{dx} = \sec^2(x) = \frac{1}{\cos^2(x)}$.</li>
+                            <li><strong>Step 3 (Find $m$):</strong> $\cos(\frac{\pi}{4}) = \frac{1}{\sqrt{2}}$, so $\cos^2 = \frac{1}{2}$. Thus $m = \frac{1}{1/2} = 2$.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul class="step-list">
+                            <li><strong>Step 4 (Equation):</strong> $y - 1 = 2(x - \frac{\pi}{4}) \implies y = 2x - \frac{\pi}{2} + 1$.</li>
+                            <li><strong>$y$-intercept ($x=0$):</strong> $y = 1 - \frac{\pi}{2}$.</li>
+                            <li><strong>$x$-intercept ($y=0$):</strong> $0 = 2x - \frac{\pi}{2} + 1 \implies x = \frac{\pi}{4} - \frac{1}{2}$.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Mastery Practise</h2>
+            <div class="practise-container">
+                
+                <div class="question-block">
+                    <p><strong>1. Easy:</strong> Find the gradient of $y = 5x^2$ at $x = 3$.</p>
+                    <div class="input-group">
+                        <input type="text" id="ans1" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(1, '30')">Check</button>
+                        <button class="btn btn-hint" onclick="showHint(1, 'Differentiate 5x^2 to get 10x, then plug in 3.')">Hint</button>
+                    </div>
+                    <div id="fb1" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>2. Medium:</strong> Find the gradient of $y = \sin(2x)$ at $x = 0$.</p>
+                    <div class="input-group">
+                        <input type="text" id="ans2" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(2, '2')">Check</button>
+                        <button class="btn btn-hint" onclick="showHint(2, 'Use the chain rule: d/dx[sin(ax)] = a cos(ax).')">Hint</button>
+                    </div>
+                    <div id="fb2" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>3. Medium:</strong> What is the $y$-intercept of the tangent to $y = x^2$ at $x = 2$?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans3" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(3, '-4')">Check</button>
+                        <button class="btn btn-hint" onclick="showHint(3, 'Find the tangent equation y=4x-4, then find y when x=0.')">Hint</button>
+                    </div>
+                    <div id="fb3" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>4. Medium:</strong> Find the gradient of $y = \frac{1}{x}$ at $x = -1$.</p>
+                    <div class="input-group">
+                        <input type="text" id="ans4" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(4, '-1')">Check</button>
+                        <button class="btn btn-hint" onclick="showHint(4, 'Write as x^-1. The derivative is -x^-2 or -1/x^2.')">Hint</button>
+                    </div>
+                    <div id="fb4" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>5. Hard:</strong> Find the gradient of $y = e^x + \cos(x)$ at $x = 0$.</p>
+                    <div class="input-group">
+                        <input type="text" id="ans5" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(5, '1')">Check</button>
+                        <button class="btn btn-hint" onclick="showHint(5, 'The derivative is e^x - sin(x). Remember sin(0) = 0.')">Hint</button>
+                    </div>
+                    <div id="fb5" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>6. Hard:</strong> At what value of $x$ (where $x > 0$) does $y = \ln(x)$ have a gradient of $0.5$?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans6" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(6, '2')">Check</button>
+                        <button class="btn btn-hint" onclick="showHint(6, 'Set the derivative 1/x equal to 0.5 and solve for x.')">Hint</button>
+                    </div>
+                    <div id="fb6" class="feedback-box"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <h2>Ready for the Next Level?</h2>
+            <p style="color: var(--text-muted); margin: 15px 0 30px;">
+                You've mastered simple tangents. In <strong>Applications v2</strong>, we'll explore <strong>Normals</strong> (lines perpendicular to curves) 
+            </p>
+            <a href="applications2.html" class="massive-btn">Go to Applications v2 →</a>
+        </div>
+    </main>
+
+    <script>
+        // --- VISUALISER LOGIC ---
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('xSlider');
+        const readout = document.getElementById('mathReadout');
+
+        let currentFunc = 'parabola';
+
+        function changeFunc(type) {
+            currentFunc = type;
+            document.querySelectorAll('.func-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            draw();
+        }
+
+        function getY(x) {
+            if (currentFunc === 'parabola') return x * x;
+            if (currentFunc === 'sine') return 3 * Math.sin(x);
+            if (currentFunc === 'cubic') return 0.2 * Math.pow(x, 3);
+            return 0;
+        }
+
+        function getM(x) {
+            if (currentFunc === 'parabola') return 2 * x;
+            if (currentFunc === 'sine') return 3 * Math.cos(x);
+            if (currentFunc === 'cubic') return 0.6 * x * x;
+            return 0;
+        }
+
+        function draw() {
+            const w = canvas.width = canvas.parentElement.clientWidth;
+            const h = canvas.height = canvas.parentElement.clientHeight;
+            const offsetX = w / 2;
+            const offsetY = h / 2;
+            const scale = 40;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Grid Axes
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, offsetY); ctx.lineTo(w, offsetY);
+            ctx.moveTo(offsetX, 0); ctx.lineTo(offsetX, h);
+            ctx.stroke();
+
+            // Draw Function Curve
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let px = -w/2; px < w/2; px++) {
+                let x = px / scale;
+                let y = getY(x);
+                let py = offsetY - y * scale;
+                if (px === -w/2) ctx.moveTo(offsetX + px, py);
+                else ctx.lineTo(offsetX + px, py);
+            }
+            ctx.stroke();
+
+            // Tangent Logic
+            const xPos = parseFloat(slider.value);
+            const yPos = getY(xPos);
+            const m = getM(xPos);
+
+            readout.innerText = `Gradient m = ${m.toFixed(2)} at x = ${xPos.toFixed(1)}`;
+
+            // Draw Tangent Line
+            ctx.strokeStyle = '#f97316';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const length = 100; // Visual length
+            const x1 = offsetX + xPos * scale - length;
+            const y1 = offsetY - yPos * scale + (m * length);
+            const x2 = offsetX + xPos * scale + length;
+            const y2 = offsetY - yPos * scale - (m * length);
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            // Point of Tangency
+            ctx.fillStyle = '#f97316';
+            ctx.beginPath();
+            ctx.arc(offsetX + xPos * scale, offsetY - yPos * scale, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        slider.addEventListener('input', draw);
+        window.addEventListener('resize', draw);
+        window.onload = draw;
+
+        // --- QUIZ SYSTEM ---
+        function checkAnswer(id, correct) {
+            const val = document.getElementById(`ans${id}`).value.trim();
+            const fb = document.getElementById(`fb${id}`);
+            fb.style.display = 'block';
+
+            if (val === correct) {
+                fb.style.backgroundColor = 'rgba(46, 160, 67, 0.1)';
+                fb.style.border = '1px solid var(--success)';
+                fb.style.color = 'var(--success)';
+                fb.innerHTML = '<strong>Correct!</strong> Great eye for gradients.';
+            } else {
+                fb.style.backgroundColor = 'rgba(248, 81, 73, 0.1)';
+                fb.style.border = '1px solid var(--danger)';
+                fb.style.color = 'var(--danger)';
+                fb.innerHTML = '<strong>Not quite.</strong> Try differentiating again or check your arithmetic.';
+            }
+        }
+
+        function showHint(id, msg) {
+            const fb = document.getElementById(`fb${id}`);
+            fb.style.display = 'block';
+            fb.style.backgroundColor = 'var(--bg-card)';
+            fb.style.border = '1px solid var(--text-muted)';
+            fb.style.color = 'var(--text-muted)';
+            fb.innerHTML = `<strong>Hint:</strong> ${msg}`;
+        }
+    </script>
+</body>
+</html>

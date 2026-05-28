@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications v4: Motion & Kinematics | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. COLOUR PALETTE & CORE STYLES
+           ========================================================================== */
+        :root {
+            --bg-body: #0f111a;
+            --bg-sidebar: #161b22;
+            --bg-card: #1c212b;
+            --bg-input: #0d1117;
+            
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --text-category: #6e7681;
+            
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --accent-teal: #14b8a6;
+            --accent-orange: #f97316;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --accent-green: #2ea043;
+            
+            --success: #2ea043;
+            --danger: #f85149;
+            --border-color: #30363d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ==========================================================================
+           2. NAVIGATION SIDEBAR
+           ========================================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-category);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 24px 0 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover { background-color: var(--bg-card); color: var(--text-main); }
+        .nav-link.active { background-color: var(--accent-orange); color: white; }
+
+        /* ==========================================================================
+           3. MAIN LAYOUT
+           ========================================================================== */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 1400px; 
+        }
+
+        .hero-title { font-size: 3.5rem; margin-bottom: 10px; }
+        .hero-title span { color: var(--accent-orange); }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            word-wrap: break-word;
+        }
+
+        .info-box {
+            background: rgba(249, 115, 22, 0.05);
+            border-left: 4px solid var(--accent-orange);
+            padding: 24px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 30px;
+        }
+
+        /* ==========================================================================
+           4. VISUALISERS
+           ========================================================================== */
+        .interactive-container {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .canvas-row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .canvas-wrap {
+            position: relative;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            height: 160px;
+            overflow: hidden;
+        }
+        
+        /* Specific height for the 1D particle track */
+        .track-wrap { height: 100px; }
+
+        canvas { width: 100%; height: 100%; }
+
+        .canvas-label {
+            position: absolute;
+            top: 10px; left: 10px;
+            background: rgba(13, 17, 23, 0.9);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .control-bar {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        input[type=range] {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 5px;
+            -webkit-appearance: none;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        /* ==========================================================================
+           5. WORKED SOLUTIONS & PRACTISE
+           ========================================================================== */
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+        }
+
+        .step-list { list-style: none; margin-top: 20px; }
+        .step-list li {
+            padding-left: 28px;
+            position: relative;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .step-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--accent-orange);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .practise-container {
+            background: var(--bg-input);
+            border: 1px dashed var(--border-color);
+            padding: 40px;
+            border-radius: 16px;
+        }
+
+        .question-block {
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        input[type=text] {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-check { background: var(--accent-orange); color: white; }
+        .btn-hint { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        /* ==========================================================================
+           6. FOOTER
+           ========================================================================== */
+        .footer-nav {
+            margin-top: 60px;
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .massive-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink));
+            color: white;
+            text-decoration: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .massive-btn:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">∫ CalcSPA</div>
+        
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">Power Rule</a>
+        <a href="product-quotient.html" class="nav-link">Product & Quotient Rules</a>
+        <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+        <a href="trig-calculus.html" class="nav-link">Trigonometric Calculus</a>
+        <a href="exp-log-calculus.html" class="nav-link">Exponential & Logarithmic</a>
+
+        <div class="nav-category">Mastery</div>
+        <a href="applications.html" class="nav-link">App v1: Tangents</a>
+        <a href="applications2.html" class="nav-link">App v2: Normals</a>
+        <a href="applicationsv3.html" class="nav-link">App v3: Higher Derivatives</a>
+        <a href="applications4.html" class="nav-link active">App v4: Motion & Kinematics</a>
+        <a href="applications5.html" class="nav-link">App v5: Further Motion</a>
+    </aside>
+
+    <main class="main-wrapper">
+        <h1 class="hero-title">Applications: <span>Motion & Kinematics</span></h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px;">
+            Welcome to physics! By tracking a particle's position over time using $x(t)$, we can use derivatives to instantly uncover its velocity and acceleration. Calculus is the mathematical engine of motion.
+        </p>
+
+        <section class="card">
+            <h2>The Mathematics of Movement</h2>
+            <p>
+                In standard Grade 11 mechanics, we assume a particle is moving along a straight line (1-Dimensional motion). Time is represented by $t$ (where $t \ge 0$).
+            </p>
+            <div class="info-box">
+                <strong>The Core Trio & Notation:</strong>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Position/Displacement: $x(t)$</strong><br>Where the particle is relative to the origin. '$t$' represents time and '$x$' represents displacement.</li>
+                    <li><strong>Velocity: $v(t) = x'(t) = \dot{x}(t)$</strong><br>The rate of change of position. How fast and in what direction it's moving. Differentiate $x(t)$ once. <em>(Newtonian dot notation $\dot{x}(t)$ is heavily used here!)</em></li>
+                    <li><strong>Acceleration: $a(t) = v'(t) = x''(t) = \ddot{x}(t)$</strong><br>The rate of change of velocity. Is it speeding up or slowing down? Differentiate $x(t)$ twice.</li>
+                </ul>
+            </div>
+            <p style="color: var(--accent-gold); font-weight: 600;">
+                <em>Key Phrase Translation: "Initially" means $t = 0$. "At rest" means $v(t) = 0$. "Stationary point" means $v(t) = 0$. "Constant velocity" means $a(t) = 0$.</em>
+            </p>
+        </section>
+
+        <section class="card">
+            <h3>Interactive: The Particle Kinematics Engine</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Scrub through time $t$. The equation governing this particle is $x(t) = t^3 - 6t^2 + 9t$. 
+                Watch how the velocity hits zero (particle stops and turns around) exactly when the position graph peaks/troughs. 
+                Watch how acceleration crosses zero when velocity peaks/troughs.
+            </p>
+            
+            <div class="interactive-container">
+                <div class="canvas-row">
+                    <div class="canvas-wrap track-wrap">
+                        <div class="canvas-label" style="color: white">1D Particle Track (View from above)</div>
+                        <canvas id="cTrack"></canvas>
+                    </div>
+                    <div class="canvas-wrap">
+                        <div class="canvas-label" style="color: var(--accent-blue)">Displacement: $x(t) = t^3 - 6t^2 + 9t$</div>
+                        <canvas id="cX"></canvas>
+                    </div>
+                    <div class="canvas-wrap">
+                        <div class="canvas-label" style="color: var(--accent-teal)">Velocity: $v(t) = \dot{x}(t) = 3t^2 - 12t + 9$</div>
+                        <canvas id="cV"></canvas>
+                    </div>
+                    <div class="canvas-wrap">
+                        <div class="canvas-label" style="color: var(--accent-red)">Acceleration: $a(t) = \ddot{x}(t) = 6t - 12$</div>
+                        <canvas id="cA"></canvas>
+                    </div>
+                </div>
+
+                <div class="control-bar">
+                    <label style="font-weight: 700; color: var(--text-category);">Time ($t$)</label>
+                    <input type="range" id="timeSlider" min="0" max="4" step="0.02" value="0">
+                    <div id="timeReadout" style="font-family: monospace; min-width: 150px; text-align: right; color: var(--accent-orange); font-size: 1.1rem;">t = 0.00 s</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Worked Solutions</h2>
+            <div class="solutions-grid">
+                <div class="card" style="border-top: 4px solid var(--accent-green);">
+                    <h4 style="color: var(--accent-green); font-size: 1.2rem; margin-bottom: 10px;">🟢 Easy: Basic Motion</h4>
+                    <p style="color: white; font-weight: 500;">A particle moves according to $x(t) = t^2 - 4t$. Find its initial position and its velocity at $t = 3$.</p>
+                    <ul class="step-list">
+                        <li><strong>Initial Position:</strong> "Initial" means $t = 0$. Substitute into $x(t)$.<br> $x(0) = (0)^2 - 4(0) = 0$ m.</li>
+                        <li><strong>Find Velocity Function:</strong> Differentiate $x(t)$ to find $v(t)$.<br> $v(t) = \dot{x}(t) = 2t - 4$.</li>
+                        <li><strong>Substitute $t = 3$:</strong> $v(3) = 2(3) - 4 = 6 - 4 = 2$.</li>
+                        <li><strong>Result:</strong> Velocity is $2$ m/s (moving in the positive direction).</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-teal);">
+                    <h4 style="color: var(--accent-teal); font-size: 1.2rem; margin-bottom: 10px;">🟡 Medium: Finding "At Rest"</h4>
+                    <p style="color: white; font-weight: 500;">If $x(t) = 2t^3 - 9t^2 + 12t$, find the times when the particle is at rest, and its acceleration at those times.</p>
+                    <ul class="step-list">
+                        <li><strong>Find $v(t)$:</strong> $v(t) = 6t^2 - 18t + 12$.</li>
+                        <li><strong>Set $v(t) = 0$:</strong> "At rest" means velocity is zero. <br>$6t^2 - 18t + 12 = 0 \Rightarrow 6(t^2 - 3t + 2) = 0$<br>Factorising: $6(t-1)(t-2) = 0$. <br>The particle is at rest at $t = 1$ and $t = 2$.</li>
+                        <li><strong>Find $a(t)$:</strong> Differentiate velocity. $a(t) = \ddot{x}(t) = 12t - 18$.</li>
+                        <li><strong>Substitute Times:</strong> <br>At $t=1$: $a(1) = 12(1) - 18 = -6$ m/s$^2$.<br>At $t=2$: $a(2) = 12(2) - 18 = 6$ m/s$^2$.</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-red);">
+                    <h4 style="color: var(--accent-red); font-size: 1.2rem; margin-bottom: 10px;">🔴 Hard: Trig Kinematics</h4>
+                    <p style="color: white; font-weight: 500;">A particle's displacement is given by $x(t) = 3\sin(2t)$. Find its acceleration when it is first at rest ($t > 0$).</p>
+                    <ul class="step-list">
+                        <li><strong>Find $v(t)$:</strong> Apply the Chain Rule. $v(t) = 6\cos(2t)$.</li>
+                        <li><strong>Find First Time at Rest:</strong> Set $6\cos(2t) = 0$. <br>$\cos(2t) = 0$. The first positive solution is $2t = \frac{\pi}{2} \Rightarrow t = \frac{\pi}{4}$.</li>
+                        <li><strong>Find $a(t)$:</strong> Differentiate velocity. $a(t) = -12\sin(2t)$.</li>
+                        <li><strong>Calculate Acceleration:</strong> Substitute $t = \frac{\pi}{4}$.<br>$a(\frac{\pi}{4}) = -12\sin(2 \times \frac{\pi}{4}) = -12\sin(\frac{\pi}{2})$.<br>Since $\sin(\frac{\pi}{2}) = 1$, the acceleration is $-12$.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Mastery Practise</h2>
+            <div class="practise-container">
+                
+                <div class="question-block">
+                    <p><strong>1. Easy:</strong> A particle has displacement $x(t) = 5t^2 + 2t$. What is its velocity at $t = 1$?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans1" placeholder="Numerical value...">
+                        <button class="btn btn-check" onclick="checkAnswer(1, ['12'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(1, 'Differentiate to get v(t) = 10t + 2. Substitute t = 1.')">Hint</button>
+                    </div>
+                    <div id="fb1" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>2. Easy-Medium:</strong> Given $x(t) = e^{3t}$, what is the initial acceleration of the particle? (i.e. $\ddot{x}(t)$ at $t=0$)</p>
+                    <div class="input-group">
+                        <input type="text" id="ans2" placeholder="Numerical value...">
+                        <button class="btn btn-check" onclick="checkAnswer(2, ['9'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(2, 'v(t) = 3e^(3t). a(t) = 9e^(3t). Substitute t = 0. Remember e^0 = 1.')">Hint</button>
+                    </div>
+                    <div id="fb2" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>3. Medium:</strong> A particle's position is $x(t) = t^3 - 6t^2$. At what time $t > 0$ is the particle momentarily at rest?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans3" placeholder="Numerical value for t...">
+                        <button class="btn btn-check" onclick="checkAnswer(3, ['4'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(3, 'Find v(t) = 3t^2 - 12t. Set it to 0. Factorise: 3t(t - 4) = 0. Since t > 0, t must be 4.')">Hint</button>
+                    </div>
+                    <div id="fb3" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>4. Hard:</strong> Let $x(t) = 4\cos(t) + t$. What is the initial velocity of the particle?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans4" placeholder="Numerical value...">
+                        <button class="btn btn-check" onclick="checkAnswer(4, ['1'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(4, 'v(t) = -4sin(t) + 1. Initial means t = 0. sin(0) is 0.')">Hint</button>
+                    </div>
+                    <div id="fb4" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>5. Legend:</strong> A particle's displacement involves the Product Rule: $x(t) = t e^{-t}$. At what exact time $t$ does the acceleration equal zero?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans5" placeholder="Numerical value for t...">
+                        <button class="btn btn-check" onclick="checkAnswer(5, ['2'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(5, 'Product rule for v(t): e^(-t) - te^(-t). Differentiate again for a(t): -e^(-t) - (e^(-t) - te^(-t)) = -2e^(-t) + te^(-t). Set to 0 and factor out e^(-t).')">Hint</button>
+                    </div>
+                    <div id="fb5" class="feedback-box"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <h2>The Peak of Calculus</h2>
+            <p style="color: var(--text-muted); margin: 15px 0 30px;">
+                You've mastered mechanics. Now it's time to further master trickier motion.
+            </p>
+            <a href="applications5.html" class="massive-btn">Go to App v5: Further Motion →</a>
+        </div>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // VISUALISER: KINEMATICS ENGINE
+        // ==========================================
+        const cTrack = document.getElementById('cTrack');
+        const cX = document.getElementById('cX');
+        const cV = document.getElementById('cV');
+        const cA = document.getElementById('cA');
+        
+        const ctxTrack = cTrack.getContext('2d');
+        const ctxX = cX.getContext('2d');
+        const ctxV = cV.getContext('2d');
+        const ctxA = cA.getContext('2d');
+        
+        const timeSlider = document.getElementById('timeSlider');
+        const timeReadout = document.getElementById('timeReadout');
+
+        // Kinematics Functions
+        // x(t) = t^3 - 6t^2 + 9t
+        const pos = (t) => Math.pow(t, 3) - 6 * Math.pow(t, 2) + 9 * t;
+        const vel = (t) => 3 * Math.pow(t, 2) - 12 * t + 9;
+        const acc = (t) => 6 * t - 12;
+
+        function drawGraphs() {
+            const tVal = parseFloat(timeSlider.value);
+            timeReadout.innerText = `t = ${tVal.toFixed(2)} s`;
+
+            const maxTime = 4;
+            const canvases = [
+                { canvas: cX, ctx: ctxX, func: pos, color: '#3b82f6', label: 'x', scaleY: 15 },
+                { canvas: cV, ctx: ctxV, func: vel, color: '#14b8a6', label: 'v', scaleY: 10 },
+                { canvas: cA, ctx: ctxA, func: acc, color: '#ef4444', label: 'a', scaleY: 6 }
+            ];
+
+            // 1. Draw 1D Track
+            const wT = cTrack.width = cTrack.parentElement.clientWidth;
+            const hT = cTrack.height = cTrack.parentElement.clientHeight;
+            ctxTrack.clearRect(0, 0, wT, hT);
+            
+            // Draw Axis
+            ctxTrack.strokeStyle = '#30363d'; ctxTrack.lineWidth = 2;
+            const originX = wT / 2 - 100;
+            const scale1D = 40;
+            ctxTrack.beginPath();
+            ctxTrack.moveTo(20, hT/2);
+            ctxTrack.lineTo(wT - 20, hT/2);
+            ctxTrack.stroke();
+            
+            // Draw Origin Marker
+            ctxTrack.fillStyle = '#8b949e';
+            ctxTrack.font = '12px Inter';
+            ctxTrack.fillText('x = 0', originX - 12, hT/2 + 20);
+            ctxTrack.beginPath();
+            ctxTrack.arc(originX, hT/2, 3, 0, Math.PI*2);
+            ctxTrack.fill();
+
+            // Draw Particle
+            const currentPos = pos(tVal);
+            const pX = originX + currentPos * scale1D;
+            ctxTrack.fillStyle = 'white';
+            ctxTrack.beginPath();
+            ctxTrack.arc(pX, hT/2, 8, 0, Math.PI*2);
+            ctxTrack.fill();
+            // Particle glow based on velocity direction
+            ctxTrack.strokeStyle = vel(tVal) >= 0 ? '#14b8a6' : '#ef4444';
+            ctxTrack.lineWidth = 3;
+            ctxTrack.stroke();
+
+            // 2. Draw standard t vs y graphs
+            canvases.forEach(item => {
+                const w = item.canvas.width = item.canvas.parentElement.clientWidth;
+                const h = item.canvas.height = item.canvas.parentElement.clientHeight;
+                const ctx = item.ctx;
+                
+                const padLeft = 40;
+                const padRight = 20;
+                const graphW = w - padLeft - padRight;
+                const oy = h / 2;
+                
+                ctx.clearRect(0, 0, w, h);
+
+                // Draw X-axis (Time)
+                ctx.strokeStyle = '#30363d'; ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padLeft, oy); ctx.lineTo(w - padRight, oy);
+                ctx.stroke();
+
+                // Draw Curve
+                ctx.strokeStyle = item.color; 
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let px = 0; px <= graphW; px++) {
+                    let t = (px / graphW) * maxTime;
+                    let y = item.func(t);
+                    let py = oy - y * item.scaleY;
+                    if (px === 0) ctx.moveTo(padLeft + px, py);
+                    else ctx.lineTo(padLeft + px, py);
+                }
+                ctx.stroke();
+
+                // Draw current time marker
+                const markerX = padLeft + (tVal / maxTime) * graphW;
+                const markerY = oy - item.func(tVal) * item.scaleY;
+                
+                // Vertical dash
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(markerX, 0); ctx.lineTo(markerX, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Point
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(markerX, markerY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Readout Value
+                ctx.fillStyle = item.color;
+                ctx.font = '13px Space Grotesk';
+                ctx.fillText(`${item.label} = ${item.func(tVal).toFixed(2)}`, markerX + 10, markerY > oy ? markerY - 10 : markerY + 20);
+            });
+        }
+
+        timeSlider.addEventListener('input', drawGraphs);
+        window.addEventListener('resize', drawGraphs);
+
+        // Init
+        window.onload = () => {
+            drawGraphs();
+        };
+
+        // ==========================================
+        // QUIZ SYSTEM WITH TOGGLEABLE HINTS
+        // ==========================================
+        function checkAnswer(id, correctAnswersArray) {
+            const val = document.getElementById(`ans${id}`).value.trim().replace(/\s/g, '');
+            const fb = document.getElementById(`fb${id}`);
+            fb.style.display = 'block';
+
+            if (correctAnswersArray.includes(val)) {
+                fb.style.backgroundColor = 'rgba(46, 160, 67, 0.1)';
+                fb.style.border = '1px solid var(--success)';
+                fb.style.color = 'var(--success)';
+                fb.innerHTML = '<strong>Correct!</strong> Flawless logic.';
+            } else {
+                fb.style.backgroundColor = 'rgba(248, 81, 73, 0.1)';
+                fb.style.border = '1px solid var(--danger)';
+                fb.style.color = 'var(--danger)';
+                fb.innerHTML = '<strong>Not quite.</strong> Check the hint or your calculus.';
+            }
+        }
+
+        function toggleHint(id, msg) {
+            const fb = document.getElementById(`fb${id}`);
+            
+            if (fb.style.display === 'block' && fb.innerHTML.includes('Hint:')) {
+                fb.style.display = 'none';
+            } else {
+                fb.style.display = 'block';
+                fb.style.backgroundColor = 'var(--bg-card)';
+                fb.style.border = '1px solid var(--text-muted)';
+                fb.style.color = 'var(--text-muted)';
+                fb.innerHTML = `<strong>Hint:</strong> ${msg}`;
+            }
+        }
+    </script>
+</body>
+</html>

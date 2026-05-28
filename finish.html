@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Mastered! | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --text-primary: #f8fafc;
+            --accent-pos: #8b5cf6; 
+            --accent-vel: #10b981; 
+            --accent-acc: #ef4444; 
+            --accent-gold: #fbbf24;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Hide the mess of the party! */
+            position: relative;
+        }
+
+        /* Animated Background Gradient */
+        .bg-glow {
+            position: absolute;
+            width: 200vw;
+            height: 200vh;
+            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, rgba(15, 23, 42, 1) 50%);
+            animation: pulseBg 8s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+
+        @keyframes pulseBg {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Floating Math Symbols */
+        .floating-math {
+            position: absolute;
+            font-family: 'Fira Code', monospace;
+            font-weight: bold;
+            font-size: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+            text-shadow: 0 0 10px currentColor;
+            animation: floatUp 6s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg) scale(0.5); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+
+        /* Center Content Card */
+        .celebration-card {
+            position: relative;
+            z-index: 20;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(251, 191, 36, 0.3);
+            border-radius: 2rem;
+            padding: 4rem 5rem;
+            text-align: center;
+            max-width: 800px;
+            box-shadow: 0 0 50px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            animation: dropIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform: translateY(-100vh);
+        }
+
+        @keyframes dropIn {
+            to { transform: translateY(0); }
+        }
+
+        .trophy {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: bounce 2s infinite ease-in-out;
+            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.8));
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        h1 {
+            font-family: 'Lexend', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+        }
+
+        p {
+            font-size: 1.25rem;
+            color: #cbd5e1;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .equation-badge {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 3rem;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .btn-home {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-pos), #6d28d9);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-family: 'Lexend', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-home:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.6);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+    
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="celebration-card">
+        <div class="trophy">🏆</div>
+        <h1>Calculus Mastered!</h1>
+        <p>Congratulations! You have successfully conquered First Principles, navigated the core Derivative Rules, explored Advanced Functions, and mastered Kinematics.</p>
+        
+        <div class="equation-badge">
+            <span style="color: var(--accent-gold);">$$\text{Limit Reached: } \lim_{t \to \text{end}} \text{CalcSPA} = \infty \text{ Knowledge}$$</span>
+        </div>
+
+        <br>
+        <a href="index.html" class="btn-home">Return to Home Dashboard</a>
+    </div>
+
+    <script>
+        // --- FLOATING MATH SYMBOLS ENGINE ---
+        const mathSymbols = ['∫', 'dy/dx', 'f\'(x)', 'lim', '∞', 'Δ', 'π', 'Σ', 'v(t)', 'a(t)', 'd²y/dx²'];
+        const colors = ['#8b5cf6', '#10b981', '#ef4444', '#3b82f6', '#fbbf24', '#ec4899'];
+
+        function spawnMath() {
+            const el = document.createElement('div');
+            el.className = 'floating-math';
+            el.innerText = mathSymbols[Math.floor(Math.random() * mathSymbols.length)];
+            
+            // Randomize position, color, and size
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.color = colors[Math.floor(Math.random() * colors.length)];
+            el.style.fontSize = (Math.random() * 2 + 1.5) + 'rem';
+            
+            // Randomize horizontal drift using CSS vars
+            const driftX = (Math.random() - 0.5) * 200 + 'px';
+            el.style.setProperty('--drift', driftX);
+
+            document.body.appendChild(el);
+
+            // Clean up after animation
+            setTimeout(() => {
+                el.remove();
+            }, 6000);
+        }
+
+        // Spawn a new symbol every 300ms
+        setInterval(spawnMath, 300);
+
+
+        // --- PHYSICS CONFETTI ENGINE ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        const maxParticles = 150;
+
+        class ConfettiParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.r = Math.random() * 6 + 2; // size
+                this.dx = Math.random() * 4 - 2;
+                this.dy = Math.random() * 3 + 2;
+                this.tilt = Math.floor(Math.random() * 10) - 10;
+                this.tiltAngleInc = (Math.random() * 0.07) + 0.05;
+                this.tiltAngle = 0;
+                // Vibrant colors
+                const palette = ['#8b5cf6', '#10b981', '#ef4444', '#3b82f6', '#fbbf24', '#ffffff'];
+                this.color = palette[Math.floor(Math.random() * palette.length)];
+            }
+
+            update() {
+                this.tiltAngle += this.tiltAngleInc;
+                this.y += (Math.cos(this.tiltAngle) + this.dy + this.r / 2) / 2;
+                this.x += Math.sin(this.tiltAngle) * 2;
+
+                // Reset particle to top if it falls off bottom
+                if (this.y > canvas.height) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = -20;
+                    this.tilt = Math.floor(Math.random() * 10) - 10;
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.lineWidth = this.r;
+                ctx.strokeStyle = this.color;
+                ctx.moveTo(this.x + this.tilt + this.r, this.y);
+                ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r);
+                ctx.stroke();
+            }
+        }
+
+        // Initialize particles
+        for (let i = 0; i < maxParticles; i++) {
+            particles.push(new ConfettiParticle());
+        }
+
+        // Animation Loop
+        function renderConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(renderConfetti);
+        }
+
+        renderConfetti();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

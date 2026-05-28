@@ -1,0 +1,397 @@
+/* =========================================
+   1. GLOBAL VARIABLES & THEME
+   ========================================= */
+   :root {
+    --bg-dark: #0f172a;
+    --bg-accent: #1e293b;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.4);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --glass-bg: rgba(30, 41, 59, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --sidebar-width: 280px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================
+   2. HARD RESETS & BASE
+   ========================================= */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .logo-container h2 {
+    font-family: 'Lexend', sans-serif;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+/* Background layer protection */
+.bg-gradient-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(30, 41, 59, 1) 0%, transparent 50%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* =========================================
+   3. STRUCTURAL LAYOUT
+   ========================================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    padding: 2rem 1.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000; /* Ensure it stays above content */
+    overflow-y: auto;
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    padding: 4rem 5%;
+    min-height: 100vh;
+    max-width: 1400px;
+}
+
+/* =========================================
+   4. SIDEBAR NAVIGATION
+   ========================================= */
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 3rem;
+}
+
+.logo-icon {
+    font-size: 1.5rem;
+    background: rgba(59, 130, 246, 0.15);
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.nav-section { margin-bottom: 2rem; }
+.section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    display: block;
+    opacity: 0.8;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    color: var(--text-muted);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    transition: var(--transition);
+}
+
+.nav-link:hover, .nav-link.active {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent);
+}
+
+.nav-link.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-left: 4px solid var(--accent);
+    font-weight: 600;
+}
+
+/* =========================================
+   5. GLASS COMPONENTS & CONTENT
+   ========================================= */
+.page-title {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+}
+.text-accent { color: var(--accent); }
+.lead-text { font-size: 1.2rem; color: var(--text-muted); max-width: 850px; margin-bottom: 4rem; }
+
+.glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================
+   6. MATH DISPLAYS & TABLES
+   ========================================= */
+.math-block {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 2rem;
+    border-radius: 14px;
+    margin: 2rem 0;
+    overflow-x: auto; 
+    text-align: center;
+    border: 1px solid var(--glass-border);
+}
+
+.math-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.math-table th {
+    text-align: left;
+    color: var(--accent);
+    padding: 15px;
+    border-bottom: 2px solid var(--glass-border);
+}
+.math-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* =========================================
+   7. UI ELEMENTS (BUTTONS/ALERTS)
+   ========================================= */
+.btn-primary { 
+    background: var(--accent); 
+    color: white; 
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 20px var(--accent-glow); }
+
+.ans-box { background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; padding: 1.5rem; border-radius: 12px; margin-top: 1rem; }
+
+/* =========================================
+   8. DIAGRAMS & VISUALIZERS
+   ========================================= */
+.visual-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.visual-canvas-wrapper {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px dashed var(--glass-border);
+}
+
+.visual-canvas-wrapper svg {
+    width: 100%;
+    max-height: 400px;
+    height: auto;
+}
+
+/* =========================================
+   9. MATHJAX PROTECTION (Prevents giant text)
+   ========================================= */
+mjx-container, mjx-container svg {
+    width: auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    display: inline-block !important;
+    vertical-align: middle;
+}
+
+/* =========================================
+   10. RULE TABS / QUICK ACCESS (Fixes Misalignment)
+   ========================================= */
+.rule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.rule-tab {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    padding: 1.2rem;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.rule-tab:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--accent);
+    transform: translateY(-5px);
+}
+
+.rule-tab .math-symbol {
+    font-size: 1.3rem;
+    color: #a855f7; /* Matching the purple in your screenshot */
+    background: rgba(168, 85, 247, 0.1);
+    padding: 8px;
+    border-radius: 8px;
+    min-width: 45px;
+    text-align: center;
+}
+
+.rule-tab .rule-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+/* =========================================
+   11. RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 1100px) {
+    .visual-grid { grid-template-columns: 1fr; }
+    :root { --sidebar-width: 240px; }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 2rem 1.5rem;
+    }
+    .page-title { font-size: 2.5rem; }
+}
+
+/* Base Button Styling */
+.btn-hint, .btn-reveal, .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+}
+
+/* Specific button colors */
+.btn-hint {
+    background: rgba(245, 158, 11, 0.1); /* Amber tint */
+    color: #f59e0b;
+}
+
+.btn-reveal {
+    background: rgba(16, 185, 129, 0.1); /* Emerald tint */
+    color: #10b981;
+}
+
+/* Hover effects */
+.btn-hint:hover, .btn-reveal:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"] {
+    background: rgba(255, 255, 255, 0.1);
+    height: 6px;
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--accent); /* Uses your primary blue */
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+/* The Container */
+.rule-shortcuts {
+    display: grid;
+    /* This makes the cards wrap automatically on small screens */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px; /* This is the magic property that stops them from overlapping */
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* The Individual Cards */
+.shortcut-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    text-decoration: none; /* Removes the default blue underline from links */
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Add a nice hover effect so users know they are clickable */
+.shortcut-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.shortcut-math {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #3b82f6; /* A nice accent color for the math */
+}
+
+.shortcut-text {
+    font-size: 1rem;
+    color: #f8fafc;
+}

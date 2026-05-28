@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Masterclass | The Chain Rule</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a; --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1); --accent-primary: #3b82f6;
+            --accent-success: #10b981; --accent-warning: #f59e0b;
+            --accent-danger: #ef4444; --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899; --accent-cyan: #06b6d4; --accent-orange: #f97316;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+        .app-container { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--glass-bg); border-right: 1px solid var(--glass-border); padding: 24px; display: flex; flex-direction: column; backdrop-filter: blur(12px); flex-shrink: 0; }
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+        .logo-icon { font-size: 28px; color: var(--accent-primary); font-family: 'Lexend', sans-serif; }
+        .logo-container h2 { font-family: 'Lexend', sans-serif; font-size: 24px; font-weight: 700; }
+        .nav-section { margin-bottom: 24px; }
+        .section-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; display: block; margin-bottom: 12px; }
+        .nav-link { display: block; padding: 10px 12px; color: var(--text-muted); text-decoration: none; border-radius: 8px; transition: 0.2s; margin-bottom: 4px; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .nav-link.active { background: var(--accent-purple); color: white; font-weight: 500; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
+        .hero-header { margin-bottom: 40px; text-align: center; }
+        .hero-header h1 { font-family: 'Lexend', sans-serif; font-size: 42px; margin-bottom: 16px; }
+        .text-accent { color: var(--accent-purple); }
+        .hero-subtitle { font-size: 18px; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* Story Text */
+        .story-section { font-size: 18px; line-height: 1.8; margin-bottom: 40px; background: rgba(255,255,255,0.02); padding: 24px; border-radius: 12px; border-left: 4px solid var(--accent-purple); }
+        .formula-box { background: rgba(139, 92, 246, 0.1); padding: 30px; border-radius: 16px; text-align: center; border: 1px solid var(--accent-purple); margin: 40px 0; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.1); }
+        
+        /* Interactivities */
+        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 32px; backdrop-filter: blur(12px); margin-bottom: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .playground-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .playground-header h3 { font-family: 'Lexend', sans-serif; font-size: 22px; }
+        .badge { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        
+        /* Gears Interactive */
+        .gear-canvas { width: 100%; height: 250px; background: #0f172a; border-radius: 12px; border: 1px solid #334155; display: flex; justify-content: space-around; align-items: center; overflow: hidden; margin-bottom: 20px; position: relative; }
+        .gear-container { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 2; }
+        .gear { transform-origin: center; }
+        .belt { position: absolute; border: 2px dashed rgba(255,255,255,0.2); border-radius: 100px; z-index: 1; }
+        
+        .controls-panel { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .slider-group { display: flex; flex-direction: column; gap: 10px; }
+        .slider-label { display: flex; justify-content: space-between; font-weight: 600; font-family: monospace; }
+        input[type=range] { width: 100%; appearance: none; height: 8px; border-radius: 4px; background: #334155; outline: none; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-purple); cursor: pointer; border: 3px solid #fff; }
+
+        /* Onion Peeler Interactive */
+        .onion-stage { text-align: center; padding: 40px; background: #0f172a; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.3s; }
+        .math-display { font-size: 42px; font-family: 'Lexend', sans-serif; transition: 0.5s all cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 5px; }
+        
+        .btn-group { display: flex; justify-content: center; gap: 15px; }
+        .btn-action { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 12px 24px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .btn-action:hover:not(:disabled) { background: rgba(139, 92, 246, 0.2); border-color: var(--accent-purple); }
+        .btn-action:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Worked Solutions */
+        .solution-box { background: rgba(255,255,255,0.03); padding: 24px; border-radius: 0 8px 8px 0; margin-bottom: 24px; }
+        .step-list { margin-top: 15px; }
+        .step-list p { margin-bottom: 8px; padding-left: 15px; border-left: 2px solid rgba(255,255,255,0.1); }
+        
+        /* Practice */
+        .practice-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .input-group { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
+        input[type="text"] { background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 6px; color: white; flex: 1; font-family: monospace; font-size: 16px; }
+        .btn-check { background: var(--accent-success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-hint { background: transparent; border: 1px solid var(--accent-warning); color: var(--accent-warning); padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+        .feedback { margin-top: 10px; font-size: 14px; display: none; }
+
+        /* Continuation Button */
+        .next-path { text-align: center; margin-top: 80px; padding: 40px; border-top: 1px solid var(--glass-border); }
+        .btn-large { display: inline-block; background: var(--accent-orange); color: white; padding: 20px 40px; border-radius: 12px; font-size: 20px; font-weight: 700; text-decoration: none; transition: 0.3s; box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3); }
+        .btn-large:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(249, 115, 22, 0.5); }
+        
+        /* Utility for math highlights */
+        .hl-outer { color: var(--accent-purple); }
+        .hl-inner { color: var(--accent-cyan); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo-container">
+                <span class="logo-icon">∫</span>
+                <h2>CalcSPA</h2>
+            </div>
+            
+            <nav>
+                <div class="nav-section">
+                    <span class="section-title">Foundations</span>
+                    <a href="index.html" class="nav-link">Introduction</a>
+                    <a href="limits.html" class="nav-link">Limits</a>
+                    <a href="first-principles.html" class="nav-link">First Principles</a>
+                    <a href="first-principles-applications.html" class="nav-link">Practice & Mastery</a>
+                </div>
+                <div class="nav-section">
+                    <span class="section-title">Core Techniques</span>
+                    <a href="power-rule.html" class="nav-link">The Power Rule</a>
+                    <a href="product-rule.html" class="nav-link">The Product Rule</a>
+                    <a href="quotient-rule.html" class="nav-link">The Quotient Rule</a>
+                    <a href="chain-rule.html" class="nav-link active">The Chain Rule</a>
+                </div>
+                <div class="nav-section">
+                    <span class="section-title">Advanced</span>
+                    <a href="transcendental.html" class="nav-link">Exponentials & Logs</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="hero-header">
+                <h1>Functions <span class="text-accent">Inside</span> Functions</h1>
+                <p class="hero-subtitle">What happens when a function swallows another function whole? You can't just use the Power Rule. You need to break the chain.</p>
+            </header>
+
+            <div class="story-section">
+                <p>Imagine you have the function $y = (3x + 1)^2$.</p>
+                <p>You <em>could</em> expand the brackets to get $y = 9x^2 + 6x + 1$, and then differentiate it using the Power Rule to get $\frac{dy}{dx} = 18x + 6$. That works fine.</p>
+                <p>But what if you had $y = (3x + 1)^{100}$? Expanding that would take you the rest of your life. We need a shortcut. We need a way to deal with <strong>composite functions</strong> (a function nested inside another function).</p>
+            </div>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Interactive 1: Why Rates Multiply</h3>
+                    <span class="badge">Visual Intuition</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Think of variables as gears in a machine. If gear $x$ drives gear $u$, and gear $u$ drives gear $y$, the total speed of $y$ depends on <strong>both</strong> connections. Adjust the gear ratios below.</p>
+
+                <div class="gear-canvas">
+                    <div class="belt" style="width: 250px; height: 80px; left: 125px; top: 85px;"></div>
+                    <div class="belt" style="width: 250px; height: 80px; left: 375px; top: 85px;"></div>
+
+                    <div class="gear-container">
+                        <span style="font-family: 'Lexend'; color: var(--accent-cyan); font-weight: bold;">Gear x</span>
+                        <svg id="gear-x" class="gear" width="80" height="80" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent-cyan)" stroke-width="8" stroke-dasharray="10, 10"/>
+                            <circle cx="50" cy="50" r="30" fill="rgba(6, 182, 212, 0.2)" stroke="var(--accent-cyan)" stroke-width="4"/>
+                            <line x1="50" y1="20" x2="50" y2="80" stroke="var(--accent-cyan)" stroke-width="4"/>
+                            <line x1="20" y1="50" x2="80" y2="50" stroke="var(--accent-cyan)" stroke-width="4"/>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-muted);">Base Speed: 1</span>
+                    </div>
+
+                    <div class="gear-container">
+                        <span style="font-family: 'Lexend'; color: var(--accent-pink); font-weight: bold;">Gear u</span>
+                        <svg id="gear-u" class="gear" width="80" height="80" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent-pink)" stroke-width="8" stroke-dasharray="10, 10"/>
+                            <circle cx="50" cy="50" r="30" fill="rgba(236, 72, 153, 0.2)" stroke="var(--accent-pink)" stroke-width="4"/>
+                            <line x1="50" y1="20" x2="50" y2="80" stroke="var(--accent-pink)" stroke-width="4"/>
+                            <line x1="20" y1="50" x2="80" y2="50" stroke="var(--accent-pink)" stroke-width="4"/>
+                        </svg>
+                        <span id="speed-u" style="font-size: 12px; color: var(--text-muted);">Speed: 2</span>
+                    </div>
+
+                    <div class="gear-container">
+                        <span style="font-family: 'Lexend'; color: var(--accent-purple); font-weight: bold;">Gear y</span>
+                        <svg id="gear-y" class="gear" width="80" height="80" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent-purple)" stroke-width="8" stroke-dasharray="10, 10"/>
+                            <circle cx="50" cy="50" r="30" fill="rgba(139, 92, 246, 0.2)" stroke="var(--accent-purple)" stroke-width="4"/>
+                            <line x1="50" y1="20" x2="50" y2="80" stroke="var(--accent-purple)" stroke-width="4"/>
+                            <line x1="20" y1="50" x2="80" y2="50" stroke="var(--accent-purple)" stroke-width="4"/>
+                        </svg>
+                        <span id="speed-y" style="font-size: 12px; color: var(--text-muted);">Speed: 6</span>
+                    </div>
+                </div>
+
+                <div class="controls-panel">
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span style="color: var(--accent-pink);">Ratio: du/dx</span>
+                            <span id="val-du-dx">2</span>
+                        </div>
+                        <input type="range" id="slider-du-dx" min="0" max="5" value="2" step="1">
+                        <span style="font-size: 12px; color: var(--text-muted);">How fast $u$ turns compared to $x$</span>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span style="color: var(--accent-purple);">Ratio: dy/du</span>
+                            <span id="val-dy-du">3</span>
+                        </div>
+                        <input type="range" id="slider-dy-du" min="0" max="5" value="3" step="1">
+                        <span style="font-size: 12px; color: var(--text-muted);">How fast $y$ turns compared to $u$</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px; text-align: center; font-family: 'Lexend'; font-size: 20px;">
+                    Total Rate $\frac{dy}{dx}$ = <span style="color: var(--accent-purple);">$\frac{dy}{du}$</span> $\times$ <span style="color: var(--accent-pink);">$\frac{du}{dx}$</span> = <span id="val-total" style="color: white; font-weight: bold; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 8px;">6</span>
+                </div>
+            </section>
+
+            <div class="formula-box">
+                <h3 style="margin-bottom: 15px; font-family: 'Lexend';">The Chain Rule</h3>
+                <p style="font-size: 18px; margin-bottom: 15px;">There are two ways to write this, depending on your preferred notation:</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px;">
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">Leibniz Notation</span>
+                        <div style="font-size: 1.4em; margin-top: 10px;">
+                            $$\frac{dy}{dx} = \frac{dy}{du} \times \frac{du}{dx}$$
+                        </div>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">Function Notation</span>
+                        <div style="font-size: 1.4em; margin-top: 10px;">
+                            $$f'(g(x)) \times g'(x)$$
+                        </div>
+                    </div>
+                </div>
+                <p style="color: var(--accent-purple); font-weight: bold; font-size: 18px; margin-top: 20px;">Memory Trick: "Differentiate the outside, leave the inside alone, then multiply by the derivative of the inside."</p>
+            </div>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Interactive 2: Peeling the Onion</h3>
+                    <span class="badge" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">Step-by-Step</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Let's differentiate $y = (5x^2 - 3)^4$. Notice how we treat the inside bracket as a single solid block until the very end.</p>
+
+                <div class="onion-stage">
+                    <div id="math-step" class="math-display">
+                        $y = $ <span class="hl-outer">(</span> <span class="hl-inner">$5x^2 - 3$</span> <span class="hl-outer">)$^4$</span>
+                    </div>
+                    <div id="onion-desc" style="margin-top: 20px; color: var(--text-muted); min-height: 24px;">Start by looking at the outer power of 4.</div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-action" id="btn-step-1" onclick="peelStep(1)">1. Differentiate Outside</button>
+                    <button class="btn-action" id="btn-step-2" onclick="peelStep(2)" disabled>2. Multiply by Inside</button>
+                    <button class="btn-action" id="btn-step-3" onclick="peelStep(3)" disabled>3. Simplify</button>
+                    <button class="btn-action" onclick="peelStep(0)" style="background: transparent; border-color: var(--text-muted); color: var(--text-muted);">Reset</button>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Applying the Chain Rule</h3>
+                    <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple);">Worked Solutions</span>
+                </div>
+                
+                <div class="solution-box" style="border-left: 4px solid #10b981;">
+                    <h4 style="color: #10b981; margin-bottom: 12px;"><span>🟢</span> Easy: Basic Brackets</h4>
+                    <p style="margin-bottom: 10px;"><strong>Question:</strong> Find $\frac{dy}{dx}$ for $y = (2x + 5)^6$</p>
+                    <div class="step-list">
+                        <p>1. Outside function is $(\text{stuff})^6$. Inside function is $u = 2x + 5$.</p>
+                        <p>2. Differentiate the outside: Bring down the 6, power becomes 5.</p>
+                        $$6(2x + 5)^5$$
+                        <p>3. Multiply by the derivative of the inside ($2$):</p>
+                        $$\frac{dy}{dx} = 6(2x + 5)^5 \times 2$$
+                        <p>4. Simplify the numbers on the outside:</p>
+                        $$\frac{dy}{dx} = 12(2x + 5)^5$$
+                    </div>
+                </div>
+
+                <div class="solution-box" style="border-left: 4px solid #f59e0b;">
+                    <h4 style="color: #f59e0b; margin-bottom: 12px;"><span>🟡</span> Medium: Square Roots</h4>
+                    <p style="margin-bottom: 10px;"><strong>Question:</strong> Find $f'(x)$ for $f(x) = \sqrt{x^2 + 1}$</p>
+                    <div class="step-list">
+                        <p>1. Rewrite the root as a fractional power:</p>
+                        $$f(x) = (x^2 + 1)^{1/2}$$
+                        <p>2. Differentiate outside (power $\frac{1}{2}$ comes down, subtract 1 to get $-\frac{1}{2}$):</p>
+                        $$\frac{1}{2}(x^2 + 1)^{-1/2}$$
+                        <p>3. Multiply by derivative of inside ($2x$):</p>
+                        $$f'(x) = \frac{1}{2}(x^2 + 1)^{-1/2} \times 2x$$
+                        <p>4. Simplify ($\frac{1}{2} \times 2x = x$):</p>
+                        $$f'(x) = x(x^2 + 1)^{-1/2} \text{ or } \frac{x}{\sqrt{x^2+1}}$$
+                    </div>
+                </div>
+
+                <div class="solution-box" style="border-left: 4px solid #ef4444;">
+                    <h4 style="color: #ef4444; margin-bottom: 12px;"><span>🔴</span> Hard: Fractions and Negative Powers</h4>
+                    <p style="margin-bottom: 10px;"><strong>Question:</strong> Find $\frac{dy}{dx}$ for $y = \frac{1}{(3x^2 - x)^3}$</p>
+                    <div class="step-list">
+                        <p>1. <em>Do not use the Quotient Rule!</em> It's much faster to rewrite using a negative power:</p>
+                        $$y = (3x^2 - x)^{-3}$$
+                        <p>2. Differentiate outside (bring down $-3$, power becomes $-4$):</p>
+                        $$-3(3x^2 - x)^{-4}$$
+                        <p>3. Multiply by derivative of inside (put it in brackets!):</p>
+                        $$\frac{dy}{dx} = -3(3x^2 - x)^{-4} \times (6x - 1)$$
+                        <p>4. Clean it up (move the negative power back to the bottom):</p>
+                        $$\frac{dy}{dx} = \frac{-3(6x - 1)}{(3x^2 - x)^4}$$
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Your Turn to Practise</h3>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Type your answers in the format <code>a(bx+c)^d</code>. Multiply your constant numbers at the front!</p>
+
+                <div class="practice-card">
+                    <span class="badge" style="background: #10b981; color: white;">Easy</span>
+                    <p style="margin-top: 10px;">Find $f'(x)$ if $f(x) = (3x - 2)^4$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans-1" placeholder="Type answer...">
+                        <button class="btn-check" onclick="checkAnswer(1, '12(3x-2)^3')">Check</button>
+                        <button class="btn-hint" onclick="showHint(1, 'Bring down 4, subtract 1 from power. Multiply by derivative of 3x-2.')">Hint</button>
+                    </div>
+                    <div id="feedback-1" class="feedback"></div>
+                </div>
+
+                <div class="practice-card">
+                    <span class="badge" style="background: #f59e0b; color: white;">Medium</span>
+                    <p style="margin-top: 10px;">Find $\frac{dy}{dx}$ if $y = (x^2 + 4x)^5$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans-2" placeholder="Type answer...">
+                        <button class="btn-check" onclick="checkAnswer(2, '5(2x+4)(x^2+4x)^4', '(10x+20)(x^2+4x)^4')">Check</button>
+                        <button class="btn-hint" onclick="showHint(2, 'Bring down 5. Inside derivative is (2x+4). Make sure you put it in brackets!')">Hint</button>
+                    </div>
+                    <div id="feedback-2" class="feedback"></div>
+                </div>
+
+                <div class="practice-card">
+                    <span class="badge" style="background: #ef4444; color: white;">Hard</span>
+                    <p style="margin-top: 10px;">Find $f'(x)$ if $f(x) = \frac{2}{(5x+1)^3}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans-3" placeholder="Type answer...">
+                        <button class="btn-check" onclick="checkAnswer(3, '-30(5x+1)^-4', '-30/(5x+1)^4')">Check</button>
+                        <button class="btn-hint" onclick="showHint(3, 'Rewrite as 2(5x+1)^-3 before you start.')">Hint</button>
+                    </div>
+                    <div id="feedback-3" class="feedback"></div>
+                </div>
+            </section>
+
+            <section class="next-path">
+                <h2 style="font-family: 'Lexend', sans-serif; font-size: 32px; margin-bottom: 16px;">Beyond Algebra.</h2>
+                <p style="font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto 32px;">You are now armed with the Power, Product, Quotient, and Chain rules. You can differentiate any algebraic function. But what about functions that aren't polynomials? What about $e^x$ and $\ln(x)$?</p>
+                
+                <a href="transcendental.html" class="btn-large">
+                    Continue: Exponentials & Logs <span style="font-size: 24px;">→</span>
+                </a>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- INTERACTIVE 1: GEARS ---
+            const sliderDuDx = document.getElementById("slider-du-dx");
+            const sliderDyDu = document.getElementById("slider-dy-du");
+            
+            const valDuDx = document.getElementById("val-du-dx");
+            const valDyDu = document.getElementById("val-dy-du");
+            const valTotal = document.getElementById("val-total");
+            
+            const speedUText = document.getElementById("speed-u");
+            const speedYText = document.getElementById("speed-y");
+
+            const gearX = document.getElementById("gear-x");
+            const gearU = document.getElementById("gear-u");
+            const gearY = document.getElementById("gear-y");
+
+            let angleX = 0;
+            let angleU = 0;
+            let angleY = 0;
+
+            let du_dx = 2;
+            let dy_du = 3;
+
+            function updateGears() {
+                du_dx = parseInt(sliderDuDx.value);
+                dy_du = parseInt(sliderDyDu.value);
+
+                valDuDx.innerText = du_dx;
+                valDyDu.innerText = dy_du;
+                
+                const total = du_dx * dy_du;
+                valTotal.innerText = total;
+
+                speedUText.innerText = `Speed: ${du_dx}`;
+                speedYText.innerText = `Speed: ${total}`;
+            }
+
+            sliderDuDx.addEventListener("input", updateGears);
+            sliderDyDu.addEventListener("input", updateGears);
+
+            // Animation Loop
+            let lastTime = performance.now();
+            function animate(time) {
+                const dt = (time - lastTime) / 1000; // delta time in seconds
+                lastTime = time;
+
+                const baseSpeed = 45; // degrees per second
+                
+                angleX += baseSpeed * dt;
+                angleU += (baseSpeed * du_dx) * dt;
+                angleY += (baseSpeed * du_dx * dy_du) * dt;
+
+                gearX.style.transform = `rotate(${angleX}deg)`;
+                gearU.style.transform = `rotate(${angleU}deg)`;
+                gearY.style.transform = `rotate(${angleY}deg)`;
+
+                requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+
+
+            // --- INTERACTIVE 2: PEEL THE ONION ---
+            const mathStep = document.getElementById("math-step");
+            const onionDesc = document.getElementById("onion-desc");
+            const btn1 = document.getElementById("btn-step-1");
+            const btn2 = document.getElementById("btn-step-2");
+            const btn3 = document.getElementById("btn-step-3");
+
+            window.peelStep = function(step) {
+                const mathStep = document.getElementById("math-step");
+                const onionDesc = document.getElementById("onion-desc");
+                const btn1 = document.getElementById("btn-step-1");
+                const btn2 = document.getElementById("btn-step-2");
+                const btn3 = document.getElementById("btn-step-3");
+            
+                if(step === 0) {
+                    mathStep.innerHTML = `$y = (5x^2 - 3)^4$`;
+                    onionDesc.innerHTML = "Start by looking at the outer power of 4.";
+                    btn1.disabled = false; btn2.disabled = true; btn3.disabled = true;
+                }
+                else if(step === 1) {
+                    mathStep.innerHTML = `$\\frac{dy}{dx} = 4(5x^2 - 3)^3$`;
+                    onionDesc.innerHTML = "<strong>Step 1:</strong> Power down, subtract 1. We leave the inside $(5x^2 - 3)$ exactly as it is.";
+                    btn1.disabled = true; btn2.disabled = false;
+                }
+                else if(step === 2) {
+                    mathStep.innerHTML = `$\\frac{dy}{dx} = 4(5x^2 - 3)^3 \\times (10x)$`;
+                    onionDesc.innerHTML = "<strong>Step 2:</strong> Multiply by the derivative of the inside. The derivative of $5x^2 - 3$ is $10x$.";
+                    btn2.disabled = true; btn3.disabled = false;
+                }
+                else if(step === 3) {
+                    mathStep.innerHTML = `$\\frac{dy}{dx} = 40x(5x^2 - 3)^3$`;
+                    onionDesc.innerHTML = "<strong>Step 3:</strong> Clean it up. Multiply the $4$ and the $10x$ to get $40x$.";
+                    btn3.disabled = true;
+                }
+            
+                // THIS IS THE KEY CHANGE: 
+                // We tell MathJax to look at BOTH the formula and the description text.
+                MathJax.typesetPromise([mathStep, onionDesc]);
+            };
+        });
+
+        // --- PRACTICE CHECKER ---
+        window.checkAnswer = function(id, ...correctStrs) {
+            const input = document.getElementById('ans-' + id).value;
+            // Clean input completely
+            const cleanInput = input.replace(/\s+/g, '').toLowerCase();
+            const feedback = document.getElementById('feedback-' + id);
+            feedback.style.display = 'block';
+            
+            let isCorrect = false;
+            for(let str of correctStrs) {
+                if(cleanInput === str || cleanInput === str.replace('+', '')) {
+                    isCorrect = true;
+                    break;
+                }
+            }
+
+            if(isCorrect) {
+                feedback.innerHTML = "✅ Perfect! You broke the chain successfully.";
+                feedback.style.color = "#10b981";
+            } else {
+                feedback.innerHTML = "❌ Not quite. Make sure you multiplied the outside constant by the inside derivative!";
+                feedback.style.color = "#ef4444";
+            }
+        };
+
+        window.showHint = function(id, text) {
+            const feedback = document.getElementById('feedback-' + id);
+            feedback.style.display = 'block';
+            feedback.innerHTML = "💡 Hint: " + text;
+            feedback.style.color = "#f59e0b";
+        };
+    </script>
+</body>
+</html>

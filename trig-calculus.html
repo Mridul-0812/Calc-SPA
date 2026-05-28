@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigonometric Calculus | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                macros: {
+                    cosec: '\\operatorname{cosec}'
+                }
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            /* CalcSPA Exact Colour Palette */
+            --bg-body: #0f111a;
+            --bg-sidebar: #161b22;
+            --bg-card: #1c212b;
+            --bg-card-hover: #222834;
+            --bg-input: #0d1117;
+            
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --text-category: #6e7681;
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.2);
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --accent-teal: #14b8a6;
+            --accent-orange: #f97316;
+            
+            --success: #2ea043;
+            --warning: #d29922;
+            --danger: #f85149;
+            
+            --border-color: #30363d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ==========================================================================
+           2. SIDEBAR NAVIGATION 
+           ========================================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            padding-left: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .brand-icon { color: var(--accent-blue); font-size: 28px; }
+
+        .nav-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-category);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            padding-left: 12px;
+            margin-top: 24px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        .nav-link.active {
+            background-color: var(--accent-purple);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* ==========================================================================
+           3. MAIN CONTENT LAYOUT
+           ========================================================================== */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 1200px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .hero-title span { color: var(--accent-teal); }
+
+        .hero-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .info-box {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--accent-teal);
+            padding: 24px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .formula-box {
+            background-color: rgba(20, 184, 166, 0.05);
+            border: 1px solid var(--accent-teal);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 1.25rem;
+        }
+
+        /* ==========================================================================
+           4. INTERACTIVE CARDS & CANVASES
+           ========================================================================== */
+        .interactive-section { margin-bottom: 80px; }
+        
+        .interactive-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            background-color: rgba(20, 184, 166, 0.2);
+            color: var(--accent-teal);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        /* Function Toggles */
+        .tab-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--bg-input);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-card-hover);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-teal);
+            color: white;
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+        
+        .tab-btn.active-recip {
+            background: var(--accent-purple);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            background-color: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .canvas-container.small {
+            height: 300px;
+        }
+
+        canvas { width: 100%; height: 100%; display: block; }
+
+        /* --- Controls & Sliders --- */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            background-color: var(--bg-body);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        #slider-recip::-webkit-slider-thumb {
+            background: var(--accent-purple);
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        
+        .math-readout {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.25rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ==========================================================================
+           5. EXAMPLES AND PRACTISE
+           ========================================================================== */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        @media(min-width: 900px) {
+            .examples-grid { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        .example-box {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            border-top: 4px solid var(--accent-teal);
+        }
+
+        .example-box.medium { border-top-color: var(--accent-blue); }
+        .example-box.hard { border-top-color: var(--accent-pink); }
+
+        .step-list {
+            margin-top: 16px;
+            list-style: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .step-list li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+        .step-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent-teal); }
+
+        .practise-container {
+            background-color: var(--bg-card);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px dashed var(--border-color);
+            margin-bottom: 60px;
+        }
+
+        .question { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid var(--border-color); }
+        .question:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+        .input-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus { outline: none; border-color: var(--accent-teal); }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            color: white;
+        }
+
+        .btn:hover { opacity: 0.9; }
+        .btn-submit { background-color: var(--accent-teal); }
+        .btn-hint { background-color: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+
+        .feedback {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.success { background-color: rgba(46, 160, 67, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .feedback.error { background-color: rgba(248, 81, 73, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+        .feedback.hint-msg { background-color: rgba(210, 153, 34, 0.1); border: 1px solid var(--warning); color: var(--warning); }
+
+        /* ==========================================================================
+           6. DERIVATION BOX
+           ========================================================================== */
+        .derivation-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* ==========================================================================
+           7. FOOTER NAV
+           ========================================================================== */
+        .footer-nav {
+            text-align: center;
+            padding-top: 60px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+
+        .btn-massive {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+            color: white;
+            text-decoration: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .btn-massive:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(20, 184, 166, 0.3); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">∫</span> CalcSPA
+        </div>
+
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+        <a href="practice.html" class="nav-link">Practise & Mastery</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">The Power Rule</a>
+        <a href="product-rule.html" class="nav-link">The Product Rule</a>
+        <a href="quotient-rule.html" class="nav-link">The Quotient Rule</a>
+        <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+
+        <div class="nav-category">Advanced</div>
+        <a href="transcendental.html" class="nav-link">Exponentials & Logs</a>
+        <a href="trig-calculus.html" class="nav-link active">Trigonometric Calculus</a>
+    </aside>
+
+    <main class="main-wrapper">
+        <h1 class="hero-title">Trigonometric <span>Calculus</span></h1>
+        <p class="hero-subtitle">The maths of oscillations, waves, and circles. Discover how the rates of change of trig functions create a beautiful, never-ending cycle.</p>
+
+        <section class="interactive-section">
+            <h2>1. The Primary Trig Functions ($\sin$, $\cos$, $\tan$)</h2>
+            
+            <div class="info-box">
+                <strong>The Core Three Derivatives:</strong><br>
+                $\frac{d}{dx}[\sin x] = \cos x$ <br>
+                $\frac{d}{dx}[\cos x] = -\sin x$ <br>
+                $\frac{d}{dx}[\tan x] = \sec^2 x$
+            </div>
+
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Before we memorise the rules, let's prove where they come from. Deriving these functions relies heavily on foundational limits and trigonometric identities.
+            </p>
+
+            <div class="derivation-box">
+                <h4 style="color: var(--accent-teal); margin-bottom: 12px;">Deriving $\sin(x)$ from First Principles</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+                    We use the angle addition formula $\sin(A+B) = \sin A \cos B + \cos A \sin B$ and the standard limit $\lim_{h \to 0} \frac{\sin h}{h} = 1$.
+                </p>
+                <div style="font-size: 1.1rem; text-align: left; overflow-x: auto;">
+                    $$f'(x) = \lim_{h \to 0} \frac{\sin(x+h) - \sin(x)}{h}$$
+                    $$f'(x) = \lim_{h \to 0} \frac{\sin x \cos h + \cos x \sin h - \sin x}{h}$$
+                    $$f'(x) = \lim_{h \to 0} \left[ \sin x \left( \frac{\cos h - 1}{h} \right) + \cos x \left( \frac{\sin h}{h} \right) \right]$$
+                    $$f'(x) = \sin x \cdot (0) + \cos x \cdot (1) = \cos x$$
+                </div>
+            </div>
+
+            <div class="derivation-box">
+                <h4 style="color: var(--accent-blue); margin-bottom: 12px;">Deriving $\tan(x)$ using the Quotient Rule</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+                    Since $\tan(x) = \frac{\sin(x)}{\cos(x)}$, we can simply apply the quotient rule: $\frac{u'v - uv'}{v^2}$.
+                </p>
+                <div style="font-size: 1.1rem; text-align: left; overflow-x: auto;">
+                    $$\frac{d}{dx}\left[\frac{\sin x}{\cos x}\right] = \frac{(\cos x)(\cos x) - (\sin x)(-\sin x)}{(\cos x)^2}$$
+                    $$= \frac{\cos^2 x + \sin^2 x}{\cos^2 x}$$
+                    $$= \frac{1}{\cos^2 x} = \sec^2 x$$
+                </div>
+            </div>
+
+            <div class="interactive-card">
+                <div class="card-header">
+                    <h3>Interactive 1: The Master Visualiser</h3>
+                    <span class="badge">Primary Functions</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    Select a function below to visualise its derivative in real-time. Move the slider to trace along the base wave (solid colour) and watch how the slope of the tangent generates the exact path of the derivative wave (dashed pink).
+                </p>
+                
+                <div class="tab-group" id="main-tabs">
+                    <button class="tab-btn active" onclick="setMainFunction('sin')">$\sin(x) \implies \cos(x)$</button>
+                    <button class="tab-btn" onclick="setMainFunction('cos')">$\cos(x) \implies -\sin(x)$</button>
+                    <button class="tab-btn" onclick="setMainFunction('tan')">$\tan(x) \implies \sec^2(x)$</button>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="canvas-main"></canvas>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="slider-group">
+                        <div class="slider-labels">
+                            <span>Position $x$ (Radians)</span>
+                            <span id="main-val" style="color: var(--accent-teal);">0.00</span>
+                        </div>
+                        <input type="range" id="slider-main" min="-6.28" max="6.28" step="0.05" value="0">
+                    </div>
+                    <div class="math-readout" id="math-main">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="interactive-section">
+            <h2>2. The Reciprocal Functions ($\sec$, $\operatorname{cosec}$, $\cot$)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                The reciprocal functions often intimidate students, but they are easily derived using the quotient or chain rule. By rewriting them with negative indices, differentiation becomes straightforward.
+            </p>
+
+            <div class="formula-box">
+                <div style="color: var(--text-muted); font-size: 1rem; margin-bottom: 12px; text-align: left;">
+                    <strong>Deriving Secant:</strong> $\frac{d}{dx}[(\cos x)^{-1}] = -1(\cos x)^{-2}(-\sin x) = \frac{\sin x}{\cos^2 x} = \frac{1}{\cos x} \cdot \frac{\sin x}{\cos x} = \sec x \tan x$<br><br>
+                    <strong>Deriving Cosecant:</strong> $\frac{d}{dx}[(\sin x)^{-1}] = -1(\sin x)^{-2}(\cos x) = -\frac{\cos x}{\sin^2 x} = -\frac{1}{\sin x} \cdot \frac{\cos x}{\sin x} = -\cosec x \cot x$
+                </div>
+                <hr style="border: 1px solid rgba(20, 184, 166, 0.2); margin: 20px 0;">
+                $\frac{d}{dx}[\sec x] = \sec x \tan x$ <br><br>
+                $\frac{d}{dx}[\cosec x] = -\cosec x \cot x$ <br><br>
+                $\frac{d}{dx}[\cot x] = -\cosec^2 x$
+            </div>
+
+            <div class="interactive-card">
+                <div class="card-header">
+                    <h3>Interactive 2: The Reciprocals</h3>
+                    <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple);">Asymptote Explorer</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    Explore the derivatives of the reciprocal functions. Notice how their derivatives shoot to infinity near vertical asymptotes!
+                </p>
+                
+                <div class="tab-group" id="recip-tabs">
+                    <button class="tab-btn active-recip" onclick="setRecipFunction('sec')">$\sec(x)$</button>
+                    <button class="tab-btn" onclick="setRecipFunction('cosec')">$\cosec(x)$</button>
+                    <button class="tab-btn" onclick="setRecipFunction('cot')">$\cot(x)$</button>
+                </div>
+
+                <div class="canvas-container small">
+                    <canvas id="canvas-recip"></canvas>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="slider-group">
+                        <div class="slider-labels">
+                            <span>Position $x$</span>
+                            <span id="recip-val" style="color: var(--accent-purple);">0.00</span>
+                        </div>
+                        <input type="range" id="slider-recip" min="-3.14" max="3.14" step="0.05" value="0.0">
+                    </div>
+                    <div class="math-readout" id="math-recip">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="interactive-section">
+            <h2>3. Worked Examples</h2>
+            <div class="examples-grid">
+                <div class="example-box">
+                    <h4 style="color: var(--accent-teal);">🟢 Easy: Trig Chain Rule</h4>
+                    <p style="margin-top: 10px;">Find $y'$ for $y = \sin(4x^2)$</p>
+                    <ul class="step-list">
+                        <li>Inside: $u = 4x^2 \implies u' = 8x$</li>
+                        <li>Outside: $\sin(u) \implies \cos(u)$</li>
+                        <li>Multiply: $y' = 8x \cdot \cos(4x^2)$</li>
+                    </ul>
+                </div>
+                <div class="example-box medium">
+                    <h4 style="color: var(--accent-blue);">🟡 Medium: Product Rule</h4>
+                    <p style="margin-top: 10px;">Find $y'$ for $y = x^3 \tan(x)$</p>
+                    <ul class="step-list">
+                        <li>$u = x^3 \implies u' = 3x^2$</li>
+                        <li>$v = \tan(x) \implies v' = \sec^2(x)$</li>
+                        <li>$y' = u'v + uv'$</li>
+                        <li>$y' = 3x^2 \tan(x) + x^3 \sec^2(x)$</li>
+                    </ul>
+                </div>
+                <div class="example-box hard">
+                    <h4 style="color: var(--accent-pink);">🔴 Hard: Nested Reciprocals</h4>
+                    <p style="margin-top: 10px;">Find $y'$ for $y = \cosec^3(2x)$</p>
+                    <ul class="step-list">
+                        <li>Rewrite: $y = [\cosec(2x)]^3$</li>
+                        <li>Power rule: $3[\cosec(2x)]^2 \cdot \frac{d}{dx}[\cosec(2x)]$</li>
+                        <li>Inner deriv: $-\cosec(2x)\cot(2x) \cdot 2$</li>
+                        <li>Combine: $-6\cosec^3(2x)\cot(2x)$</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="interactive-section">
+            <div class="practise-container">
+                <h3 style="margin-bottom: 20px;">Test Your Knowledge: Trig & Reciprocals</h3>
+                
+                <div class="question">
+                    <p><strong>1. Easy:</strong> Differentiate $y = \cos(5x)$</p>
+                    <div class="input-row">
+                        <input type="text" id="ans-t1" placeholder="Type your answer...">
+                        <button class="btn btn-submit" onclick="checkAnswer('t1', ['-5sin(5x)', '-5*sin(5x)'])">Check</button>
+                        <button class="btn btn-hint" onclick="showHint('t1', 'The derivative of cos is -sin. Don\'t forget the chain rule for the 5x!')">Hint</button>
+                    </div>
+                    <div id="fb-t1" class="feedback"></div>
+                </div>
+
+                <div class="question">
+                    <p><strong>2. Medium:</strong> Differentiate $y = e^x \sin(x)$</p>
+                    <div class="input-row">
+                        <input type="text" id="ans-t2" placeholder="Type your answer...">
+                        <button class="btn btn-submit" onclick="checkAnswer('t2', ['e^xsin(x)+e^xcos(x)', 'e^x(sin(x)+cos(x))', 'e^xcos(x)+e^xsin(x)'])">Check</button>
+                        <button class="btn btn-hint" onclick="showHint('t2', 'Use the product rule! The derivative of e^x is just e^x.')">Hint</button>
+                    </div>
+                    <div id="fb-t2" class="feedback"></div>
+                </div>
+
+                <div class="question">
+                    <p><strong>3. Hard:</strong> Differentiate $y = \cosec(3x)$</p>
+                    <div class="input-row">
+                        <input type="text" id="ans-t3" placeholder="Type your answer...">
+                        <button class="btn btn-submit" onclick="checkAnswer('t3', ['-3cosec(3x)cot(3x)', '-3cot(3x)cosec(3x)', '-3*cosec(3x)*cot(3x)'])">Check</button>
+                        <button class="btn btn-hint" onclick="showHint('t3', 'The derivative of cosec(u) is -cosec(u)cot(u) * u\'. Watch your negative signs!')">Hint</button>
+                    </div>
+                    <div id="fb-t3" class="feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <h2 style="font-size: 2rem;">Ready to See Calculus in the Real World?</h2>
+            <p style="color: var(--text-muted); margin: 10px 0 20px;">You've mastered the rules. Now let's apply them to physics, optimisation, and kinematics.</p>
+            <a href="applications.html" class="btn-massive">Next: Applications of Calculus →</a>
+        </div>
+    </main>
+
+    <script>
+        // --- UTILITIES ---
+        function setupCanvas(id) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            return { canvas, ctx, width: rect.width, height: rect.height };
+        }
+
+        let mathTimeout = null;
+        function updateMathjax(id, tex) {
+            const el = document.getElementById(id);
+            el.innerHTML = tex;
+            // Debounce the MathJax typesetting to keep sliders smooth
+            clearTimeout(mathTimeout);
+            mathTimeout = setTimeout(() => {
+                if(window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise([el]);
+                }
+            }, 50);
+        }
+
+        // --- GLOBAL STATE ---
+        let currentMainFunc = 'sin';
+        let currentRecipFunc = 'sec';
+
+        // --- INTERACTIVE 1: MAIN FUNCTIONS ---
+        function setMainFunction(func) {
+            currentMainFunc = func;
+            const btns = document.querySelectorAll('#main-tabs .tab-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            drawMain();
+        }
+
+        function drawMain() {
+            const { ctx, width, height } = setupCanvas('canvas-main');
+            const slider = document.getElementById('slider-main');
+            const valSpan = document.getElementById('main-val');
+            
+            const oX = width / 2;
+            const oY = height / 2;
+            const scaleX = 80;
+            const scaleY = 80;
+
+            const xVal = parseFloat(slider.value);
+            valSpan.innerText = xVal.toFixed(2);
+            
+            let fVal, fPrime, fName, fPrimeName;
+
+            // Define the functions
+            if (currentMainFunc === 'sin') {
+                fVal = Math.sin(xVal);
+                fPrime = Math.cos(xVal);
+                fName = '\\sin';
+                fPrimeName = '\\cos';
+            } else if (currentMainFunc === 'cos') {
+                fVal = Math.cos(xVal);
+                fPrime = -Math.sin(xVal);
+                fName = '\\cos';
+                fPrimeName = '-\\sin';
+            } else if (currentMainFunc === 'tan') {
+                // Prevent exact asymptote landing for cleaner visuals
+                let safeX = xVal;
+                if(Math.abs(Math.cos(safeX)) < 0.05) safeX += 0.05;
+                fVal = Math.tan(safeX);
+                fPrime = 1 / Math.pow(Math.cos(safeX), 2); // sec^2
+                fName = '\\tan';
+                fPrimeName = '\\sec^2';
+            }
+
+            updateMathjax('math-main', `At $x = ${xVal.toFixed(2)}$, $${fName}(x) = ${fVal.toFixed(2)}$ and slope $${fPrimeName}(x) = ${fPrime.toFixed(2)}$`);
+
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw Axes
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(oX, 0); ctx.lineTo(oX, height);
+            ctx.moveTo(0, oY); ctx.lineTo(width, oY);
+            ctx.stroke();
+
+            // Draw Full Function (Base wave)
+            ctx.strokeStyle = 'rgba(20, 184, 166, 0.4)'; // Faded Teal
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let x = -8; x <= 8; x += 0.05) {
+                let y;
+                if (currentMainFunc === 'sin') y = Math.sin(x);
+                else if (currentMainFunc === 'cos') y = Math.cos(x);
+                else y = Math.tan(x);
+
+                const px = oX + x * scaleX;
+                const py = oY - y * scaleY;
+                
+                // Lift pen for tan asymptotes
+                if (currentMainFunc === 'tan' && (py < -200 || py > height + 200)) {
+                    ctx.moveTo(px, py);
+                } else {
+                    if (x === -8) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Draw Derivative Trace up to xVal
+            ctx.strokeStyle = '#ec4899'; // Pink
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            for (let x = -8; x <= xVal; x += 0.05) {
+                let yPrime;
+                if (currentMainFunc === 'sin') yPrime = Math.cos(x);
+                else if (currentMainFunc === 'cos') yPrime = -Math.sin(x);
+                else yPrime = 1 / Math.pow(Math.cos(x), 2);
+
+                const px = oX + x * scaleX;
+                const py = oY - yPrime * scaleY;
+
+                if (currentMainFunc === 'tan' && (py < -200 || py > height + 200)) {
+                    ctx.moveTo(px, py);
+                } else {
+                    if (x === -8) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Current Point & Tangent Line
+            let safeX = xVal;
+            if (currentMainFunc === 'tan' && Math.abs(Math.cos(safeX)) < 0.05) safeX += 0.05;
+
+            const curPx = oX + safeX * scaleX;
+            const curPy = oY - fVal * scaleY;
+
+            // Draw Tangent line
+            ctx.strokeStyle = '#3b82f6'; // Blue
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const dx = 1; 
+            ctx.moveTo(curPx - dx * scaleX, curPy - (-dx * fPrime) * scaleY);
+            ctx.lineTo(curPx + dx * scaleX, curPy - (dx * fPrime) * scaleY);
+            ctx.stroke();
+
+            // Dots
+            ctx.fillStyle = '#14b8a6'; // Teal Base dot
+            ctx.beginPath(); ctx.arc(curPx, curPy, 6, 0, Math.PI*2); ctx.fill();
+            
+            ctx.fillStyle = '#ec4899'; // Pink Deriv dot
+            ctx.beginPath(); ctx.arc(curPx, oY - fPrime * scaleY, 6, 0, Math.PI*2); ctx.fill();
+        }
+
+        // --- INTERACTIVE 2: RECIPROCAL FUNCTIONS ---
+        function setRecipFunction(func) {
+            currentRecipFunc = func;
+            const btns = document.querySelectorAll('#recip-tabs .tab-btn');
+            btns.forEach(btn => btn.classList.remove('active-recip'));
+            event.target.classList.add('active-recip');
+            drawRecip();
+        }
+
+        function drawRecip() {
+            const { ctx, width, height } = setupCanvas('canvas-recip');
+            const slider = document.getElementById('slider-recip');
+            const valSpan = document.getElementById('recip-val');
+            
+            const oX = width / 2;
+            const oY = height / 2;
+            const scaleX = 80;
+            const scaleY = 40; // Smaller scale for rapid growth
+
+            let xVal = parseFloat(slider.value);
+            valSpan.innerText = xVal.toFixed(2);
+            
+            let fVal, fPrime, fName, fPrimeName;
+
+            // Shift slightly off exact asymptotes to prevent JS infinity breaking maths string
+            if (currentRecipFunc === 'sec' && Math.abs(Math.cos(xVal)) < 0.05) xVal += 0.05;
+            if (currentRecipFunc === 'cosec' && Math.abs(Math.sin(xVal)) < 0.05) xVal += 0.05;
+            if (currentRecipFunc === 'cot' && Math.abs(Math.sin(xVal)) < 0.05) xVal += 0.05;
+
+            if (currentRecipFunc === 'sec') {
+                fVal = 1 / Math.cos(xVal);
+                fPrime = fVal * Math.tan(xVal);
+                fName = '\\sec';
+                fPrimeName = '\\sec(x)\\tan(x)';
+            } else if (currentRecipFunc === 'cosec') {
+                fVal = 1 / Math.sin(xVal);
+                fPrime = -fVal * (1/Math.tan(xVal)); // -cosec*cot
+                fName = '\\cosec';
+                fPrimeName = '-\\cosec(x)\\cot(x)';
+            } else if (currentRecipFunc === 'cot') {
+                fVal = 1 / Math.tan(xVal);
+                fPrime = -1 / Math.pow(Math.sin(xVal), 2); // -cosec^2
+                fName = '\\cot';
+                fPrimeName = '-\\cosec^2(x)';
+            }
+
+            updateMathjax('math-recip', `At $x = ${xVal.toFixed(2)}$, $${fName}(x) = ${fVal.toFixed(2)}$ and slope is $${fPrime.toFixed(2)}$`);
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw Axes
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(oX, 0); ctx.lineTo(oX, height);
+            ctx.moveTo(0, oY); ctx.lineTo(width, oY);
+            ctx.stroke();
+
+            // Draw Reciprocal Base Function
+            ctx.strokeStyle = '#8b5cf6'; // Purple
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let x = -4; x <= 4; x += 0.05) {
+                let y;
+                if (currentRecipFunc === 'sec') y = 1/Math.cos(x);
+                else if (currentRecipFunc === 'cosec') y = 1/Math.sin(x);
+                else y = 1/Math.tan(x);
+
+                const px = oX + x * scaleX;
+                const py = oY - y * scaleY;
+                
+                if (py < -200 || py > height + 200) {
+                    ctx.moveTo(px, py); // Lift pen over asymptote
+                } else {
+                    if (x === -4) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Current Point & Tangent
+            const curPx = oX + xVal * scaleX;
+            const curPy = oY - fVal * scaleY;
+
+            ctx.strokeStyle = '#f97316'; // Orange tangent line
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const dx = 0.5;
+            ctx.moveTo(curPx - dx * scaleX, curPy - (-dx * fPrime) * scaleY);
+            ctx.lineTo(curPx + dx * scaleX, curPy - (dx * fPrime) * scaleY);
+            ctx.stroke();
+
+            // Dot
+            ctx.fillStyle = '#8b5cf6';
+            ctx.beginPath(); ctx.arc(curPx, curPy, 6, 0, Math.PI*2); ctx.fill();
+        }
+
+        // --- QUIZ LOGIC ---
+        function checkAnswer(id, validAnswers) {
+            const input = document.getElementById(`ans-${id}`).value;
+            // Clean input by removing spaces and standardising to lowercase
+            const cleanedInput = input.replace(/\s+/g, '').toLowerCase();
+            const fb = document.getElementById(`fb-${id}`);
+            
+            fb.style.display = 'block';
+            fb.className = 'feedback';
+
+            let isCorrect = validAnswers.some(ans => ans.replace(/\s+/g, '').toLowerCase() === cleanedInput);
+            
+            if (isCorrect) {
+                fb.classList.add('success');
+                fb.innerHTML = `✅ <strong>Correct!</strong> Brilliant work.`;
+            } else {
+                fb.classList.add('error');
+                fb.innerHTML = `❌ <strong>Incorrect.</strong> Check your derivative rules again and try rewriting the expression.`;
+            }
+        }
+
+        function showHint(id, msg) {
+            const fb = document.getElementById(`fb-${id}`);
+            fb.style.display = 'block';
+            fb.className = 'feedback hint-msg';
+            fb.innerHTML = `💡 <strong>Hint:</strong> ${msg}`;
+        }
+
+        // --- BOOT ---
+        window.addEventListener('load', () => {
+            // Attach event listeners to sliders
+            document.getElementById('slider-main').addEventListener('input', drawMain);
+            document.getElementById('slider-recip').addEventListener('input', drawRecip);
+            
+            // Handle window resize dynamically
+            window.addEventListener('resize', () => {
+                drawMain();
+                drawRecip();
+            });
+
+            // Initial renders
+            drawMain();
+            drawRecip();
+        });
+    </script>
+</body>
+</html>

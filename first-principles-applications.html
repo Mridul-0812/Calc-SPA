@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Masterclass | Applying First Principles</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a; --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1); --accent-primary: #3b82f6;
+            --accent-success: #10b981; --accent-warning: #f59e0b;
+            --accent-danger: #ef4444; --accent-purple: #8b5cf6;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+        .app-container { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--glass-bg); border-right: 1px solid var(--glass-border); padding: 24px; display: flex; flex-direction: column; backdrop-filter: blur(12px); flex-shrink: 0; }
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+        .logo-icon { font-size: 28px; color: var(--accent-primary); }
+        .logo-container h2 { font-family: 'Lexend', sans-serif; font-size: 24px; font-weight: 700; }
+        .nav-link { display: block; padding: 10px 12px; color: var(--text-muted); text-decoration: none; border-radius: 8px; transition: 0.2s; margin-bottom: 4px; }
+        .nav-link.active { background: var(--accent-primary); color: white; }
+
+        /* Content Area */
+        .main-content { flex: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
+        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 32px; margin-bottom: 40px; backdrop-filter: blur(12px); }
+        
+        .hero-title { font-family: 'Lexend', sans-serif; font-size: 38px; margin-bottom: 10px; text-align: center; }
+        .hero-subtitle { color: var(--text-muted); text-align: center; margin-bottom: 40px; font-size: 18px; }
+
+        /* Worked Solutions Styling */
+        .solution-box { border-left: 4px solid var(--accent-primary); background: rgba(255,255,255,0.03); padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 30px; }
+        .difficulty-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+        
+        /* Practice Section */
+        .practice-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .input-group { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
+        input[type="text"] { background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 6px; color: white; flex: 1; }
+        .btn-check { background: var(--accent-success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-hint { background: transparent; border: 1px solid var(--accent-warning); color: var(--accent-warning); padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+        .feedback { margin-top: 10px; font-size: 14px; display: none; }
+
+        /* The "Formula Hero" Interactive */
+        .interactive-formula { text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 20px; border: 1px solid var(--accent-primary); margin-bottom: 60px; }
+        .formula-display { font-size: 2rem; margin: 20px 0; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+
+        /* Continuation Button */
+        .next-path { text-align: center; margin-top: 80px; padding: 40px; border-top: 1px solid var(--glass-border); }
+        .btn-large { display: inline-block; background: var(--accent-primary); color: white; padding: 20px 40px; border-radius: 12px; font-size: 20px; font-weight: 700; text-decoration: none; transition: 0.3s; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+        .btn-large:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo-container">
+                <span class="logo-icon">∫</span>
+                <h2>CalcSPA</h2>
+            </div>
+            <nav>
+                <span class="section-title" style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 10px;">Foundations</span>
+                <a href="index.html" class="nav-link">Introduction</a>
+                <a href="limits.html" class="nav-link">Limits</a>
+                <a href="first-principles.html" class="nav-link">First Principles</a>
+                <a href="first-principles-applications.html" class="nav-link active">Practice & Mastery</a>
+                <a href="power-rule.html" class="nav-link">The Power Rule</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1 class="hero-title">Practice: Finding the <span class="text-accent">Derivative</span></h1>
+            <p class="hero-subtitle">Before we learn the shortcuts, we must prove we can handle the formula. Master the algebra of $f'(x)$ here.</p>
+
+            <div class="interactive-formula">
+                <h3 style="font-family: 'Lexend';">Step 1: Set Up Your Formula</h3>
+                <p>Choose a function to see how it "plugs into" the First Principles machine.</p>
+                <div style="margin: 20px 0; display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn-check" style="background: var(--accent-purple);" onclick="showSetup('3x')">f(x) = 3x</button>
+                    <button class="btn-check" style="background: var(--accent-purple);" onclick="showSetup('x^2')">f(x) = x²</button>
+                    <button class="btn-check" style="background: var(--accent-purple);" onclick="showSetup('x^2 + 5')">f(x) = x² + 5</button>
+                </div>
+                <div class="formula-display" id="setup-display">
+                    Select a function above to begin...
+                </div>
+            </div>
+
+            <h2 style="font-family: 'Lexend'; margin-bottom: 20px;">Three Worked Solutions</h2>
+            
+            <div class="solution-box">
+                <span class="difficulty-tag" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-success);">Easy: Linear</span>
+                <p><strong>Find the derivative of $f(x) = 7x$ from first principles.</strong></p>
+                $$f'(x) = \lim_{h \to 0} \frac{7(x+h) - 7x}{h}$$
+                $$= \lim_{h \to 0} \frac{7x + 7h - 7x}{h}$$
+                $$= \lim_{h \to 0} \frac{7h}{h} = 7$$
+                <p style="color: var(--accent-success); font-weight: 600;">Result: $f'(x) = 7$</p>
+            </div>
+
+            <div class="solution-box">
+                <span class="difficulty-tag" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-warning);">Medium: Quadratic</span>
+                <p><strong>Find the derivative of $f(x) = x^2 + 2x$ from first principles.</strong></p>
+                $$f'(x) = \lim_{h \to 0} \frac{((x+h)^2 + 2(x+h)) - (x^2 + 2x)}{h}$$
+                $$= \lim_{h \to 0} \frac{x^2 + 2xh + h^2 + 2x + 2h - x^2 - 2x}{h}$$
+                $$= \lim_{h \to 0} \frac{2xh + h^2 + 2h}{h} = \lim_{h \to 0} (2x + h + 2)$$
+                <p style="color: var(--accent-warning); font-weight: 600;">Result: $f'(x) = 2x + 2$</p>
+            </div>
+
+            <div class="solution-box">
+                <span class="difficulty-tag" style="background: rgba(239, 68, 68, 0.2); color: var(--accent-danger);">Hard: The Shortcut Proof</span>
+                <p><strong>Find the derivative of $f(x) = 3x^2$ from first principles.</strong></p>
+                $$f'(x) = \lim_{h \to 0} \frac{3(x+h)^2 - 3x^2}{h}$$
+                $$= \lim_{h \to 0} \frac{3(x^2 + 2xh + h^2) - 3x^2}{h}$$
+                $$= \lim_{h \to 0} \frac{3x^2 + 6xh + 3h^2 - 3x^2}{h}$$
+                $$= \lim_{h \to 0} (6x + 3h)$$
+                <p style="color: var(--accent-danger); font-weight: 600;">Result: $f'(x) = 6x$</p>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 60px 0;">
+
+            <h2 style="font-family: 'Lexend'; margin-bottom: 20px;">Your Turn to Practice</h2>
+            <p style="margin-bottom: 30px; color: var(--text-muted);">Work these out on paper first, then check your answer!</p>
+
+            <div class="practice-card">
+                <span class="difficulty-tag" style="background: #10b981;">Easy</span>
+                <p>Find $f'(x)$ if $f(x) = 12x$.</p>
+                <div class="input-group">
+                    <input type="text" id="ans-1" placeholder="Type your answer...">
+                    <button class="btn-check" onclick="checkAnswer(1, '12')">Check</button>
+                    <button class="btn-hint" onclick="showHint(1, 'Think about what happened in the 7x example!')">Hint</button>
+                </div>
+                <div id="feedback-1" class="feedback"></div>
+            </div>
+
+            <div class="practice-card">
+                <span class="difficulty-tag" style="background: #f59e0b;">Medium</span>
+                <p>Find $f'(x)$ if $f(x) = x^2 - 10$.</p>
+                <div class="input-group">
+                    <input type="text" id="ans-2" placeholder="Type your answer...">
+                    <button class="btn-check" onclick="checkAnswer(2, '2x')">Check</button>
+                    <button class="btn-hint" onclick="showHint(2, 'The -10 will cancel out when you subtract f(x).')">Hint</button>
+                </div>
+                <div id="feedback-2" class="feedback"></div>
+            </div>
+
+            <div class="practice-card">
+                <span class="difficulty-tag" style="background: #ef4444;">Hard</span>
+                <p>Find $f'(x)$ if $f(x) = 5x^2$.</p>
+                <div class="input-group">
+                    <input type="text" id="ans-3" placeholder="Type your answer...">
+                    <button class="btn-check" onclick="checkAnswer(3, '10x')">Check</button>
+                    <button class="btn-hint" onclick="showHint(3, 'Expand 5(x+h)² carefully!')">Hint</button>
+                </div>
+                <div id="feedback-3" class="feedback"></div>
+            </div>
+
+            <div class="next-path">
+                <h2>Exhausted from all that algebra?</h2>
+                <p style="margin-bottom: 30px; color: var(--text-muted);">You've done it the hard way. Now, let's learn how to find these answers in 2 seconds using the most famous rule in Calculus.</p>
+                <a href="power-rule.html" class="btn-large">Learn the Shortcut: Power Rule →</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function showSetup(func) {
+            const display = document.getElementById('setup-display');
+            let math = '';
+            if(func === '3x') {
+                math = '$$f\'(x) = \\lim_{h \\to 0} \\frac{3(x+h) - 3x}{h}$$';
+            } else if(func === 'x^2') {
+                math = '$$f\'(x) = \\lim_{h \\to 0} \\frac{(x+h)^2 - x^2}{h}$$';
+            } else if(func === 'x^2 + 5') {
+                math = '$$f\'(x) = \\lim_{h \\to 0} \\frac{((x+h)^2 + 5) - (x^2 + 5)}{h}$$';
+            }
+            display.innerHTML = math;
+            MathJax.typesetPromise();
+        }
+
+        function checkAnswer(id, correct) {
+            const userAns = document.getElementById('ans-' + id).value.toLowerCase().replace(/\s+/g, '');
+            const feedback = document.getElementById('feedback-' + id);
+            feedback.style.display = 'block';
+            
+            if(userAns === correct) {
+                feedback.innerHTML = "✅ Correct! You've got the hang of this.";
+                feedback.style.color = "#10b981";
+            } else {
+                feedback.innerHTML = "❌ Not quite. Check your expansion or simplify again.";
+                feedback.style.color = "#ef4444";
+            }
+        }
+
+        function showHint(id, text) {
+            const feedback = document.getElementById('feedback-' + id);
+            feedback.style.display = 'block';
+            feedback.innerHTML = "💡 Hint: " + text;
+            feedback.style.color = "#f59e0b";
+        }
+    </script>
+</body>
+</html>

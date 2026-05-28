@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal Motion: Speeding & Slowing | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --bg-sidebar: #1e293b;
+            --bg-card: #1e293b;
+            --bg-inset: #0d1117;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-pos: #8b5cf6; 
+            --accent-vel: #10b981; 
+            --accent-acc: #ef4444; 
+            --accent-warn: #f59e0b; 
+            --border-ui: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==========================================================================
+           2. NAVIGATION SIDEBAR
+           ========================================================================== */
+           .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+        .logo-box { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2.5rem; font-family: 'Lexend'; font-weight: 700; font-size: 1.5rem;}
+        .nav-link { display: block; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 0.5rem; font-size: 0.9rem; transition: 0.2s; margin-bottom: 0.25rem; }
+        .nav-link.active { background: var(--accent-pos); color: white; }
+
+        /* MAIN CONTENT */
+        .content-wrap { margin-left: var(--sidebar-width); flex: 1; padding: 4rem 5%; max-width: 1200px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-ui); border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 3rem; }
+        h1, h2, h3 { font-family: 'Lexend'; margin-bottom: 1.5rem; }
+        h1 { font-size: 3rem; }
+        
+        /* LOGIC BOXES */
+        .logic-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0; }
+        .logic-item { padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border-ui); text-align: center; }
+        .up { border-top: 5px solid var(--accent-vel); background: rgba(16, 185, 129, 0.05); }
+        .down { border-top: 5px solid var(--accent-acc); background: rgba(239, 68, 68, 0.05); }
+
+        /* THE CAR SIMULATOR */
+        .sim-stage { background: var(--bg-inset); border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-ui); position: relative; overflow: hidden; }
+        .status-header { background: var(--accent-warn); color: #000; text-align: center; padding: 0.75rem; border-radius: 0.5rem; font-weight: 800; font-family: 'Lexend'; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 1px;}
+        
+        .track { width: 100%; height: 120px; border-bottom: 2px solid #334155; position: relative; display: flex; align-items: flex-end; }
+        .origin-marker { position: absolute; left: 50%; bottom: -25px; transform: translateX(-50%); font-size: 0.75rem; color: var(--text-muted); }
+        .origin-marker::before { content: ''; position: absolute; top: -10px; left: 50%; width: 2px; height: 10px; background: #334155; }
+
+        /* CAR DESIGN */
+        #car-wrapper { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .car-body { width: 80px; height: 30px; background: #3b82f6; border-radius: 10px 15px 5px 5px; position: relative; }
+        .car-top { width: 45px; height: 20px; background: #60a5fa; position: absolute; top: -15px; left: 10px; border-radius: 10px 10px 0 0; }
+        .wheel { width: 15px; height: 15px; background: #000; border-radius: 50%; position: absolute; bottom: -7px; border: 2px solid #64748b; }
+        .wheel-l { left: 8px; } .wheel-r { right: 8px; }
+        
+        .vector-arrow { position: absolute; height: 4px; border-radius: 2px; transition: width 0.2s; }
+        #v-vector { top: -40px; background: var(--accent-vel); left: 50%; }
+        #a-vector { top: -30px; background: var(--accent-acc); left: 50%; }
+
+        .sim-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 1rem; }
+        input[type=range] { width: 100%; accent-color: var(--accent-pos); margin-top: 0.5rem; }
+
+        /* PRACTICE SECTION */
+        .q-box { background: var(--bg-inset); padding: 2rem; border-radius: 1rem; border: 1px solid var(--border-ui); margin-bottom: 2rem; }
+        .btn-group { display: flex; gap: 1rem; margin-top: 1rem; }
+        .btn { padding: 0.8rem 1.5rem; border-radius: 0.5rem; border: none; cursor: pointer; font-family: 'Lexend'; font-weight: 600; transition: 0.2s; }
+        .btn-yes { background: var(--accent-vel); color: white; }
+        .btn-no { background: var(--accent-acc); color: white; }
+        .btn-check { background: var(--accent-pos); color: white; }
+        .feedback { margin-top: 1rem; font-weight: 600; min-height: 1.5em; }
+
+        footer { text-align: center; padding: 4rem 0; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">∫ CalcSPA</div>
+        
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">Power Rule</a>
+        <a href="product-quotient.html" class="nav-link">Product & Quotient Rules</a>
+        <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+        <a href="trig-calculus.html" class="nav-link">Trigonometric Calculus</a>
+        <a href="exp-log-calculus.html" class="nav-link">Exponential & Logarithmic</a>
+
+        <div class="nav-category">Mastery</div>
+        <a href="applications.html" class="nav-link">App v1: Tangents</a>
+        <a href="applications2.html" class="nav-link">App v2: Normals</a>
+        <a href="applicationsv3.html" class="nav-link">App v3: Higher Derivatives</a>
+        <a href="applications4.html" class="nav-link">App v4: Motion & Kinematics</a>
+        <a href="applications5.html" class="nav-link">App v5: Harder Motion</a>
+        <a href="applications6.html" class="nav-link active">App v6: speeding vs Slowing Down</a>
+    </aside>
+
+    <main class="content-wrap">
+        <header>
+            <h1>Horizontal <span style="color:var(--accent-pos);">Dynamics</span></h1>
+            <p style="font-size:1.2rem; color:var(--text-secondary);">Unpacking the relationship between vectors, direction, and speed.</p>
+        </header>
+
+        <section class="card">
+            <h2>The "Sign" Misconception</h2>
+            <p>In kinematics, many students believe that a <strong>negative acceleration</strong> automatically means an object is slowing down. <strong>This is a mathematical trap!</strong></p>
+            
+            <blockquote style="border-left: 4px solid var(--accent-warn); padding: 1rem 2rem; background: rgba(0,0,0,0.2); margin: 2rem 0; border-radius: 0 1rem 1rem 0;">
+                Acceleration is a <strong>vector</strong>. The sign $(+/-)$ only tells you the <strong>direction</strong> of the push. To know if an object is actually getting faster, you must compare that push to the direction it is currently moving (Velocity).
+            </blockquote>
+
+            <h3>The Golden Rule of Speed</h3>
+            <p>Speed is the magnitude of velocity ($|v|$). An object's speed increases if the acceleration "helps" the velocity, and decreases if it "fights" it.</p>
+            
+            <div class="logic-container">
+                <div class="logic-item up">
+                    <h4 style="color:var(--accent-vel)">Speeding Up</h4>
+                    <p>$v$ and $a$ have the <strong>SAME SIGN</strong></p>
+                    <p style="font-size:0.8rem; margin-top:10px;">$v > 0, a > 0$ (Rightward push)<br>$v < 0, a < 0$ (Leftward push)</p>
+                    <div style="margin-top:15px; font-weight:bold;">$v \times a > 0$</div>
+                </div>
+                <div class="logic-item down">
+                    <h4 style="color:var(--accent-acc)">Slowing Down</h4>
+                    <p>$v$ and $a$ have <strong>OPPOSITE SIGNS</strong></p>
+                    <p style="font-size:0.8rem; margin-top:10px;">$v > 0, a < 0$ (Braking to left)<br>$v < 0, a > 0$ (Braking to right)</p>
+                    <div style="margin-top:15px; font-weight:bold;">$v \times a < 0$</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>The Vector Simulator</h2>
+            <p>Observe the vectors above the car. When the green arrow (Velocity) and red arrow (Acceleration) point the same way, the car speeds up!</p>
+            
+            <div class="sim-stage">
+                <div id="status-display" class="status-header">Status: At Rest</div>
+                
+                <div class="track">
+                    <div class="origin-marker">x = 0 (Origin)</div>
+                    
+                    <div id="car-wrapper">
+                        <div id="v-vector" class="vector-arrow"></div>
+                        <div id="a-vector" class="vector-arrow"></div>
+                        
+                        <div class="car-body">
+                            <div class="car-top"></div>
+                            <div class="wheel wheel-l"></div>
+                            <div class="wheel wheel-r"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-controls">
+                    <div>
+                        <label style="color:var(--accent-vel); font-weight:700;">Velocity ($v$): <span id="v-out">0</span> m/s</label>
+                        <input type="range" id="v-slider" min="-20" max="20" value="0">
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:5px;">Determines the direction of motion.</p>
+                    </div>
+                    <div>
+                        <label style="color:var(--accent-acc); font-weight:700;">Acceleration ($a$): <span id="a-out">0</span> m/s²</label>
+                        <input type="range" id="a-slider" min="-10" max="10" value="0">
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:5px;">Determines the direction of the force.</p>
+                    </div>
+                </div>
+                <button class="btn btn-check" style="width:100%; margin-top:1rem;" onclick="resetCar()">Reset Car to Origin</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Worked Solutions</h2>
+            
+            <div class="q-box">
+                <h3>Solution 1: Determining State</h3>
+                <p>A particle moves with displacement $x = t^2 - 10t + 5$. Is it speeding up at $t = 2$?</p>
+                <div style="margin-top:1.5rem; border-left:2px solid var(--accent-pos); padding-left:1.5rem;">
+                    <p><strong>1. Find Velocity:</strong> $v(t) = \frac{dx}{dt} = 2t - 10$</p>
+                    <p><strong>2. Find Acceleration:</strong> $a(t) = \frac{dv}{dt} = 2$</p>
+                    <p><strong>3. Evaluate at $t=2$:</strong><br>
+                    $v(2) = 2(2) - 10 = -6$<br>
+                    $a(2) = 2$ (always positive)</p>
+                    <p><strong>Conclusion:</strong> Since $v$ is negative and $a$ is positive (opposite signs), the particle is <strong>Slowing Down</strong>.</p>
+                </div>
+            </div>
+
+            <div class="q-box">
+                <h3>Solution 2: Finding the Domain</h3>
+                <p>For what values of $t$ is the particle $x = \frac{1}{3}t^3 - 4t^2 + 12t$ speeding up for $t \ge 0$?</p>
+                <div style="margin-top:1.5rem; border-left:2px solid var(--accent-pos); padding-left:1.5rem;">
+                    <p><strong>Step 1:</strong> $v(t) = t^2 - 8t + 12 = (t-2)(t-6)$<br>
+                    $v > 0$ on $(0,2)$ and $(6, \infty)$; $v < 0$ on $(2,6)$.</p>
+                    <p><strong>Step 2:</strong> $a(t) = 2t - 8 = 2(t-4)$<br>
+                    $a > 0$ for $t > 4$; $a < 0$ for $t < 4$.</p>
+                    <p><strong>Step 3: Match Signs:</strong><br>
+                    - Speeding up when both are positive: $t > 6$.<br>
+                    - Speeding up when both are negative: $2 < t < 4$.</p>
+                    <p><strong>Final Domain:</strong> $2 < t < 4$ or $t > 6$.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Adaptive Practice</h2>
+            
+            <div class="q-box">
+                <p><strong>Q1 (Simple):</strong> A car is moving left ($v = -15$) and the driver hits the brakes, creating a rightward acceleration ($a = 5$). Is the car speeding up?</p>
+                <div class="btn-group">
+                    <button class="btn btn-yes" onclick="checkQ(1, false)">Yes</button>
+                    <button class="btn btn-no" onclick="checkQ(1, true)">No</button>
+                </div>
+                <div id="f1" class="feedback"></div>
+            </div>
+
+            <div class="q-box">
+                <p><strong>Q2 (Tricky):</strong> A particle's velocity is $v = t^2 - 4$. At $t = 1$, is it speeding up?</p>
+                <div class="btn-group">
+                    <button class="btn btn-yes" onclick="checkQ(2, true)">Yes</button>
+                    <button class="btn btn-no" onclick="checkQ(2, false)">No</button>
+                </div>
+                <div id="f2" class="feedback"></div>
+            </div>
+
+            <div class="q-box">
+                <p><strong>Q3 (Tricky):</strong> If $a$ is constant and negative, and the object is currently moving left, is it speeding up?</p>
+                <div class="btn-group">
+                    <button class="btn btn-yes" onclick="checkQ(3, true)">Yes</button>
+                    <button class="btn btn-no" onclick="checkQ(3, false)">No</button>
+                </div>
+                <div id="f3" class="feedback"></div>
+            </div>
+
+            <div class="q-box">
+                <p><strong>Q4 (Domain Mastery):</strong> Find the domain where $x = t^2 - 6t$ is <strong>slowing down</strong>.</p>
+                <input type="text" id="q4-ans" placeholder="e.g. 0 < t < 3" style="background:#000; color:#fff; border:1px solid #444; padding:0.8rem; border-radius:0.5rem; width:200px;">
+                <button class="btn btn-check" onclick="checkQ4()">Check Domain</button>
+                <div id="f4" class="feedback"></div>
+            </div>
+        </section>
+
+        <footer>
+            <a href="finish.html" style="text-decoration:none;">
+                <button class="btn" style="background:var(--accent-pos); color:white; padding:1.5rem 3rem; font-size:1.2rem; box-shadow: 0 0 30px rgba(139,92,246,0.3);">
+                    FINISH (HURRAY!) →
+                </button>
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        // SIMULATOR LOGIC
+        const car = document.getElementById('car-wrapper');
+        const vSlider = document.getElementById('v-slider');
+        const aSlider = document.getElementById('a-slider');
+        const vOut = document.getElementById('v-out');
+        const aOut = document.getElementById('a-out');
+        const vVec = document.getElementById('v-vector');
+        const aVec = document.getElementById('a-vector');
+        const statusDisplay = document.getElementById('status-display');
+
+        let carPos = 50; // Percentage of track width
+
+        function updateSim() {
+            const v = parseFloat(vSlider.value);
+            const a = parseFloat(aSlider.value);
+            
+            vOut.innerText = v;
+            aOut.innerText = a;
+
+            // Update Vectors
+            vVec.style.width = Math.abs(v * 3) + "px";
+            vVec.style.transform = v >= 0 ? "translateX(0)" : "translateX(-100%)";
+            
+            aVec.style.width = Math.abs(a * 6) + "px";
+            aVec.style.transform = a >= 0 ? "translateX(0)" : "translateX(-100%)";
+
+            // Update Status UI
+            if (v === 0) {
+                statusDisplay.innerText = "Status: At Rest";
+                statusDisplay.style.background = "var(--text-muted)";
+            } else if ((v > 0 && a > 0) || (v < 0 && a < 0)) {
+                statusDisplay.innerText = "Status: Speeding Up";
+                statusDisplay.style.background = "var(--accent-vel)";
+            } else if (a === 0) {
+                statusDisplay.innerText = "Status: Constant Velocity";
+                statusDisplay.style.background = "var(--accent-pos)";
+            } else {
+                statusDisplay.innerText = "Status: Slowing Down";
+                statusDisplay.style.background = "var(--accent-acc)";
+            }
+        }
+
+        function animate() {
+            const v = parseFloat(vSlider.value);
+            // Move car based on velocity
+            carPos += (v * 0.05);
+            
+            /* SMOOTH TRANSITION WRAPPER 
+               The car width is approx 80px. To seem to disappear fully,
+               we let it go to -15% or 115% before wrapping.
+            */
+            if (carPos > 115) {
+                carPos = -15;
+            } else if (carPos < -15) {
+                carPos = 115;
+            }
+
+            car.style.left = carPos + "%";
+            requestAnimationFrame(animate);
+        }
+
+        function resetCar() { carPos = 50; }
+
+        vSlider.addEventListener('input', updateSim);
+        aSlider.addEventListener('input', updateSim);
+
+        // PRACTICE LOGIC
+        function checkQ(id, isCorrect) {
+            const f = document.getElementById('f' + id);
+            if (isCorrect) {
+                f.innerText = "Correct! Well reasoned.";
+                f.style.color = "var(--accent-vel)";
+            } else {
+                f.innerText = "Try again. Compare the signs of velocity and acceleration!";
+                f.style.color = "var(--accent-acc)";
+            }
+        }
+
+        function checkQ4() {
+            const ans = document.getElementById('q4-ans').value.replace(/\s/g, '');
+            const f = document.getElementById('f4');
+            if (ans.includes("t<3") || ans.includes("0<t<3")) {
+                f.innerText = "Correct! Since a = 2 (positive), we need v < 0, which occurs when t < 3.";
+                f.style.color = "var(--accent-vel)";
+            } else {
+                f.innerText = "Hint: Find v(t) and a(t). Acceleration is always +2 here.";
+                f.style.color = "var(--accent-acc)";
+            }
+        }
+
+        updateSim();
+        animate();
+    </script>
+</body>
+</html>

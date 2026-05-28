@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Kinematics & Graph Modelling | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --bg-sidebar: #1e293b;
+            --bg-card: #1e293b;
+            --bg-inset: #0d1117;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-pos: #8b5cf6; 
+            --accent-vel: #10b981; 
+            --accent-acc: #ef4444; 
+            --accent-warn: #f59e0b; 
+            --border-ui: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ==========================================================================
+           2. NAVIGATION SIDEBAR
+           ========================================================================== */
+           .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+        .logo-box { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2.5rem; }
+        .logo-text { font-family: 'Lexend', sans-serif; font-size: 1.25rem; font-weight: 700; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1rem; color: var(--text-muted); margin-bottom: 0.75rem; display: block; }
+        .nav-link { display: block; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 0.5rem; font-size: 0.9rem; transition: 0.2s; margin-bottom: 0.25rem; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .nav-link.active { background: var(--accent-pos); color: white; font-weight: 600; }
+
+        /* MAIN CONTENT */
+        .content-wrap { margin-left: var(--sidebar-width); flex: 1; padding: 4rem 5%; max-width: 1300px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-ui); border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        h1, h2, h3 { font-family: 'Lexend', sans-serif; margin-bottom: 1rem; }
+        h1 { font-size: 3rem; }
+        h2 { color: var(--accent-vel); border-bottom: 1px solid var(--border-ui); padding-bottom: 0.5rem; }
+
+        /* THEORY STYLING */
+        .hierarchy-box { background: var(--bg-inset); padding: 2rem; border-radius: 1rem; border-left: 4px solid var(--accent-pos); margin: 2rem 0; }
+        .pro-tip { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--accent-warn); margin: 2rem 0; }
+        
+        /* STATIONARY POINTS GALLERY */
+        .sp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+        .sp-card { background: var(--bg-inset); padding: 1.5rem; border-radius: 1rem; text-align: center; border: 1px solid var(--border-ui); }
+        .sp-svg { width: 100%; height: 120px; }
+
+        /* INTERACTIVE SKETCHER */
+        .sketch-container { background: #000; border: 2px solid var(--border-ui); border-radius: 1rem; position: relative; cursor: crosshair; touch-action: none; }
+        canvas { display: block; width: 100%; height: 550px; }
+        .tab-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab { padding: 0.6rem 1rem; background: var(--bg-inset); border: 1px solid var(--border-ui); border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; color: var(--text-secondary); transition: 0.2s; }
+        .tab.active { background: var(--accent-pos); color: white; border-color: var(--accent-pos); }
+        .ui-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 1rem 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid var(--border-ui); border-top: none; }
+        
+        /* CALCULATION SECTION */
+        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+        .calc-card { background: var(--bg-inset); padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border-ui); }
+        input { background: #000; border: 1px solid var(--text-muted); color: #fff; padding: 0.5rem; border-radius: 0.4rem; width: 100px; margin-right: 0.5rem; }
+        .btn { padding: 0.6rem 1.2rem; border-radius: 0.5rem; cursor: pointer; border: none; font-weight: 600; font-family: 'Inter'; transition: 0.2s; }
+        .btn-check { background: var(--accent-vel); color: white; }
+        .btn-clear { background: transparent; color: var(--text-secondary); border: 1px solid var(--text-muted); }
+        .feedback { margin-top: 1rem; font-size: 0.9rem; font-weight: 500; }
+
+        /* WORKED SOLUTIONS */
+        .sol-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem; align-items: center; border-bottom: 1px solid var(--border-ui); padding: 2rem 0; }
+        .sol-graph { background: #000; border-radius: 0.75rem; padding: 1rem; border: 1px solid var(--border-ui); }
+        
+        .score-overlay { position: absolute; top: 1rem; right: 1rem; background: rgba(0,0,0,0.85); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--accent-vel); display: none; backdrop-filter: blur(5px); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">∫ CalcSPA</div>
+        
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">Power Rule</a>
+        <a href="product-quotient.html" class="nav-link">Product & Quotient Rules</a>
+        <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+        <a href="trig-calculus.html" class="nav-link">Trigonometric Calculus</a>
+        <a href="exp-log-calculus.html" class="nav-link">Exponential & Logarithmic</a>
+
+        <div class="nav-category">Mastery</div>
+        <a href="applications.html" class="nav-link">App v1: Tangents</a>
+        <a href="applications2.html" class="nav-link">App v2: Normals</a>
+        <a href="applicationsv3.html" class="nav-link">App v3: Higher Derivatives</a>
+        <a href="applications4.html" class="nav-link">App v4: Motion & Kinematics</a>
+        <a href="applications5.html" class="nav-link active">App v5: Harder Motion</a>
+        <a href="applications6.html" class="nav-link">App v6: speeding vs Slowing Down</a>
+    </aside>
+
+
+    <main class="content-wrap">
+        <header>
+            <h1 style="margin-bottom:0.2rem;">Harder Motion & <span style="color:var(--accent-pos);">Graphing</span></h1>
+            <p style="color:var(--text-secondary); font-size:1.2rem; margin-bottom:3rem;">Mastering the physical interpretation of derivatives through visual modelling.</p>
+        </header>
+
+        <section class="card">
+            <h2>The Calculus Hierarchy</h2>
+            <p>In kinematics, everything is linked by the derivative. If you have a function for where something is, you can find its speed and its acceleration just by differentiating.</p>
+            
+            <div class="hierarchy-box">
+                <p><strong>1. Displacement $x(t)$</strong><br>The position of an object relative to an origin at time $t$.</p>
+                <p style="margin-top:1rem;"><strong>2. Velocity $v(t) = \frac{dx}{dt}$</strong><br>The rate of change of displacement. If $v(t) = 0$, the object is <strong>instantaneously at rest</strong>.</p>
+                <p style="margin-top:1rem;"><strong>3. Acceleration $a(t) = \frac{dv}{dt} = \frac{d^2x}{dt^2}$</strong><br>The rate at which velocity changes. If $a(t) = 0$, velocity is constant (a stationary point on the velocity graph!).</p>
+            </div>
+
+            <div class="pro-tip">
+                <h4 style="color:var(--accent-warn); margin-bottom:0.5rem;">Pro Tip: The Graph Secret</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li>The <strong>Gradient</strong> of a Displacement graph is Velocity.</li>
+                    <li>The <strong>Gradient</strong> of a Velocity graph is Acceleration.</li>
+                    <li>A <strong>Stationary Point</strong> on the Displacement graph means the object has stopped and is likely changing direction.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Visualizing Stationary Points</h2>
+            <p>Before we sketch, we must understand what "Turning Points" actually mean in the real world. A turning point occurs when the gradient is zero ($f'(x) = 0$).</p>
+            
+            <div class="sp-grid">
+                <div class="sp-card">
+                    <svg class="sp-svg" viewBox="0 0 200 100">
+                        <path d="M 20 80 Q 100 -10 180 80" fill="none" stroke="var(--accent-pos)" stroke-width="3"/>
+                        <circle cx="100" cy="35" r="5" fill="var(--accent-warn)"/>
+                    </svg>
+                    <h4 style="color:var(--accent-pos);">Local Maximum</h4>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">The object reaches its furthest positive point before turning back.</p>
+                </div>
+                <div class="sp-card">
+                    <svg class="sp-svg" viewBox="0 0 200 100">
+                        <path d="M 20 20 Q 100 110 180 20" fill="none" stroke="var(--accent-pos)" stroke-width="3"/>
+                        <circle cx="100" cy="65" r="5" fill="var(--accent-warn)"/>
+                    </svg>
+                    <h4 style="color:var(--accent-pos);">Local Minimum</h4>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">The object reaches its furthest negative point before turning back.</p>
+                </div>
+                <div class="sp-card">
+                    <svg class="sp-svg" viewBox="0 0 200 100">
+                        <path d="M 20 80 C 80 80 120 20 180 20" fill="none" stroke="var(--accent-pos)" stroke-width="3"/>
+                        <circle cx="100" cy="50" r="5" fill="var(--accent-warn)"/>
+                    </svg>
+                    <h4 style="color:var(--accent-pos);">Point of Inflection</h4>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);">The object pauses momentarily but continues in the same direction.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Worked Solutions: Drawing Trends</h2>
+            
+            <div class="sol-layout">
+                <div>
+                    <h3>1. The Quadratic Launch</h3>
+                    <p>A ball is thrown with $x(t) = 4t - t^2$. Find $v(t)$ and describe the motion.</p>
+                    <p style="margin-top:1rem; font-size:0.9rem;">
+                        <strong>Solution:</strong> Differentiating gives $v(t) = 4 - 2t$.<br>
+                        At $t=0, v=4$. At $t=2, v=0$ (at rest/max height).<br>
+                        The velocity graph is a straight line starting at 4 and crossing the axis at $t=2$.
+                    </p>
+                </div>
+                <div class="sol-graph">
+                    <svg viewBox="0 0 300 180">
+                        <line x1="20" y1="140" x2="280" y2="140" stroke="#334155"/>
+                        <path d="M 40 140 Q 140 20 240 140" fill="none" stroke="var(--accent-pos)" stroke-width="2" stroke-opacity="0.5"/>
+                        <line x1="40" y1="60" x2="240" y2="170" stroke="var(--accent-vel)" stroke-width="3"/>
+                        <text x="230" y="155" fill="var(--accent-vel)" font-size="10">v(t)</text>
+                        <text x="130" y="40" fill="var(--accent-pos)" font-size="10">x(t)</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="sol-layout">
+                <div>
+                    <h3>2. Cubic Oscillations</h3>
+                    <p>A particle moves with $x(t) = t^3 - 6t^2 + 9t$. When does it change direction?</p>
+                    <p style="margin-top:1rem; font-size:0.9rem;">
+                        <strong>Solution:</strong> $v(t) = 3t^2 - 12t + 9 = 3(t-1)(t-3)$.<br>
+                        It stops at $t=1$ and $t=3$.<br>
+                        Graphically, the velocity is a parabola hitting zero at 1 and 3.
+                    </p>
+                </div>
+                <div class="sol-graph">
+                    <svg viewBox="0 0 300 180">
+                        <line x1="20" y1="90" x2="280" y2="90" stroke="#334155"/>
+                        <path d="M 40 140 Q 90 20 140 90 T 240 40" fill="none" stroke="var(--accent-pos)" stroke-width="2" stroke-opacity="0.3"/>
+                        <path d="M 50 30 Q 140 200 230 30" fill="none" stroke="var(--accent-vel)" stroke-width="3"/>
+                        <circle cx="85" cy="90" r="4" fill="var(--accent-warn)"/>
+                        <circle cx="195" cy="90" r="4" fill="var(--accent-warn)"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="sol-layout" style="border:none;">
+                <div>
+                    <h3>3. Exponential Decay</h3>
+                    <p>A car brakes with $x(t) = 10(1 - e^{-t})$. Find the velocity after a long time.</p>
+                    <p style="margin-top:1rem; font-size:0.9rem;">
+                        <strong>Solution:</strong> $v(t) = 10e^{-t}$.<br>
+                        As $t \to \infty, v(t) \to 0$.<br>
+                        The velocity graph starts high and approaches the axis as an asymptote.
+                    </p>
+                </div>
+                <div class="sol-graph">
+                    <svg viewBox="0 0 300 180">
+                        <line x1="20" y1="150" x2="280" y2="150" stroke="#334155"/>
+                        <path d="M 20 150 C 50 40 150 40 280 40" fill="none" stroke="var(--accent-pos)" stroke-width="2" stroke-opacity="0.3"/>
+                        <path d="M 20 40 Q 60 140 280 148" fill="none" stroke="var(--accent-vel)" stroke-width="3"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>The Sketching Lab: 6 Levels of Mastery</h2>
+            <p style="margin-bottom:1.5rem;">Select a function type, study the Displacement ($x$) graph, and sketch its Velocity ($v$) derivative. </p>
+            
+            <div class="tab-bar" id="tabBar">
+                <div class="tab active" onclick="setMode(0)">1. Quadratic</div>
+                <div class="tab" onclick="setMode(1)">2. Cubic</div>
+                <div class="tab" onclick="setMode(2)">3. Quartic</div>
+                <div class="tab" onclick="setMode(3)">4. Trig ($sin/cos$)</div>
+                <div class="tab" onclick="setMode(4)">5. Exponential ($e^x$)</div>
+                <div class="tab" onclick="setMode(5)">6. Weird ($ln$)</div>
+            </div>
+
+            <div class="sketch-container" id="sketchBox">
+                <div class="score-overlay" id="scorePanel">
+                    <h3 id="scoreText" style="margin:0; color:var(--accent-vel);">Accuracy: 0%</h3>
+                    <p id="scoreMsg" style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.4rem;"></p>
+                </div>
+                <canvas id="mainCanvas"></canvas>
+            </div>
+
+            <div class="ui-row">
+                <div style="display:flex; gap:1rem;">
+                    <button class="btn btn-clear" onclick="clearCanvas()">Clear Sketch</button>
+                    <button class="btn btn-check" onclick="checkGraph()">Check My Gradient</button>
+                </div>
+                <div id="hintLabel" style="font-family:'Fira Code'; font-size:0.75rem; color:var(--text-muted);">
+                    Goal: $v(t) = \frac{dx}{dt}$
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Numerical Practice</h2>
+            <div class="calc-grid">
+                <div class="calc-card">
+                    <h3>Problem A</h3>
+                    <p style="font-size:0.95rem;">A particle's displacement is $x(t) = 2t^3 - 9t^2 + 12t$.<br>Calculate the <strong>Velocity</strong> at $t = 2$.</p>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin:1rem 0;">Hint: Differentiate to find $v(t)$, then substitute $t=2$.</p>
+                    <input type="number" id="ansA" placeholder="Ans">
+                    <button class="btn btn-check" onclick="checkA()">Check</button>
+                    <div id="feedA" class="feedback"></div>
+                </div>
+                <div class="calc-card">
+                    <h3>Problem B</h3>
+                    <p style="font-size:0.95rem;">A particle moves with velocity $v(t) = e^{2t} - 7.389$.<br>At what <strong>time</strong> $t$ is the particle at rest? (use 3 sig figs)</p>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin:1rem 0;">Hint: Set $v(t) = 0$ and solve for $t$ using natural logs.</p>
+                    <input type="number" id="ansB" step="0.1" placeholder="Ans">
+                    <button class="btn btn-check" onclick="checkB()">Check</button>
+                    <div id="feedB" class="feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <footer style="text-align:center; padding: 4rem 0;">
+            <a href="applications6.html" style="text-decoration:none;">
+                <button class="btn btn-check" style="padding:1.5rem 3rem; font-size:1.2rem; background:var(--accent-pos); box-shadow: 0 0 30px rgba(139,92,246,0.3);">
+                    Proceed to Applications 6: Speeding vs. Slowing Down →
+                </button>
+            </a>
+        </footer>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const sketchBox = document.getElementById('sketchBox');
+        
+        let width, height;
+        let isDrawing = false;
+        let userPoints = [];
+        let currentMode = 0;
+
+        // DATA FOR 6 MODES
+        const modes = [
+            {
+                name: "Quadratic",
+                xFn: (t) => -0.000003 * Math.pow(t - 400, 2) + 0.6,
+                vFn: (t) => -0.000006 * (t - 400),
+                desc: "Parabolic displacement means linear velocity."
+            },
+            {
+                name: "Cubic",
+                xFn: (t) => 0.000000005 * (t * (t-350) * (t-750)),
+                vFn: (t) => 0.000000005 * (3*t*t - 2200*t + 262500),
+                desc: "Cubic displacement leads to a parabolic velocity."
+            },
+            {
+                name: "Quartic",
+                xFn: (t) => 0.00000000001 * (t * (t-200) * (t-500) * (t-800)),
+                vFn: (t) => 0.00000000001 * (4*Math.pow(t,3) - 4500*Math.pow(t,2) + 1240000*t - 80000000),
+                desc: "W-shaped displacement has 3 stationary points!"
+            },
+            {
+                name: "Trigonometric",
+                xFn: (t) => 0.2 * Math.sin(t * 0.01) + 0.3,
+                vFn: (t) => 0.2 * 0.01 * Math.cos(t * 0.01),
+                desc: "Sine displacement creates a Cosine velocity."
+            },
+            {
+                name: "Exponential",
+                xFn: (t) => 0.8 * (1 - Math.exp(-t * 0.005)),
+                vFn: (t) => 0.8 * 0.005 * Math.exp(-t * 0.005),
+                desc: "Velocity decays exponentially towards zero."
+            },
+            {
+                name: "Logarithmic Weirdness",
+                xFn: (t) => 0.15 * Math.log(t * 0.05 + 1) * Math.sin(t * 0.01),
+                vFn: (t) => 0.15 * ( (0.05/(t*0.05+1))*Math.sin(t*0.01) + Math.log(t*0.05+1)*0.01*Math.cos(t*0.01) ),
+                desc: "Complex rate of change combining growth and oscillation."
+            }
+        ];
+
+        function init() {
+            width = canvas.width = sketchBox.clientWidth;
+            height = canvas.height = 550;
+            drawAxes();
+        }
+
+        function drawAxes() {
+            ctx.clearRect(0,0,width,height);
+            const margin = 80;
+            const topY = height * 0.25;
+            const botY = height * 0.75;
+            const graphW = width - (2 * margin);
+
+            // X AXES
+            ctx.strokeStyle = '#334155';
+            ctx.setLineDash([5,5]);
+            ctx.beginPath();
+            ctx.moveTo(margin, topY); ctx.lineTo(width-margin, topY);
+            ctx.moveTo(margin, botY); ctx.lineTo(width-margin, botY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // LABELS
+            ctx.fillStyle = 'var(--text-muted)';
+            ctx.font = '12px Fira Code';
+            ctx.fillText("Displacement x(t)", margin, topY - 100);
+            ctx.fillText("Velocity v(t)", margin, botY - 100);
+
+            // DRAW DISPLACEMENT
+            const m = modes[currentMode];
+            ctx.beginPath();
+            ctx.strokeStyle = 'var(--accent-pos)';
+            ctx.lineWidth = 3;
+            for(let x=0; x <= graphW; x++) {
+                const t = (x / graphW) * 800;
+                const val = m.xFn(t);
+                const sy = topY - (val * 180);
+                if(x===0) ctx.moveTo(margin+x, sy);
+                else ctx.lineTo(margin+x, sy);
+            }
+            ctx.stroke();
+        }
+
+        function setMode(idx) {
+            currentMode = idx;
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+            clearCanvas();
+        }
+
+        function clearCanvas() {
+            userPoints = [];
+            document.getElementById('scorePanel').style.display = 'none';
+            drawAxes();
+        }
+
+        // DRAWING LOGIC
+        canvas.addEventListener('mousedown', (e) => { isDrawing = true; addPoint(e); });
+        window.addEventListener('mousemove', (e) => { if(isDrawing) addPoint(e); });
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; addPoint(e.touches[0]); e.preventDefault(); });
+        canvas.addEventListener('touchmove', (e) => { if(isDrawing) addPoint(e.touches[0]); e.preventDefault(); });
+        canvas.addEventListener('touchend', () => isDrawing = false);
+
+        function addPoint(e) {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
+            if(py > height/2) {
+                userPoints.push({x: px, y: py});
+                renderDrawing();
+            }
+        }
+
+        function renderDrawing() {
+            drawAxes();
+            ctx.beginPath();
+            ctx.strokeStyle = 'var(--accent-vel)';
+            ctx.lineWidth = 4;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            userPoints.forEach((p, i) => {
+                if(i===0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            });
+            ctx.stroke();
+        }
+
+        function checkGraph() {
+            if(userPoints.length < 10) return;
+            const m = modes[currentMode];
+            const margin = 80;
+            const graphW = width - (2*margin);
+            const botY = height * 0.75;
+
+            // Accuracy based on Gradient Trends
+            let score = 0;
+            let sampleCount = 0;
+
+            // Sort points by X
+            userPoints.sort((a,b) => a.x - b.x);
+
+            // Compare slope signs and magnitudes
+            for(let i=5; i < userPoints.length; i+=5) {
+                const p1 = userPoints[i-5];
+                const p2 = userPoints[i];
+                const userSlope = (p2.y - p1.y) / (p2.x - p1.x);
+                
+                const t = ((p1.x - margin) / graphW) * 800;
+                const targetV = m.vFn(t);
+                const targetY = botY - (targetV * 18000); // Scaled for check
+                
+                // Instead of strict Y matching, we check proximity to target curve
+                const diff = Math.abs(p1.y - targetY);
+                let pointScore = Math.max(0, 100 - (diff * 0.8));
+                score += pointScore;
+                sampleCount++;
+            }
+
+            const finalScore = (score / sampleCount).toFixed(0);
+            showScore(finalScore);
+            
+            // Draw Ghost Answer
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.setLineDash([5,5]);
+            for(let x=0; x <= graphW; x++) {
+                const t = (x / graphW) * 800;
+                const v = m.vFn(t);
+                const sy = botY - (v * 18000);
+                if(x===0) ctx.moveTo(margin+x, sy);
+                else ctx.lineTo(margin+x, sy);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function showScore(s) {
+            const p = document.getElementById('scorePanel');
+            const t = document.getElementById('scoreText');
+            const m = document.getElementById('scoreMsg');
+            p.style.display = 'block';
+            t.innerText = `Accuracy: ${s}%`;
+            if(s > 80) m.innerText = "Superb! You correctly identified the gradient trends.";
+            else if(s > 50) m.innerText = "Good attempt. Watch for the stationary points!";
+            else m.innerText = "Trend mismatch. Remember: when x stops, v is zero.";
+        }
+
+        // Numerical Checks
+        function checkA() {
+            const val = document.getElementById('ansA').value;
+            const f = document.getElementById('feedA');
+            // v(t) = 6t^2 - 18t + 12. At t=2: 6(4)-18(2)+12 = 24-36+12 = 0
+            if(parseInt(val) === 0) { f.innerText = "Correct! The particle is at rest at t=2."; f.style.color = "var(--accent-vel)"; }
+            else { f.innerText = "Try again. Hint: Find v(2)."; f.style.color = "var(--accent-acc)"; }
+        }
+
+        function checkB() {
+            const val = document.getElementById('ansB').value;
+            const f = document.getElementById('feedB');
+            // e^2t = 7.389 -> 2t = ln(7.389) -> 2t = 2 -> t=1
+            if(parseFloat(val) === 1) { f.innerText = "Spot on! t = 1.00s"; f.style.color = "var(--accent-vel)"; }
+            else { f.innerText = "Not quite. Solve e^(2t) = 7.389."; f.style.color = "var(--accent-acc)"; }
+        }
+
+        window.onload = init;
+        window.onresize = init;
+    </script>
+</body>
+</html>

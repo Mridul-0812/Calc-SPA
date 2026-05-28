@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Masterclass | The Quotient Rule</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a; --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1); --accent-primary: #3b82f6;
+            --accent-success: #10b981; --accent-warning: #f59e0b;
+            --accent-danger: #ef4444; --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899; --accent-cyan: #06b6d4;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+        .app-container { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--glass-bg); border-right: 1px solid var(--glass-border); padding: 24px; display: flex; flex-direction: column; backdrop-filter: blur(12px); flex-shrink: 0; }
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+        .logo-icon { font-size: 28px; color: var(--accent-primary); font-family: 'Lexend', sans-serif; }
+        .logo-container h2 { font-family: 'Lexend', sans-serif; font-size: 24px; font-weight: 700; }
+        .nav-section { margin-bottom: 24px; }
+        .section-title { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; display: block; margin-bottom: 12px; }
+        .nav-link { display: block; padding: 10px 12px; color: var(--text-muted); text-decoration: none; border-radius: 8px; transition: 0.2s; margin-bottom: 4px; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .nav-link.active { background: var(--accent-cyan); color: white; font-weight: 500; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 40px; max-width: 1000px; margin: 0 auto; }
+        .hero-header { margin-bottom: 40px; text-align: center; }
+        .hero-header h1 { font-family: 'Lexend', sans-serif; font-size: 42px; margin-bottom: 16px; }
+        .text-accent { color: var(--accent-cyan); }
+        .hero-subtitle { font-size: 18px; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* Story Text */
+        .story-section { font-size: 18px; line-height: 1.8; margin-bottom: 40px; background: rgba(255,255,255,0.02); padding: 24px; border-radius: 12px; border-left: 4px solid var(--accent-cyan); }
+        .formula-box { background: rgba(6, 182, 212, 0.1); padding: 30px; border-radius: 16px; text-align: center; border: 1px solid var(--accent-cyan); margin: 40px 0; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.1); }
+        
+        /* Interactivities */
+        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 32px; backdrop-filter: blur(12px); margin-bottom: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .playground-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .playground-header h3 { font-family: 'Lexend', sans-serif; font-size: 22px; }
+        .badge { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        
+        /* Builder Interactive */
+        .builder-stage { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 30px; background: #0f172a; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
+        .fraction-line { width: 100%; max-width: 400px; height: 3px; background: white; margin: 10px 0; border-radius: 2px; }
+        .numerator, .denominator { display: flex; gap: 10px; align-items: center; height: 50px; font-family: 'Lexend'; font-size: 24px; }
+        .slot { width: 60px; height: 50px; border: 2px dashed #475569; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: var(--accent-cyan); transition: 0.3s; }
+        .slot.filled { border-style: solid; border-color: var(--accent-cyan); background: rgba(6,182,212,0.1); }
+        .operator { font-size: 28px; margin: 0 5px; color: var(--text-muted); }
+        
+        .controls-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .btn-build { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .btn-build:hover { background: rgba(6, 182, 212, 0.2); border-color: var(--accent-cyan); }
+        .btn-build:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Graph Interactive */
+        .svg-canvas { width: 100%; height: 350px; background: #0f172a; border-radius: 12px; border: 1px solid #334155; position: relative; overflow: hidden; margin-bottom: 20px; }
+        .controls-panel { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--glass-border); }
+        input[type=range] { width: 100%; appearance: none; height: 8px; border-radius: 4px; background: #334155; outline: none; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-cyan); cursor: pointer; border: 3px solid #fff; }
+        
+        /* Live Data Grid */
+        .live-data { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; }
+        .data-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; text-align: center; }
+        .data-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
+        .data-value { font-family: 'Lexend', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); }
+
+        /* Worked Solutions */
+        .solution-box { background: rgba(255,255,255,0.03); padding: 24px; border-radius: 0 8px 8px 0; margin-bottom: 24px; }
+        .step-list { margin-top: 15px; }
+        .step-list p { margin-bottom: 8px; padding-left: 15px; border-left: 2px solid rgba(255,255,255,0.1); }
+        
+        /* Practice */
+        .practice-card { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .input-group { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
+        input[type="text"] { background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 6px; color: white; flex: 1; font-family: monospace; font-size: 16px; }
+        .btn-check { background: var(--accent-success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-hint { background: transparent; border: 1px solid var(--accent-warning); color: var(--accent-warning); padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+        .feedback { margin-top: 10px; font-size: 14px; display: none; }
+
+        /* Continuation Button */
+        .next-path { text-align: center; margin-top: 80px; padding: 40px; border-top: 1px solid var(--glass-border); }
+        .btn-large { display: inline-block; background: var(--accent-cyan); color: white; padding: 20px 40px; border-radius: 12px; font-size: 20px; font-weight: 700; text-decoration: none; transition: 0.3s; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3); }
+        .btn-large:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(6, 182, 212, 0.5); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo-container">
+                <span class="logo-icon">∫</span>
+                <h2>CalcSPA</h2>
+            </div>
+            
+            <nav>
+                <div class="nav-section">
+                    <span class="section-title">Foundations</span>
+                    <a href="index.html" class="nav-link">Introduction</a>
+                    <a href="limits.html" class="nav-link">Limits</a>
+                    <a href="first-principles.html" class="nav-link">First Principles</a>
+                    <a href="first-principles-applications.html" class="nav-link">Practice & Mastery</a>
+                </div>
+                <div class="nav-section">
+                    <span class="section-title">Core Techniques</span>
+                    <a href="power-rule.html" class="nav-link">The Power Rule</a>
+                    <a href="product-rule.html" class="nav-link">The Product Rule</a>
+                    <a href="quotient-rule.html" class="nav-link active">The Quotient Rule</a>
+                    <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="hero-header">
+                <h1>When Functions <span class="text-accent">Divide</span></h1>
+                <p class="hero-subtitle">You now know what to do when functions multiply. But what if one function is stacked on top of another as a fraction? Enter: The Quotient Rule.</p>
+            </header>
+
+            <div class="story-section">
+                <p>Consider the function $f(x) = \frac{x^2}{3x - 2}$.</p>
+                <p>Just like the Product Rule, <strong>you cannot simply divide the derivatives</strong>. If you try to say $f'(x) = \frac{2x}{3}$, you will get it wrong every single time.</p>
+                <p>Because fractions are essentially just multiplication in disguise (e.g., dividing by $x$ is the same as multiplying by $x^{-1}$), the Quotient Rule looks suspiciously similar to the Product Rule. But it has a notorious trap: a <strong>minus sign</strong>.</p>
+            </div>
+
+            <div class="formula-box">
+                <h3 style="margin-bottom: 15px; font-family: 'Lexend';">The Quotient Rule Formula</h3>
+                <p style="font-size: 18px; margin-bottom: 15px;">If $f(x) = \frac{u(x)}{v(x)}$, then the derivative is:</p>
+                <div style="font-size: 1.5em; margin-bottom: 15px;">
+                    $$f'(x) = \frac{v(x)u'(x) - u(x)v'(x)}{[v(x)]^2}$$
+                </div>
+                <p style="color: var(--accent-cyan); font-weight: bold; font-size: 18px;">Memory Rhyme: "Low d-High minus High d-Low, square the bottom and away we go!"</p>
+            </div>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Interactive 1: Build the Formula</h3>
+                    <span class="badge">Visualiser</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">The order of this formula matters! Because of the subtraction, if you swap the terms, your answer will be entirely backwards. Click the buttons in the correct order based on the rhyme.</p>
+
+                <div class="builder-stage">
+                    <div class="numerator" id="num-container">
+                        <div class="slot" id="slot-1">?</div>
+                        <div class="slot" id="slot-2">?</div>
+                        <div class="operator">-</div>
+                        <div class="slot" id="slot-3">?</div>
+                        <div class="slot" id="slot-4">?</div>
+                    </div>
+                    <div class="fraction-line"></div>
+                    <div class="denominator" id="den-container">
+                        <div class="slot" id="slot-5" style="width: 80px;">?</div>
+                    </div>
+                </div>
+
+                <div class="controls-grid" id="builder-controls">
+                    <button class="btn-build" onclick="fillSlot('v', 'Low')">"Low" ( $v$ )</button>
+                    <button class="btn-build" onclick="fillSlot('u\'', 'd-High')">"d-High" ( $u'$ )</button>
+                    <button class="btn-build" onclick="fillSlot('u', 'High')">"High" ( $u$ )</button>
+                    <button class="btn-build" onclick="fillSlot('v\'', 'd-Low')">"d-Low" ( $v'$ )</button>
+                    <button class="btn-build" onclick="fillSlot('v^2', 'Square the bottom')" style="grid-column: span 2;">"Square the bottom" ( $v^2$ )</button>
+                </div>
+                
+                <div id="builder-feedback" style="margin-top: 15px; text-align: center; color: var(--accent-warning); font-weight: bold; min-height: 24px;">
+                    Start with the first word of the rhyme: "Low..."
+                </div>
+                <button onclick="resetBuilder()" style="margin: 15px auto 0; display: block; background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 5px 15px; border-radius: 4px; cursor: pointer;">Reset</button>
+            </section>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Interactive 2: The Witch's Hat Curve</h3>
+                    <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-primary);">Dynamic Graph</span>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Let's differentiate $f(x) = \frac{4x}{x^2 + 1}$. Drag the slider to track the tangent. Notice how the denominator $v^2$ keeps the slope values under control even as things get steep!</p>
+
+                <div class="svg-canvas" style="height: 300px;">
+                    <svg viewBox="-5 -5 10 10" style="width: 100%; height: 100%; overflow: visible;">
+                        <line x1="-5" y1="0" x2="5" y2="0" stroke="#334155" stroke-width="0.05"/>
+                        <line x1="0" y1="-5" x2="0" y2="5" stroke="#334155" stroke-width="0.05"/>
+                        
+                        <path id="quotient-curve" fill="transparent" stroke="var(--accent-cyan)" stroke-width="0.1"/>
+                        
+                        <line id="quotient-tangent" stroke="#fff" stroke-width="0.1" />
+                        <circle id="quotient-point" r="0.15" fill="#fff" />
+                    </svg>
+                </div>
+
+                <div class="controls-panel">
+                    <input type="range" id="q-slider" min="-4" max="4" value="-1" step="0.1">
+                </div>
+
+                <div class="live-data">
+                    <div class="data-box">
+                        <span class="data-label">$u = 4x$</span>
+                        <span class="data-value" id="val-u" style="color: #3b82f6;">0.00</span>
+                    </div>
+                    <div class="data-box">
+                        <span class="data-label">$u' = 4$</span>
+                        <span class="data-value">4</span>
+                    </div>
+                    <div class="data-box">
+                        <span class="data-label">$v = x^2+1$</span>
+                        <span class="data-value" id="val-v" style="color: #10b981;">0.00</span>
+                    </div>
+                    <div class="data-box">
+                        <span class="data-label">$v' = 2x$</span>
+                        <span class="data-value" id="val-dv" style="color: #f59e0b;">0.00</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; text-align: center; font-family: 'Lexend'; font-size: 18px;">
+                    Gradient = $\frac{v(4) - u(v')}{v^2}$ = <span id="final-slope-text" style="color: var(--accent-cyan); font-weight: bold; font-size: 24px;">0</span>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Applying the Quotient Rule</h3>
+                    <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple);">Worked Solutions</span>
+                </div>
+                
+                <div class="solution-box" style="border-left: 4px solid #10b981;">
+                    <h4 style="color: #10b981; margin-bottom: 12px;"><span>🟢</span> Easy: Linear over Linear</h4>
+                    <p style="margin-bottom: 10px;"><strong>Question:</strong> Differentiate $f(x) = \frac{2x}{x - 3}$</p>
+                    <div class="step-list">
+                        <p>1. Identify: $u = 2x$ (High) and $v = x - 3$ (Low)</p>
+                        <p>2. Differentiate: $u' = 2$ and $v' = 1$</p>
+                        <p>3. Apply "Low d-High minus High d-Low, over Low squared":</p>
+                        $$f'(x) = \frac{(x-3)(2) - (2x)(1)}{(x-3)^2}$$
+                        <p>4. Expand the top ONLY. (Leave the bottom squared, it's tidier!):</p>
+                        $$f'(x) = \frac{2x - 6 - 2x}{(x-3)^2} = \frac{-6}{(x-3)^2}$$
+                    </div>
+                </div>
+
+                <div class="solution-box" style="border-left: 4px solid #f59e0b;">
+                    <h4 style="color: #f59e0b; margin-bottom: 12px;"><span>🟡</span> Medium: Polynomials</h4>
+                    <p style="margin-bottom: 10px;"><strong>Question:</strong> Differentiate $f(x) = \frac{x^2 + 1}{3x}$</p>
+                    <div class="step-list">
+                        <p>1. Identify: $u = x^2 + 1$ and $v = 3x$</p>
+                        <p>2. Differentiate: $u' = 2x$ and $v' = 3$</p>
+                        <p>3. Apply formula:</p>
+                        $$f'(x) = \frac{(3x)(2x) - (x^2 + 1)(3)}{(3x)^2}$$
+                        <p>4. Expand and simplify:</p>
+                        $$f'(x) = \frac{6x^2 - 3x^2 - 3}{9x^2} = \frac{3x^2 - 3}{9x^2}$$
+                        <p>5. (Optional) Divide everything by 3:</p>
+                        $$f'(x) = \frac{x^2 - 1}{3x^2}$$
+                    </div>
+                </div>
+
+                <div class="solution-box" style="border-left: 4px solid #ef4444;">
+                    <h4 style="color: #ef4444; margin-bottom: 12px;"><span>🔴</span> Hard: Dealing with Roots</h4>
+                    <p style="margin-bottom: 10px;"><strong>Question:</strong> Differentiate $f(x) = \frac{\sqrt{x}}{x + 2}$</p>
+                    <div class="step-list">
+                        <p>1. Rewrite: $u = x^{1/2}$ and $v = x + 2$</p>
+                        <p>2. Differentiate: $u' = \frac{1}{2}x^{-1/2}$ and $v' = 1$</p>
+                        <p>3. Apply formula (take a deep breath):</p>
+                        $$f'(x) = \frac{(x + 2)(\frac{1}{2}x^{-1/2}) - (x^{1/2})(1)}{(x + 2)^2}$$
+                        <p>4. Expand the top:</p>
+                        $$f'(x) = \frac{\frac{1}{2}x^{1/2} + x^{-1/2} - x^{1/2}}{(x + 2)^2}$$
+                        $$f'(x) = \frac{-\frac{1}{2}x^{1/2} + x^{-1/2}}{(x + 2)^2}$$
+                        <p style="color: var(--text-muted); font-size: 14px;">(In an exam, stopping here is usually perfectly fine unless asked to simplify further!)</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>Your Turn to Practise</h3>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Expand the numerator and simplify, but leave the denominator in brackets (e.g. <code>(x+3)^2</code>). No spaces in your answers.</p>
+
+                <div class="practice-card">
+                    <span class="badge" style="background: #10b981; color: white;">Easy</span>
+                    <p style="margin-top: 10px;">Find $f'(x)$ if $f(x) = \frac{2x}{x+3}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans-1" placeholder="Type answer...">
+                        <button class="btn-check" onclick="checkAnswer(1, '6/(x+3)^2')">Check</button>
+                        <button class="btn-hint" onclick="showHint(1, 'u=2x, v=x+3. Top becomes (x+3)(2) - (2x)(1).')">Hint</button>
+                    </div>
+                    <div id="feedback-1" class="feedback"></div>
+                </div>
+
+                <div class="practice-card">
+                    <span class="badge" style="background: #f59e0b; color: white;">Medium</span>
+                    <p style="margin-top: 10px;">Find $f'(x)$ if $f(x) = \frac{x^2}{2x-1}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans-2" placeholder="Type answer...">
+                        <button class="btn-check" onclick="checkAnswer(2, '(2x^2-2x)/(2x-1)^2')">Check</button>
+                        <button class="btn-hint" onclick="showHint(2, 'u=x^2, v=2x-1. Top becomes (2x-1)(2x) - (x^2)(2).')">Hint</button>
+                    </div>
+                    <div id="feedback-2" class="feedback"></div>
+                </div>
+
+                <div class="practice-card">
+                    <span class="badge" style="background: #ef4444; color: white;">Hard</span>
+                    <p style="margin-top: 10px;">Find $f'(x)$ if $f(x) = \frac{3x+5}{x^2}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans-3" placeholder="Type answer...">
+                        <button class="btn-check" onclick="checkAnswer(3, '(-3x-10)/x^4', '(-3x-10)/x^4', '-(3x+10)/x^4')">Check</button>
+                        <button class="btn-hint" onclick="showHint(3, 'Top becomes (x^2)(3) - (3x+5)(2x). Bottom is (x^2)^2 = x^4.')">Hint</button>
+                    </div>
+                    <div id="feedback-3" class="feedback"></div>
+                </div>
+            </section>
+
+            <section class="next-path">
+                <h2 style="font-family: 'Lexend', sans-serif; font-size: 32px; margin-bottom: 16px;">The Final Boss Awaits...</h2>
+                <p style="font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto 32px;">You've mastered Adding, Multiplying, and Dividing functions. But what happens if a function is trapped <em>inside</em> another function? For that, we need the most powerful rule of all.</p>
+                
+                <a href="chain-rule.html" class="btn-large">
+                    Enter: The Chain Rule <span style="font-size: 24px;">→</span>
+                </a>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- INTERACTIVE 1: BUILDER ---
+            const expectedOrder = ['v', 'u\'', 'u', 'v\'', 'v^2'];
+            const names = ['Low', 'd-High', 'High', 'd-Low', 'Square the bottom'];
+            let currentStep = 0;
+            const feedback = document.getElementById("builder-feedback");
+
+            window.fillSlot = function(val, name) {
+                if (val === expectedOrder[currentStep]) {
+                    // Correct choice
+                    const slot = document.getElementById(`slot-${currentStep + 1}`);
+                    slot.innerText = val === 'v^2' ? 'v²' : val;
+                    slot.classList.add('filled');
+                    currentStep++;
+                    
+                    if (currentStep < 5) {
+                        feedback.innerText = `Correct! Next up: "${names[currentStep]}..."`;
+                        feedback.style.color = "var(--accent-success)";
+                    } else {
+                        feedback.innerText = "🎉 Nailed it! Low d-High minus High d-Low, over Low squared!";
+                        feedback.style.color = "var(--accent-cyan)";
+                    }
+                } else {
+                    // Incorrect choice
+                    feedback.innerText = `Oops! You tried to place "${name}". Follow the rhyme!`;
+                    feedback.style.color = "var(--accent-danger)";
+                    
+                    // Shake animation for feedback
+                    feedback.style.transform = "translateX(-5px)";
+                    setTimeout(() => feedback.style.transform = "translateX(5px)", 100);
+                    setTimeout(() => feedback.style.transform = "translateX(0)", 200);
+                }
+            };
+
+            window.resetBuilder = function() {
+                currentStep = 0;
+                for(let i=1; i<=5; i++) {
+                    const slot = document.getElementById(`slot-${i}`);
+                    slot.innerText = '?';
+                    slot.classList.remove('filled');
+                }
+                feedback.innerText = 'Start with the first word of the rhyme: "Low..."';
+                feedback.style.color = 'var(--accent-warning)';
+            };
+
+            // --- INTERACTIVE 2: GRAPH TRACKER ---
+            const qSlider = document.getElementById("q-slider");
+            const qPath = document.getElementById("quotient-curve");
+            const qTangent = document.getElementById("quotient-tangent");
+            const qPoint = document.getElementById("quotient-point");
+            
+            const valU = document.getElementById("val-u");
+            const valV = document.getElementById("val-v");
+            const valDv = document.getElementById("val-dv");
+            const slopeText = document.getElementById("final-slope-text");
+
+            // Draw f(x) = 4x / (x^2 + 1). Scale for SVG viewbox (-5 to 5)
+            function getFuncY(x) {
+                return (4 * x) / (Math.pow(x, 2) + 1);
+            }
+
+            let d = "M -5 " + (-getFuncY(-5));
+            for(let x = -5; x <= 5; x += 0.2) {
+                d += ` L ${x} ${-getFuncY(x)}`; // Negative Y for SVG coordinates
+            }
+            qPath.setAttribute("d", d);
+
+            function updateGraph() {
+                const x = parseFloat(qSlider.value);
+                const y = getFuncY(x);
+                
+                // Update point (SVG coords)
+                qPoint.setAttribute("cx", x);
+                qPoint.setAttribute("cy", -y);
+
+                // Math values
+                const u = 4 * x;
+                const v = Math.pow(x, 2) + 1;
+                const du = 4;
+                const dv = 2 * x;
+                
+                // Quotient rule: (v*du - u*dv) / v^2
+                // ( (x^2+1)*4 - (4x)*(2x) ) / (x^2+1)^2
+                // = (4x^2 + 4 - 8x^2) / (x^2+1)^2 = (4 - 4x^2) / (x^2+1)^2
+                const m = (4 - 4 * Math.pow(x, 2)) / Math.pow(v, 2);
+
+                // Update text
+                valU.innerText = u.toFixed(2);
+                valV.innerText = v.toFixed(2);
+                valDv.innerText = dv.toFixed(2);
+                slopeText.innerText = m.toFixed(2);
+
+                // Draw tangent line
+                const svgM = -m; // flip slope for SVG
+                const x1 = x - 2;
+                const y1 = -y - (svgM * 2);
+                const x2 = x + 2;
+                const y2 = -y + (svgM * 2);
+                
+                qTangent.setAttribute("x1", x1);
+                qTangent.setAttribute("y1", y1);
+                qTangent.setAttribute("x2", x2);
+                qTangent.setAttribute("y2", y2);
+            }
+
+            qSlider.addEventListener("input", updateGraph);
+            updateGraph();
+        });
+
+        // --- PRACTICE CHECKER ---
+        // Accepting multiple valid string formats due to algebraic differences
+        window.checkAnswer = function(id, ...correctStrs) {
+            const input = document.getElementById('ans-' + id).value;
+            // Clean input completely
+            const cleanInput = input.replace(/\s+/g, '').toLowerCase();
+            const feedback = document.getElementById('feedback-' + id);
+            feedback.style.display = 'block';
+            
+            let isCorrect = false;
+            for(let str of correctStrs) {
+                if(cleanInput === str || cleanInput === str.replace('+', '')) {
+                    isCorrect = true;
+                    break;
+                }
+            }
+
+            if(isCorrect) {
+                feedback.innerHTML = "✅ Perfect! You successfully navigated the minus-sign trap.";
+                feedback.style.color = "#10b981";
+            } else {
+                feedback.innerHTML = "❌ Not quite. Check your expansion on the top line!";
+                feedback.style.color = "#ef4444";
+            }
+        };
+
+        window.showHint = function(id, text) {
+            const feedback = document.getElementById('feedback-' + id);
+            feedback.style.display = 'block';
+            feedback.innerHTML = "💡 Hint: " + text;
+            feedback.style.color = "#f59e0b";
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications v2: Normals | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                macros: { cosec: '\\operatorname{cosec}' }
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. COLOUR PALETTE & CORE STYLES
+           ========================================================================== */
+        :root {
+            --bg-body: #0f111a;
+            --bg-sidebar: #161b22;
+            --bg-card: #1c212b;
+            --bg-input: #0d1117;
+            
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --text-category: #6e7681;
+            
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --accent-teal: #14b8a6;
+            --accent-orange: #f97316;
+            
+            --success: #2ea043;
+            --danger: #f85149;
+            --border-color: #30363d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ==========================================================================
+           2. NAVIGATION SIDEBAR
+           ========================================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-category);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 24px 0 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover { background-color: var(--bg-card); color: var(--text-main); }
+        .nav-link.active { background-color: var(--accent-purple); color: white; }
+
+        /* ==========================================================================
+           3. MAIN LAYOUT
+           ========================================================================== */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 1300px; 
+        }
+
+        .hero-title { font-size: 3.5rem; margin-bottom: 10px; }
+        .hero-title span { color: var(--accent-teal); }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            word-wrap: break-word;
+        }
+
+        .info-box {
+            background: rgba(20, 184, 166, 0.05);
+            border-left: 4px solid var(--accent-teal);
+            padding: 24px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 30px;
+        }
+
+        /* ==========================================================================
+           4. INTERACTIVE CANVASES
+           ========================================================================== */
+        .interactive-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        .canvas-container {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            height: 480px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas { width: 100%; height: 100%; }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 5px;
+            -webkit-appearance: none;
+            outline: none;
+            margin-top: 15px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        .readout-math {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--bg-card);
+            border-radius: 6px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .highlight-t { color: var(--accent-orange); font-weight: bold; }
+        .highlight-n { color: var(--accent-teal); font-weight: bold; }
+
+        /* ==========================================================================
+           5. WORKED SOLUTIONS
+           ========================================================================== */
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+        }
+
+        .step-list { list-style: none; margin-top: 20px; }
+        .step-list li {
+            padding-left: 28px;
+            position: relative;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .step-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--accent-teal);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* ==========================================================================
+           6. PRACTISE SECTION
+           ========================================================================== */
+        .practise-container {
+            background: var(--bg-input);
+            border: 1px dashed var(--border-color);
+            padding: 40px;
+            border-radius: 16px;
+        }
+
+        .question-block {
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        input[type=text] {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-check { background: var(--accent-teal); color: white; }
+        .btn-hint { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        /* ==========================================================================
+           7. FOOTER NAVIGATION
+           ========================================================================== */
+        .footer-nav {
+            margin-top: 60px;
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .massive-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+            color: white;
+            text-decoration: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .massive-btn:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">∫ CalcSPA</div>
+        
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">The Power Rule</a>
+        <a href="trig-calculus.html" class="nav-link">Trigonometric Calculus</a>
+
+        <div class="nav-category">Mastery</div>
+        <a href="applications.html" class="nav-link">Applications: Tangents</a>
+        <a href="applications2.html" class="nav-link active">Applications v2: Normals</a>
+        <a href="applicationsv3.html" class="nav-link">Applications v3: Higher Derivatives</a>
+    </aside>
+
+    <main class="main-wrapper">
+        <h1 class="hero-title">Applications: <span>The Normal Line</span></h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px;">
+            While tangents skim the surface of a curve, <strong>Normals</strong> pierce directly through it. 
+            A normal line is perfectly perpendicular (at exactly $90^\circ$) to the tangent line at the point of contact. 
+            In physics, normals are vital for calculating forces, reflections, and structural stress.
+        </p>
+
+        <section class="card">
+            <h2>The Negative Reciprocal Rule</h2>
+            <p>
+                Because the normal is perpendicular to the tangent, their gradients are mathematically linked. 
+                If the gradient of the tangent is $m_T$, and the gradient of the normal is $m_N$, their relationship is always:
+                <br><br>
+                $$m_T \times m_N = -1 \quad \text{or} \quad m_N = -\frac{1}{m_T}$$
+            </p>
+            <div class="info-box">
+                <strong>Standard Recipe for a Normal Line:</strong>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Differentiate:</strong> Find $\frac{dy}{dx}$ to get the gradient formula.</li>
+                    <li><strong>Find Tangent Gradient ($m_T$):</strong> Substitute your $x$-value to find the steepness of the curve.</li>
+                    <li><strong>Flip & Change Sign ($m_N$):</strong> Flip the fraction of $m_T$ and multiply by $-1$. <em>(e.g., if $m_T = 2$, then $m_N = -\frac{1}{2}$)</em>.</li>
+                    <li><strong>Construct:</strong> Use your point and your <strong>new</strong> normal gradient in the equation $y - y_1 = m_N(x - x_1)$.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Visualiser 1: The Perpendicular Explorer</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Drag the slider to move the point along the cubic curve $y = 0.2x^3 - x$. Notice how the <span class="highlight-t">Tangent (Orange)</span> and <span class="highlight-n">Normal (Teal)</span> are locked in a perfect right angle. Watch the gradient readout to see the negative reciprocal in real-time.
+            </p>
+            
+            <div class="interactive-grid">
+                <div class="canvas-container">
+                    <canvas id="perpCanvas"></canvas>
+                </div>
+                <div class="controls-panel">
+                    <div class="control-card">
+                        <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; color: var(--text-category);">Position ($x$)</label>
+                        <input type="range" id="xSlider1" min="-3" max="3" step="0.1" value="1.5">
+                        
+                        <div class="readout-math" id="readout1">
+                            <span class="highlight-t">$m_T = 0.00$</span><br><br>
+                            <span class="highlight-n">$m_N = 0.00$</span><br><br>
+                            $m_T \times m_N = -1$
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card" style="border: 2px solid var(--accent-purple);">
+            <h3>Visualiser 2: Normal Line Builder (Mini-Game)</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                You are at the point $(2, 2)$ on the curve $y = -\frac{1}{2}x^2 + 4$. 
+                Use the slider to adjust the gradient of the line. Try to make it a perfect Normal line visually. The system will alert you when you hit the exact negative reciprocal!
+            </p>
+            
+            <div class="interactive-grid">
+                <div class="canvas-container">
+                    <canvas id="gameCanvas"></canvas>
+                </div>
+                <div class="controls-panel">
+                    <div class="control-card" id="gamePanel">
+                        <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; color: var(--text-category);">Adjust Gradient ($m$)</label>
+                        <input type="range" id="mSlider" min="-3" max="3" step="0.1" value="-2">
+                        
+                        <div class="readout-math" id="gameReadout" style="text-align: center; font-weight: bold;">
+                            Current $m = -2.0$
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Worked Solutions</h2>
+            <div class="solutions-grid">
+                <div class="card" style="border-top: 4px solid var(--accent-blue);">
+                    <h4 style="color: var(--accent-blue); font-size: 1.2rem; margin-bottom: 10px;">🟢 Easy: Basic Normal</h4>
+                    <p style="color: white; font-weight: 500;">Find the equation of the normal to $y = x^2 - 3x$ at the point where $x = 2$.</p>
+                    <ul class="step-list">
+                        <li><strong>Find the Point:</strong> Plug $x = 2$ into the original function. $y = (2)^2 - 3(2) = 4 - 6 = -2$. The point is $(2, -2)$.</li>
+                        <li><strong>Differentiate:</strong> Using the power rule, $\frac{dy}{dx} = 2x - 3$.</li>
+                        <li><strong>Find Tangent Gradient ($m_T$):</strong> At $x = 2$, $m_T = 2(2) - 3 = 1$.</li>
+                        <li><strong>Find Normal Gradient ($m_N$):</strong> The negative reciprocal of $1$ is $-\frac{1}{1}$, which is $-1$. So, $m_N = -1$.</li>
+                        <li><strong>Construct Line:</strong> $y - (-2) = -1(x - 2) \implies y + 2 = -x + 2 \implies y = -x$.</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-purple);">
+                    <h4 style="color: var(--accent-purple); font-size: 1.2rem; margin-bottom: 10px;">🟡 Medium: Trigonometric Normal</h4>
+                    <p style="color: white; font-weight: 500;">Find the equation of the normal to $y = \cos(x)$ at $x = \frac{\pi}{2}$.</p>
+                    <ul class="step-list">
+                        <li><strong>Find the Point:</strong> $y = \cos(\frac{\pi}{2}) = 0$. Point is $(\frac{\pi}{2}, 0)$.</li>
+                        <li><strong>Differentiate:</strong> The derivative of $\cos(x)$ is $-\sin(x)$. So $\frac{dy}{dx} = -\sin(x)$.</li>
+                        <li><strong>Find Tangent Gradient ($m_T$):</strong> Substitute $x = \frac{\pi}{2}$. $m_T = -\sin(\frac{\pi}{2}) = -1$.</li>
+                        <li><strong>Find Normal Gradient ($m_N$):</strong> Flip and change the sign of $-1$. $m_N = -\frac{1}{-1} = 1$.</li>
+                        <li><strong>Construct Line:</strong> $y - 0 = 1(x - \frac{\pi}{2}) \implies y = x - \frac{\pi}{2}$.</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-pink);">
+                    <h4 style="color: var(--accent-pink); font-size: 1.2rem; margin-bottom: 10px;">🔴 Hard: Logarithmic Challenge</h4>
+                    <p style="color: white; font-weight: 500;">Find the equation of the normal to the curve $y = \ln(x)$ at $x = e$.</p>
+                    <ul class="step-list">
+                        <li><strong>Find the Point:</strong> $y = \ln(e)$. Since $\ln$ is $\log_e$, $\ln(e) = 1$. Point is $(e, 1)$.</li>
+                        <li><strong>Differentiate:</strong> The derivative of $\ln(x)$ is a standard result: $\frac{dy}{dx} = \frac{1}{x}$.</li>
+                        <li><strong>Find Tangent Gradient ($m_T$):</strong> Substitute $x = e$. $m_T = \frac{1}{e}$.</li>
+                        <li><strong>Find Normal Gradient ($m_N$):</strong> The negative reciprocal of $\frac{1}{e}$ is $-e$. So, $m_N = -e$.</li>
+                        <li><strong>Construct Line:</strong> $y - 1 = -e(x - e)$. Expanding gives $y - 1 = -ex + e^2 \implies y = -ex + e^2 + 1$. Leave it exact!</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Mastery Practise</h2>
+            <div class="practise-container">
+                
+                <div class="question-block">
+                    <p><strong>1. Easy:</strong> What is the gradient of the <strong>normal</strong> line to the curve $y = 3x^2$ at $x = 1$?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans1" placeholder="Fractions like -1/2 are accepted...">
+                        <button class="btn btn-check" onclick="checkAnswer(1, ['-1/6', '-0.166', '-0.167'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(1, 'Find dy/dx first (which is 6x). Plug in 1 to get the tangent gradient. Then find the negative reciprocal.')">Hint</button>
+                    </div>
+                    <div id="fb1" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>2. Medium:</strong> Find the gradient of the <strong>normal</strong> to $y = \sin(x)$ at $x = \pi$.</p>
+                    <div class="input-group">
+                        <input type="text" id="ans2" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(2, ['1'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(2, 'Derivative of sin(x) is cos(x). Evaluate cos(π) to get the tangent gradient, then flip and negate.')">Hint</button>
+                    </div>
+                    <div id="fb2" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>3. Hard:</strong> What is the <strong>$y$-intercept</strong> of the normal line to $y = e^x$ at $x = 0$?</p>
+                    <div class="input-group">
+                        <input type="text" id="ans3" placeholder="Numerical answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(3, ['1'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(3, '1. Point is (0,1). 2. dy/dx is e^x. 3. Tangent m = 1. 4. Normal m = -1. 5. Write the equation y - 1 = -1(x - 0). What is the y-intercept?')">Hint</button>
+                    </div>
+                    <div id="fb3" class="feedback-box"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <h2>The Ultimate Challenge Awaits</h2>
+            <p style="color: var(--text-muted); margin: 15px 0 30px;">
+                You've mastered the geometry of Tangents and Normals. Next, we push calculus to its limits in <strong>Applications v3: Second Derivatives and More</strong>. Discover further derivatives. What if we differentiate a function more than once?
+            </p>
+            <a href="applicationsv3.html" class="massive-btn">Go to Applications v3 →</a>
+        </div>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // VISUALISER 1: Perpendicular Explorer
+        // ==========================================
+        const pCanvas = document.getElementById('perpCanvas');
+        const pCtx = pCanvas.getContext('2d');
+        const pSlider = document.getElementById('xSlider1');
+        const pReadout = document.getElementById('readout1');
+
+        function drawExplorer() {
+            const w = pCanvas.width = pCanvas.parentElement.clientWidth;
+            const h = pCanvas.height = pCanvas.parentElement.clientHeight;
+            const ox = w / 2;
+            const oy = h / 2;
+            const scale = 50;
+
+            pCtx.clearRect(0, 0, w, h);
+
+            // Axes
+            pCtx.strokeStyle = '#30363d'; pCtx.lineWidth = 1;
+            pCtx.beginPath(); pCtx.moveTo(0, oy); pCtx.lineTo(w, oy);
+            pCtx.moveTo(ox, 0); pCtx.lineTo(ox, h); pCtx.stroke();
+
+            // Curve: y = 0.2x^3 - x
+            const f = (x) => 0.2 * Math.pow(x, 3) - x;
+            const df = (x) => 0.6 * Math.pow(x, 2) - 1;
+
+            pCtx.strokeStyle = '#3b82f6'; pCtx.lineWidth = 3;
+            pCtx.beginPath();
+            for (let px = -w/2; px < w/2; px++) {
+                let x = px / scale;
+                if (px === -w/2) pCtx.moveTo(ox + px, oy - f(x) * scale);
+                else pCtx.lineTo(ox + px, oy - f(x) * scale);
+            }
+            pCtx.stroke();
+
+            // Intersect Point
+            const cx = parseFloat(pSlider.value);
+            const cy = f(cx);
+            const mT = df(cx);
+            const mN = -1 / mT;
+
+            // Draw Tangent (Orange)
+            pCtx.strokeStyle = '#f97316'; pCtx.lineWidth = 2;
+            pCtx.beginPath();
+            const len = 150;
+            pCtx.moveTo(ox + cx*scale - len, oy - cy*scale + mT*len);
+            pCtx.lineTo(ox + cx*scale + len, oy - cy*scale - mT*len);
+            pCtx.stroke();
+
+            // Draw Normal (Teal)
+            pCtx.strokeStyle = '#14b8a6'; pCtx.lineWidth = 2;
+            pCtx.beginPath();
+            pCtx.moveTo(ox + cx*scale - len, oy - cy*scale + mN*len);
+            pCtx.lineTo(ox + cx*scale + len, oy - cy*scale - mN*len);
+            pCtx.stroke();
+
+            // Right Angle Square Marker
+            const angleT = Math.atan(-mT); // Negative because canvas Y is inverted
+            const sqSize = 15;
+            pCtx.save();
+            pCtx.translate(ox + cx*scale, oy - cy*scale);
+            pCtx.rotate(angleT);
+            pCtx.strokeStyle = 'white';
+            pCtx.lineWidth = 1.5;
+            pCtx.beginPath();
+            pCtx.moveTo(0, 0);
+            pCtx.lineTo(sqSize, 0);
+            pCtx.lineTo(sqSize, -Math.sign(mN)*sqSize); // Flips depending on angle
+            pCtx.lineTo(0, -Math.sign(mN)*sqSize);
+            pCtx.stroke();
+            pCtx.restore();
+
+            // Point
+            pCtx.fillStyle = 'white';
+            pCtx.beginPath(); pCtx.arc(ox + cx*scale, oy - cy*scale, 6, 0, Math.PI*2); pCtx.fill();
+
+            // Update Math
+            pReadout.innerHTML = `
+                <span class="highlight-t">$m_T = ${mT.toFixed(2)}$</span><br><br>
+                <span class="highlight-n">$m_N = ${mN.toFixed(2)}$</span><br><br>
+                $(${mT.toFixed(2)}) \\times (${mN.toFixed(2)}) = ${(mT * mN).toFixed(0)}$
+            `;
+            if(window.MathJax) MathJax.typesetPromise([pReadout]);
+        }
+
+        pSlider.addEventListener('input', drawExplorer);
+        window.addEventListener('resize', drawExplorer);
+
+        // ==========================================
+        // VISUALISER 2: Normal Line Builder Game
+        // ==========================================
+        const gCanvas = document.getElementById('gameCanvas');
+        const gCtx = gCanvas.getContext('2d');
+        const mSlider = document.getElementById('mSlider');
+        const gReadout = document.getElementById('gameReadout');
+        const gPanel = document.getElementById('gamePanel');
+
+        function drawGame() {
+            const w = gCanvas.width = gCanvas.parentElement.clientWidth;
+            const h = gCanvas.height = gCanvas.parentElement.clientHeight;
+            const ox = w / 2;
+            const oy = h / 2 + 100; // Shifted down
+            const scale = 40;
+
+            gCtx.clearRect(0, 0, w, h);
+
+            // Curve: y = -0.5x^2 + 4
+            const f = (x) => -0.5 * Math.pow(x, 2) + 4;
+            const targetX = 2;
+            const targetY = 2; // f(2) = 2
+            
+            // Draw Curve
+            gCtx.strokeStyle = '#8b5cf6'; gCtx.lineWidth = 3;
+            gCtx.beginPath();
+            for (let px = -w/2; px < w/2; px++) {
+                let x = px / scale;
+                if (px === -w/2) gCtx.moveTo(ox + px, oy - f(x) * scale);
+                else gCtx.lineTo(ox + px, oy - f(x) * scale);
+            }
+            gCtx.stroke();
+
+            // Draw Target Tangent (Faint)
+            const mT = -targetX; // derivative is -x. at x=2, mT = -2.
+            gCtx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; gCtx.lineWidth = 2; gCtx.setLineDash([5, 5]);
+            gCtx.beginPath();
+            gCtx.moveTo(ox + targetX*scale - 100, oy - targetY*scale + mT*100);
+            gCtx.lineTo(ox + targetX*scale + 100, oy - targetY*scale - mT*100);
+            gCtx.stroke();
+            gCtx.setLineDash([]);
+
+            // Draw User Line
+            const userM = parseFloat(mSlider.value);
+            gCtx.strokeStyle = 'white'; gCtx.lineWidth = 3;
+            gCtx.beginPath();
+            gCtx.moveTo(ox + targetX*scale - 200, oy - targetY*scale + userM*200);
+            gCtx.lineTo(ox + targetX*scale + 200, oy - targetY*scale - userM*200);
+            gCtx.stroke();
+
+            // Point
+            gCtx.fillStyle = '#ec4899';
+            gCtx.beginPath(); gCtx.arc(ox + targetX*scale, oy - targetY*scale, 7, 0, Math.PI*2); gCtx.fill();
+
+            // Check Success (Exact normal is 0.5)
+            if (Math.abs(userM - 0.5) < 0.01) {
+                gPanel.style.backgroundColor = 'rgba(46, 160, 67, 0.2)';
+                gPanel.style.borderColor = 'var(--success)';
+                gReadout.style.color = 'var(--success)';
+                gReadout.innerHTML = `Perfect Normal! $m_N = 0.5$`;
+                gCtx.strokeStyle = '#2ea043'; // Turn line green
+                gCtx.stroke();
+            } else {
+                gPanel.style.backgroundColor = 'var(--bg-input)';
+                gPanel.style.borderColor = 'var(--border-color)';
+                gReadout.style.color = 'var(--text-main)';
+                gReadout.innerHTML = `Current $m = ${userM.toFixed(1)}$`;
+            }
+            if(window.MathJax) MathJax.typesetPromise([gReadout]);
+        }
+
+        mSlider.addEventListener('input', drawGame);
+        window.addEventListener('resize', drawGame);
+
+        // Initialise Canvas
+        window.onload = () => {
+            drawExplorer();
+            drawGame();
+        };
+
+        // ==========================================
+        // QUIZ SYSTEM WITH TOGGLEABLE HINTS
+        // ==========================================
+        function checkAnswer(id, correctAnswersArray) {
+            const val = document.getElementById(`ans${id}`).value.trim().replace(/\s/g, '');
+            const fb = document.getElementById(`fb${id}`);
+            fb.style.display = 'block';
+
+            if (correctAnswersArray.includes(val)) {
+                fb.style.backgroundColor = 'rgba(46, 160, 67, 0.1)';
+                fb.style.border = '1px solid var(--success)';
+                fb.style.color = 'var(--success)';
+                fb.innerHTML = '<strong>Correct!</strong> Flawless logic.';
+            } else {
+                fb.style.backgroundColor = 'rgba(248, 81, 73, 0.1)';
+                fb.style.border = '1px solid var(--danger)';
+                fb.style.color = 'var(--danger)';
+                fb.innerHTML = '<strong>Not quite.</strong> Check the hint if you are stuck.';
+            }
+        }
+
+        function toggleHint(id, msg) {
+            const fb = document.getElementById(`fb${id}`);
+            
+            // Check if the hint is currently displaying
+            if (fb.style.display === 'block' && fb.innerHTML.includes('Hint:')) {
+                // If it is, hide it
+                fb.style.display = 'none';
+            } else {
+                // If it's not (or if it's currently showing right/wrong text), show the hint
+                fb.style.display = 'block';
+                fb.style.backgroundColor = 'var(--bg-card)';
+                fb.style.border = '1px solid var(--text-muted)';
+                fb.style.color = 'var(--text-muted)';
+                fb.innerHTML = `<strong>Hint:</strong> ${msg}`;
+            }
+        }
+    </script>
+</body>
+</html>

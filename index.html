@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Masterclass | Home</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async 
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="bg-gradient-layer"></div>
+    <div class="glass-overlay"></div>
+
+    <div class="app-container">
+        <aside class="sidebar glass">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <span class="logo-icon">∫</span>
+                    <h2>CalcSPA</h2>
+                </div>
+                <p class="syllabus-tag">NSW Year 11 Advanced</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="section-title">Foundations</span>
+                    <a href="index.html" class="nav-link active">Introduction</a>
+                    <a href="limits.html" class="nav-link">Limits</a>
+                    <a href="derivatives-library.html" class="nav-link">Derivatives Library</a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="section-title">Core Techniques</span>
+                    <a href="power-rule.html" class="nav-link">The Power Rule</a>
+                    <a href="product-rule.html" class="nav-link">The Product Rule</a>
+                    <a href="quotient-rule.html" class="nav-link">The Quotient Rule</a>
+                    <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="section-title">Advanced Functions</span>
+                    <a href="transcendental.html" class="nav-link">Exp, Log & Trig</a>
+                </div>
+
+                <div class="nav-section">
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="progress-container">
+                    <span class="progress-text">Course Roadmap</span>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 10%;"></div></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="hero-section-alt glass">
+                <div class="hero-content">
+                    <h1 class="page-title">Welcome to the <span class="text-accent">Calculus Masterclass</span></h1>
+                    <p class="lead-text">An interactive companion designed for the NSW Mathematics Advanced syllabus. Explore the mechanics of change through visual models and adaptive practice.</p>
+                    
+                    <div class="hero-math-display glass">
+                        <p class="notation-label">The Core Concept</p>
+                        $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+                    </div>
+
+                    <div class="hero-actions">
+                        <a href="limits.html" class="btn-primary">Begin Journey: Understanding the basics of calculus (Limits) →</a>
+                        <a href="derivatives-library.html" class="btn-secondary">Formula Reference Hub</a>
+                    </div>
+                </div>
+            </header>
+
+            <section class="intro-grid">
+                <div class="info-card glass">
+                    <div class="card-icon">🎯</div>
+                    <h3>Interactive Learning</h3>
+                    <p>Every rule includes a <strong>Visual Playground</strong>. Adjust sliders to see how derivatives respond to changes in real-time before you dive into the algebra.</p>
+                </div>
+
+                <div class="info-card glass">
+                    <div class="card-icon">⚡</div>
+                    <h3>The Formula Vault</h3>
+                    <p>Stuck on a problem? Our <a href="derivatives-library.html">Derivatives Library</a> contains every trig, log, and algebraic form you'll need for Year 11 and 12.</p>
+                </div>
+
+                <div class="info-card glass">
+                    <div class="card-icon">🧪</div>
+                    <h3>Adaptive Practice</h3>
+                    <p>Test your knowledge with Foundation, Advanced, and Extension level questions. Use <strong>Hints</strong> to get moving or <strong>Reveal</strong> to check your work.</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2>Quick Access: Core Rules</h2>
+                <div class="rule-shortcuts">
+                    <a href="power-rule.html" class="shortcut-item glass">
+                        <span class="shortcut-math">$x^n$</span>
+                        <span class="shortcut-text">Power Rule</span>
+                    </a>
+                    <a href="product-rule.html" class="shortcut-item glass">
+                        <span class="shortcut-math">$uv$</span>
+                        <span class="shortcut-text">Product Rule</span>
+                    </a>
+                    <a href="quotient-rule.html" class="shortcut-item glass">
+                        <span class="shortcut-math">$u/v$</span>
+                        <span class="shortcut-text">Quotient Rule</span>
+                    </a>
+                    <a href="chain-rule.html" class="shortcut-item glass">
+                        <span class="shortcut-math">$f(g(x))$</span>
+                        <span class="shortcut-text">Chain Rule</span>
+                    </a>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <div class="legal-info">
+                    <p>Calculus Masterclass | Designed for NSW Education Standards Authority (NESA) Requirements.</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+</body>
+</html>

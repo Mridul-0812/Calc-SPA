@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limits | CalcSPA</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. COLOUR PALETTE & CORE STYLES
+           ========================================================================== */
+        :root {
+            --bg-body: #0f111a;
+            --bg-sidebar: #161b22;
+            --bg-card: #1c212b;
+            --bg-input: #0d1117;
+            
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --text-category: #6e7681;
+            
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --accent-teal: #14b8a6;
+            --accent-orange: #f97316;
+            --accent-gold: #e3b341;
+            --accent-red: #ef4444;
+            --accent-green: #2ea043;
+            
+            --success: #2ea043;
+            --danger: #f85149;
+            --border-color: #30363d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ==========================================================================
+           2. NAVIGATION SIDEBAR
+           ========================================================================== */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-category);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 24px 0 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover { background-color: var(--bg-card); color: var(--text-main); }
+        .nav-link.active { background-color: var(--accent-purple); color: white; }
+
+        /* ==========================================================================
+           3. MAIN LAYOUT
+           ========================================================================== */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            padding: 60px 80px;
+            max-width: 1400px; 
+        }
+
+        .hero-title { font-size: 3.5rem; margin-bottom: 10px; }
+        .hero-title span { color: var(--accent-purple); }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            word-wrap: break-word;
+        }
+
+        .info-box {
+            background: rgba(139, 92, 246, 0.05);
+            border-left: 4px solid var(--accent-purple);
+            padding: 24px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 30px;
+        }
+
+        /* ==========================================================================
+           4. VISUALISERS
+           ========================================================================== */
+        .interactive-container {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .canvas-wrap {
+            position: relative;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            height: 300px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        canvas { width: 100%; height: 100%; }
+
+        .control-bar {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        input[type=range] {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 5px;
+            -webkit-appearance: none;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        /* ==========================================================================
+           5. WORKED SOLUTIONS & PRACTISE
+           ========================================================================== */
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .step-list { list-style: none; margin-top: 20px; }
+        .step-list li {
+            padding-left: 28px;
+            position: relative;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .step-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--accent-purple);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .practise-container {
+            background: var(--bg-input);
+            border: 1px dashed var(--border-color);
+            padding: 40px;
+            border-radius: 16px;
+        }
+
+        .question-block {
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .question-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        input[type=text] {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-check { background: var(--accent-purple); color: white; }
+        .btn-hint { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        /* ==========================================================================
+           6. GLASSMORPHISM FOOTER
+           ========================================================================== */
+        .footer-nav {
+            margin-top: 60px;
+            text-align: center;
+            padding: 60px 40px;
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .glass-btn {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 24px 48px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+            position: relative;
+            z-index: 2;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-5px);
+            background: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.6), inset 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        /* Background glowing orb for the footer */
+        .glow-orb {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 100px;
+            background: var(--accent-purple);
+            filter: blur(80px);
+            opacity: 0.5;
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">∫ CalcSPA</div>
+        
+        <div class="nav-category">Foundations</div>
+        <a href="index.html" class="nav-link">Introduction</a>
+        <a href="limits.html" class="nav-link active">Limits</a>
+        <a href="first-principles.html" class="nav-link">First Principles</a>
+
+        <div class="nav-category">Core Techniques</div>
+        <a href="power-rule.html" class="nav-link">Power Rule</a>
+        <a href="product-quotient.html" class="nav-link">Product & Quotient Rules</a>
+        <a href="chain-rule.html" class="nav-link">The Chain Rule</a>
+        <a href="trig-calculus.html" class="nav-link">Trigonometric Calculus</a>
+        <a href="exp-log-calculus.html" class="nav-link">Exponential & Logarithmic</a>
+
+        <div class="nav-category">Mastery</div>
+        <a href="applications.html" class="nav-link">App v1: Tangents</a>
+    </aside>
+
+    <main class="main-wrapper">
+        <h1 class="hero-title">The Foundation: <span>Limits</span></h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px;">
+            Before we can calculate the exact rate of change at a specific moment, we need to understand what happens when we get infinitely close to that moment. Welcome to the concept of the Limit.
+        </p>
+
+        <section class="card">
+            <h2>What is a Limit?</h2>
+            <p>
+                In mathematics, a limit tells us the value that a function <em>approaches</em> as the input ($x$) gets closer and closer to some number. The actual value of the function exactly *at* that number might be broken (undefined), but the limit still exists!
+            </p>
+            <p style="margin-top: 15px;">We write this in proper mathematical notation as:</p>
+            <div style="font-size: 1.5rem; text-align: center; margin: 20px 0;">
+                $$\lim_{x \to a} f(x) = L$$
+            </div>
+            <p>This reads as: <em>"The limit of $f(x)$ as $x$ approaches $a$, is equal to $L$."</em></p>
+
+            <div class="info-box">
+                <strong>How to Evaluate Limits: The 3 Steps</strong>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Step 1: Direct Substitution.</strong> Just plug the number in! If $\lim_{x \to 3} (2x + 1)$, just do $2(3) + 1 = 7$. You're done.</li>
+                    <li><strong>Step 2: Check for $0/0$.</strong> If you substitute and get $\frac{0}{0}$, this is called an <strong>indeterminate form</strong>. It means there is a "hole" in the graph, but a limit still exists hiding behind the math!</li>
+                    <li><strong>Step 3: Factor & Cancel.</strong> If you get $0/0$, factorise the numerator and denominator algebraically. Cancel out the matching brackets, and then try substituting again.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Interactive: The Missing Point</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Let's look at the function $f(x) = \frac{x^2 - 4}{x - 2}$. If you plug in $x = 2$, you get $\frac{0}{0}$ (Undefined). 
+                But watch what happens to the $y$-value as $x$ gets extremely close to $2$ from either side.
+            </p>
+            
+            <div class="interactive-container">
+                <div class="canvas-wrap">
+                    <canvas id="limitGraph"></canvas>
+                </div>
+
+                <div class="control-bar">
+                    <label style="font-weight: 700; color: var(--text-category); min-width: 100px;">Slide $x \to 2$</label>
+                    <input type="range" id="xSlider" min="0" max="4" step="0.01" value="0.5">
+                    <div id="valReadout" style="font-family: monospace; text-align: right; color: white; font-size: 1.1rem; min-width: 250px;">
+                        $x = 0.50$, $y = 2.50$
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Worked Solutions</h2>
+            <div class="solutions-grid">
+                <div class="card" style="border-top: 4px solid var(--accent-green);">
+                    <h4 style="color: var(--accent-green); font-size: 1.2rem; margin-bottom: 10px;">🟢 Easy: Direct Sub</h4>
+                    <p style="color: white; font-weight: 500;">Evaluate $$\lim_{x \to 5} (x^2 - 3x)$$</p>
+                    <ul class="step-list">
+                        <li><strong>Substitute $x = 5$:</strong> Plug it straight in.<br> $(5)^2 - 3(5)$</li>
+                        <li><strong>Calculate:</strong> $25 - 15 = 10$.</li>
+                        <li><strong>Result:</strong> Since we didn't get $0/0$, the limit is just $10$.</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-teal);">
+                    <h4 style="color: var(--accent-teal); font-size: 1.2rem; margin-bottom: 10px;">🟡 Medium: The 0/0 Hole</h4>
+                    <p style="color: white; font-weight: 500;">Evaluate $$\lim_{x \to 3} \frac{x^2 - 9}{x - 3}$$</p>
+                    <ul class="step-list">
+                        <li><strong>Substitute:</strong> $\frac{3^2 - 9}{3 - 3} = \frac{0}{0}$. We must factorise!</li>
+                        <li><strong>Factorise top:</strong> Difference of two squares.<br> $\lim_{x \to 3} \frac{(x - 3)(x + 3)}{x - 3}$</li>
+                        <li><strong>Cancel:</strong> Cross out $(x-3)$. We are left with $\lim_{x \to 3} (x + 3)$.</li>
+                        <li><strong>Substitute again:</strong> $3 + 3 = 6$. The limit is $6$.</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--accent-red);">
+                    <h4 style="color: var(--accent-red); font-size: 1.2rem; margin-bottom: 10px;">🔴 Hard: Harder Quadratics</h4>
+                    <p style="color: white; font-weight: 500;">Evaluate $$\lim_{x \to 2} \frac{x^2 + x - 6}{x - 2}$$</p>
+                    <ul class="step-list">
+                        <li><strong>Check:</strong> Subbing in $x=2$ gives $\frac{4 + 2 - 6}{0} = \frac{0}{0}$.</li>
+                        <li><strong>Factorise top:</strong> What multiplies to $-6$ and adds to $1$? ($+3$ and $-2$).<br> $\lim_{x \to 2} \frac{(x + 3)(x - 2)}{x - 2}$</li>
+                        <li><strong>Cancel & Sub:</strong> Cancel the $(x-2)$.<br> $\lim_{x \to 2} (x + 3) = 2 + 3 = 5$.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--accent-gold);">
+                    <h4 style="color: var(--accent-gold); font-size: 1.2rem; margin-bottom: 10px;">👑 Mastery: Expansion</h4>
+                    <p style="color: white; font-weight: 500;">Evaluate $$\lim_{h \to 0} \frac{(x + h)^2 - x^2}{h}$$</p>
+                    <ul class="step-list">
+                        <li><strong>Note:</strong> We are treating $x$ as a constant and taking the limit as $h$ goes to $0$. Subbing $h=0$ gives $0/0$.</li>
+                        <li><strong>Expand the top:</strong> $(x^2 + 2xh + h^2) - x^2$</li>
+                        <li><strong>Simplify:</strong> The $x^2$ terms cancel, leaving $\frac{2xh + h^2}{h}$.</li>
+                        <li><strong>Factorise $h$:</strong> $\frac{h(2x + h)}{h} = 2x + h$.</li>
+                        <li><strong>Substitute $h=0$:</strong> $2x + 0 = 2x$. (This is a sneak peek at First Principles!)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Mastery Practise</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;"><em>Instructions: Enter numerical values or simple algebraic expressions (e.g., "2x", "4"). Do not use spaces in your answers.</em></p>
+            
+            <div class="practise-container">
+                
+                <div class="question-block">
+                    <p><strong>1. Easy:</strong> Evaluate $\lim_{x \to 4} (2x - 3)$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans1" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(1, ['5'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(1, 'Just substitute x = 4 into the expression.')">Hint</button>
+                    </div>
+                    <div id="fb1" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>2. Easy:</strong> Evaluate $\lim_{x \to 0} (x^3 + 7)$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans2" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(2, ['7'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(2, 'Substitute x = 0.')">Hint</button>
+                    </div>
+                    <div id="fb2" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>3. Medium:</strong> Evaluate $\lim_{x \to 5} \frac{x^2 - 25}{x - 5}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans3" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(3, ['10'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(3, 'Factorise the top using difference of two squares: (x-5)(x+5). Cancel and substitute x = 5.')">Hint</button>
+                    </div>
+                    <div id="fb3" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>4. Medium:</strong> Evaluate $\lim_{x \to -2} \frac{x^2 - 4}{x + 2}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans4" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(4, ['-4'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(4, 'Factorise top to (x-2)(x+2). Cancel out (x+2), then substitute x = -2.')">Hint</button>
+                    </div>
+                    <div id="fb4" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>5. Medium:</strong> Evaluate $\lim_{x \to 0} \frac{x^2 + 8x}{x}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans5" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(5, ['8'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(5, 'Factor out an x from the top: x(x + 8). Cancel the x, then sub x = 0.')">Hint</button>
+                    </div>
+                    <div id="fb5" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>6. Hard:</strong> Evaluate $\lim_{x \to 1} \frac{x^2 + 3x - 4}{x - 1}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans6" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(6, ['5'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(6, 'Factorise top: what multiplies to -4 and adds to 3? (x+4)(x-1).')">Hint</button>
+                    </div>
+                    <div id="fb6" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>7. Hard:</strong> Evaluate $\lim_{x \to 3} \frac{2x^2 - 18}{x - 3}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans7" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(7, ['12'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(7, 'Factor out the 2 first: 2(x^2 - 9). Then difference of two squares.')">Hint</button>
+                    </div>
+                    <div id="fb7" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>8. Hard:</strong> Evaluate $\lim_{x \to 0} \frac{(x + 2)^2 - 4}{x}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans8" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(8, ['4'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(8, 'Expand the brackets first: x^2 + 4x + 4. Subtract the 4, factor out x, and substitute x = 0.')">Hint</button>
+                    </div>
+                    <div id="fb8" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>9. Legend:</strong> Evaluate $\lim_{h \to 0} \frac{3(x + h) - 3x}{h}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans9" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(9, ['3'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(9, 'Expand 3(x+h) to 3x + 3h. The 3x terms cancel out.')">Hint</button>
+                    </div>
+                    <div id="fb9" class="feedback-box"></div>
+                </div>
+
+                <div class="question-block">
+                    <p><strong>10. Legend:</strong> Evaluate $\lim_{h \to 0} \frac{(x + h)^2 + (x + h) - (x^2 + x)}{h}$</p>
+                    <div class="input-group">
+                        <input type="text" id="ans10" placeholder="Type answer...">
+                        <button class="btn btn-check" onclick="checkAnswer(10, ['2x+1'])">Check</button>
+                        <button class="btn btn-hint" onclick="toggleHint(10, 'Expand carefully: (x^2 + 2xh + h^2) + x + h - x^2 - x. Cancel all terms without h. Factor out h, then let h=0.')">Hint</button>
+                    </div>
+                    <div id="fb10" class="feedback-box"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <div class="glow-orb"></div>
+            <h2 style="position: relative; z-index: 2; margin-bottom: 20px;">You are ready.</h2>
+            <a href="first-principles.html" class="glass-btn">Begin Journey: First Principles →</a>
+        </div>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // VISUALISER: LIMITS ENGINE
+        // ==========================================
+        const canvas = document.getElementById('limitGraph');
+        const ctx = canvas.getContext('2d');
+        const xSlider = document.getElementById('xSlider');
+        const valReadout = document.getElementById('valReadout');
+
+        // Target function: f(x) = (x^2 - 4) / (x - 2) which simplifies to x + 2, hole at x=2
+        const func = (x) => {
+            // JS handling to simulate exact hole
+            if (Math.abs(x - 2) < 0.001 && x.toFixed(3) === "2.000") return NaN; 
+            return (x * x - 4) / (x - 2);
+        };
+
+        function drawGraph() {
+            const w = canvas.width = canvas.parentElement.clientWidth;
+            const h = canvas.height = canvas.parentElement.clientHeight;
+            ctx.clearRect(0, 0, w, h);
+
+            const padding = 40;
+            const graphW = w - padding * 2;
+            const graphH = h - padding * 2;
+            
+            // Graph mapping limits: x from 0 to 4, y from 0 to 6
+            const minX = 0, maxX = 4;
+            const minY = 0, maxY = 6;
+
+            const mapX = (x) => padding + ((x - minX) / (maxX - minX)) * graphW;
+            const mapY = (y) => h - padding - ((y - minY) / (maxY - minY)) * graphH;
+
+            // Draw Axes
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            // Y Axis
+            ctx.moveTo(mapX(0), mapY(0)); ctx.lineTo(mapX(0), padding);
+            // X Axis
+            ctx.moveTo(mapX(0), mapY(0)); ctx.lineTo(w - padding, mapY(0));
+            ctx.stroke();
+
+            // Draw Line
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            let first = true;
+            for (let px = mapX(0); px <= mapX(4); px += 2) {
+                let x = minX + ((px - padding) / graphW) * (maxX - minX);
+                // Skip the exact hole to draw it manually later
+                if (Math.abs(x - 2) < 0.05) continue; 
+                let y = x + 2; // the simplified limit
+                if (first) { ctx.moveTo(px, mapY(y)); first = false; }
+                else { ctx.lineTo(px, mapY(y)); }
+            }
+            ctx.stroke();
+
+            // Draw the "Hole" at x = 2, y = 4
+            ctx.strokeStyle = '#ec4899';
+            ctx.fillStyle = '#0f111a'; // bg color to make it look hollow
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(mapX(2), mapY(4), 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Draw the slider point
+            const currentX = parseFloat(xSlider.value);
+            
+            // Readout update
+            if (currentX.toFixed(2) === "2.00") {
+                valReadout.innerHTML = `x = 2.00, y = <span style="color:#ef4444">Undefined</span>`;
+                valReadout.style.color = '#ef4444';
+            } else {
+                const currentY = func(currentX);
+                valReadout.innerHTML = `x = ${currentX.toFixed(2)}, f(x) = ${currentY.toFixed(2)}`;
+                valReadout.style.color = 'white';
+                
+                // Draw tracking point
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.arc(mapX(currentX), mapY(currentY), 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw dashed lines to axis
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.setLineDash([5, 5]);
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(mapX(currentX), mapY(currentY));
+                ctx.lineTo(mapX(currentX), mapY(0));
+                ctx.moveTo(mapX(currentX), mapY(currentY));
+                ctx.lineTo(mapX(0), mapY(currentY));
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        xSlider.addEventListener('input', drawGraph);
+        window.addEventListener('resize', drawGraph);
+
+        window.onload = () => {
+            drawGraph();
+        };
+
+        // ==========================================
+        // QUIZ SYSTEM WITH TOGGLEABLE HINTS
+        // ==========================================
+        function checkAnswer(id, correctAnswersArray) {
+            const inputEl = document.getElementById(`ans${id}`);
+            // Normalize string: remove spaces, lowercase
+            const val = inputEl.value.trim().replace(/\s/g, '').toLowerCase();
+            const fb = document.getElementById(`fb${id}`);
+            fb.style.display = 'block';
+
+            if (correctAnswersArray.includes(val)) {
+                fb.style.backgroundColor = 'rgba(46, 160, 67, 0.1)';
+                fb.style.border = '1px solid var(--success)';
+                fb.style.color = 'var(--success)';
+                fb.innerHTML = '<strong>Correct!</strong> Well done.';
+            } else {
+                fb.style.backgroundColor = 'rgba(248, 81, 73, 0.1)';
+                fb.style.border = '1px solid var(--danger)';
+                fb.style.color = 'var(--danger)';
+                fb.innerHTML = '<strong>Not quite.</strong> Double check your working out.';
+            }
+        }
+
+        function toggleHint(id, msg) {
+            const fb = document.getElementById(`fb${id}`);
+            
+            if (fb.style.display === 'block' && fb.innerHTML.includes('Hint:')) {
+                fb.style.display = 'none';
+            } else {
+                fb.style.display = 'block';
+                fb.style.backgroundColor = 'var(--bg-card)';
+                fb.style.border = '1px solid var(--text-muted)';
+                fb.style.color = 'var(--text-muted)';
+                fb.innerHTML = `<strong>Hint:</strong> ${msg}`;
+            }
+        }
+    </script>
+</body>
+</html>
