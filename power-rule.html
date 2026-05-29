@@ -109,9 +109,9 @@
                 <div class="nav-section">
                     <span class="section-title">Foundations</span>
                     <a href="index.html" class="nav-link">Introduction</a>
+                    <a href="video.html" class="nav-link">Video Tutorials</a>
                     <a href="limits.html" class="nav-link">Limits</a>
                     <a href="first-principles.html" class="nav-link">First Principles</a>
-                    <a href="first-principles-applications.html" class="nav-link">Practice & Mastery</a>
                 </div>
                 <div class="nav-section">
                     <span class="section-title">Core Techniques</span>
@@ -166,6 +166,46 @@
                 </div>
             </section>
 
+            <section class="glass-card">
+                <div class="playground-header">
+                    <h3>The Constant Rule: What if there is no $x$?</h3>
+                    <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-warning);">Foundational</span>
+                </div>
+                <p style="margin-bottom: 20px;">In calculus, we use letters like $c$ or $a$ to represent <strong>Constants</strong>. These are fixed numbers (like 5, -10, or $\pi$) that do not change as $x$ moves.</p>
+                
+                <div class="story-section" style="border-left-color: var(--accent-warning);">
+                    <p>Why is the derivative of a constant always <strong>0</strong>? We can prove it using the Power Rule!</p>
+                    <p>A constant $c$ can be written as $c \cdot x^0$ (since any number to the power of 0 is 1).</p>
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: center; font-family: 'Fira Code', monospace;">
+                        $$f(x) = c \cdot x^0$$
+                        $$f'(x) = 0 \cdot c \cdot x^{-1}$$
+                        $$f'(x) = 0$$
+                    </div>
+                </div>
+
+                <p style="color: var(--text-muted); margin-bottom: 20px;"><strong>Visual Proof:</strong> A constant function is just a flat, horizontal line. Look at the graph below. Since the line never "rises," the slope (rise/run) is zero at every single point.</p>
+
+                <div class="svg-container">
+                    <svg viewBox="-100 -50 200 100" style="width: 100%; height: auto;">
+                        <line x1="-100" y1="0" x2="100" y2="0" stroke="#334155" stroke-width="1"/>
+                        <line x1="0" y1="-50" x2="0" y2="50" stroke="#334155" stroke-width="1"/>
+                        <line id="const-line" x1="-100" y1="-20" x2="100" y2="-20" stroke="var(--accent-warning)" stroke-width="3" />
+                    </svg>
+                </div>
+
+                <div class="controls-panel">
+                    <div class="slider-label">
+                        <span>Adjust Constant Value ($c$)</span>
+                        <span id="const-val-text" style="color: var(--accent-warning);">c = 20</span>
+                    </div>
+                    <input type="range" id="const-slider" min="-40" max="40" value="20">
+                </div>
+
+                <div class="data-box" style="margin-top: 20px; border: 1px solid var(--accent-warning);">
+                    <span class="data-label">Derivative Result</span>
+                    <span class="data-value" style="color: var(--accent-warning);">$\frac{d}{dx}(c) = 0$</span>
+                </div>
+            </section>
             <section class="glass-card">
                 <div class="playground-header">
                     <h3>Interactive 2: The Speed of the Shortcut</h3>
@@ -305,6 +345,19 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             
+            // --- CONSTANT RULE VISUALISER ---
+            const constLine = document.getElementById('const-line');
+            const constSlider = document.getElementById('const-slider');
+            const constValText = document.getElementById('const-val-text');
+
+            constSlider.addEventListener('input', () => {
+                const val = constSlider.value;
+                // SVG y is inverted
+                constLine.setAttribute('y1', -val);
+                constLine.setAttribute('y2', -val);
+                constValText.innerText = `c = ${val}`;
+            });
+
             // --- INTERACTIVE 1: ANIMATOR ---
             const btnAnim = document.getElementById("btn-animate");
             const animExp = document.getElementById("anim-exp");
@@ -314,7 +367,6 @@
 
             window.triggerAnimation = function() {
                 if(animState === 0) {
-                    // Step 1: Drop the power down
                     animExp.style.transform = "translate(-80px, 45px) scale(1.5)";
                     animExp.style.color = "var(--accent-primary)";
                     explainer.innerText = "1. The power drops to the front and multiplies...";
@@ -328,17 +380,15 @@
                     }, 800);
                 } 
                 else if (animState === 1) {
-                    // Step 2: Subtract 1
                     animExp.style.transform = "translate(0px, 0px) scale(1)";
                     animExp.style.opacity = 1;
-                    animExp.innerText = "3"; // 4 - 1
+                    animExp.innerText = "3"; 
                     animExp.style.color = "var(--accent-success)";
                     explainer.innerText = "2. And the old power reduces by 1. Done in 2 seconds!";
                     btnAnim.innerText = "Reset";
                     animState = 2;
                 }
                 else {
-                    // Reset
                     animExp.innerText = "4";
                     animExp.style.color = "var(--accent-warning)";
                     animMult.style.opacity = 0;
@@ -358,43 +408,27 @@
             const coordX = document.getElementById("coord-x");
             const valSlope = document.getElementById("val-slope");
 
-            // Math function: y = a*x^3
-            // In SVG, y is flipped (negative is up). 
-            const a = 0.005; // 1/200 
+            const a = 0.005; 
             
-            // Draw standard cubic path
             let d = "M -200 " + (-a * Math.pow(-200, 3));
             for(let x = -200; x <= 200; x += 5) {
-                // negative y to flip axis for SVG visually
                 d += ` L ${x} ${-(a * Math.pow(x, 3))}`;
             }
             cubicPath.setAttribute("d", d);
 
             function updateGraph() {
                 const xVal = parseFloat(xSlider.value);
-                const visualX = xVal * 2; // scale up for wider movement on screen
-                
-                // Original Y
+                const visualX = xVal * 2; 
                 const yVal = a * Math.pow(visualX, 3);
-                
-                // SVG Y (flipped)
                 const svgY = -yVal;
-                
-                // Power Rule applied for slope: f'(x) = 3ax^2
-                // We use visualX for the drawing, but actual math X for the readout
                 const mathSlope = 3 * a * Math.pow(visualX, 2); 
                 
-                // Position Point
                 graphPoint.setAttribute("cx", visualX);
                 graphPoint.setAttribute("cy", svgY);
 
-                // Draw Tangent Line (y - y1 = m(x - x1))
-                // Flipped slope for SVG
                 const svgSlope = -mathSlope;
-                
-                // Draw line stretching left and right of point
                 const x1 = visualX - 100;
-                const y1 = svgY - svgSlope * 100; // actually minus because of SVG coords
+                const y1 = svgY - svgSlope * 100; 
                 const x2 = visualX + 100;
                 const y2 = svgY + svgSlope * 100;
 
@@ -403,10 +437,7 @@
                 tangentLine.setAttribute("x2", x2);
                 tangentLine.setAttribute("y2", y2);
 
-                // Update text
                 coordX.innerText = `X = ${xVal}`;
-                
-                // Since our scale is arbitrary for the visual, let's display a clean math slope based on the slider value
                 const displaySlope = 3 * (1/200) * Math.pow(xVal, 2);
                 valSlope.innerText = displaySlope.toFixed(2);
             }
@@ -418,12 +449,10 @@
         // --- PRACTICE CHECKER ---
         window.checkAnswer = function(id, correctStr) {
             const input = document.getElementById('ans-' + id).value;
-            // Clean input: remove spaces, convert to lower case
             const cleanInput = input.replace(/\s+/g, '').toLowerCase();
             const feedback = document.getElementById('feedback-' + id);
             feedback.style.display = 'block';
             
-            // Handle variations in string input (e.g. 12x^3+8 vs 12x^3 + 8)
             if(cleanInput === correctStr || cleanInput === correctStr.replace('+', '')) {
                 feedback.innerHTML = "✅ Perfect! The Power Rule is yours.";
                 feedback.style.color = "#10b981";
@@ -462,7 +491,7 @@
                 ctx.clearRect(0,0, canvas.width, canvas.height);
                 let active = false;
                 particles.forEach(p => {
-                    p.x += p.vx; p.y += p.vy; p.vy += 0.1; // slight gravity
+                    p.x += p.vx; p.y += p.vy; p.vy += 0.1; 
                     if(p.y < canvas.height) {
                         active = true;
                         ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
