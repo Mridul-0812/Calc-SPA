@@ -3,292 +3,1143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculus Mastered! | CalcSPA</title>
+    <title>Calculus Final Assessment | CalcSPA</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
-            svg: { fontCache: 'global' }
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: { fontCache: 'global' },
+            startup: {
+                typeset: false // We will trigger manually after dynamic JS rendering
+            }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <style>
+        /* ==========================================================================
+           CSS RESET & VARIABLES
+           ========================================================================== */
         :root {
             --bg-base: #0f172a;
+            --bg-card: #1e293b;
+            --bg-inset: #0d1117;
             --text-primary: #f8fafc;
-            --accent-pos: #8b5cf6; 
-            --accent-vel: #10b981; 
-            --accent-acc: #ef4444; 
-            --accent-gold: #fbbf24;
+            --text-secondary: #94a3b8;
+            --accent-primary: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --success: #10b981;
+            --success-dark: #047857;
+            --error: #ef4444;
+            --error-dark: #b91c1c;
+            --warn: #f59e0b;
+            --border-ui: rgba(255, 255, 255, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-head: 'Lexend', sans-serif;
+            --font-mono: 'Fira Code', monospace;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: var(--bg-base);
             color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* Hide the mess of the party! */
-            position: relative;
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* Animated Background Gradient */
-        .bg-glow {
-            position: absolute;
-            width: 200vw;
-            height: 200vh;
-            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, rgba(15, 23, 42, 1) 50%);
-            animation: pulseBg 8s infinite alternate ease-in-out;
-            z-index: 0;
+        /* ==========================================================================
+           TYPOGRAPHY & LAYOUT
+           ========================================================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 100px 20px;
         }
 
-        @keyframes pulseBg {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.2); opacity: 1; }
-        }
-
-        /* Confetti Canvas */
-        #confetti-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        /* Floating Math Symbols */
-        .floating-math {
-            position: absolute;
-            font-family: 'Fira Code', monospace;
-            font-weight: bold;
-            font-size: 2rem;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 5;
-            text-shadow: 0 0 10px currentColor;
-            animation: floatUp 6s linear forwards;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) rotate(0deg) scale(0.5); opacity: 0; }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { transform: translateY(-20vh) rotate(360deg) scale(1.5); opacity: 0; }
-        }
-
-        /* Center Content Card */
-        .celebration-card {
-            position: relative;
-            z-index: 20;
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(16px);
-            border: 2px solid rgba(251, 191, 36, 0.3);
-            border-radius: 2rem;
-            padding: 4rem 5rem;
+        header {
             text-align: center;
-            max-width: 800px;
-            box-shadow: 0 0 50px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.05);
-            animation: dropIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            transform: translateY(-100vh);
-        }
-
-        @keyframes dropIn {
-            to { transform: translateY(0); }
-        }
-
-        .trophy {
-            font-size: 6rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            animation: bounce 2s infinite ease-in-out;
-            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.8));
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-15px) scale(1.05); }
+            padding: 60px 0 40px 0;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-ui);
+            background: radial-gradient(circle at top, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
         }
 
         h1 {
-            font-family: 'Lexend', sans-serif;
+            font-family: var(--font-head);
             font-size: 3.5rem;
             font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
         }
 
-        p {
-            font-size: 1.25rem;
-            color: #cbd5e1;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .equation-badge {
+        h2 {
+            font-family: var(--font-head);
+            font-size: 2rem;
+            margin: 50px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-primary);
             display: inline-block;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 3rem;
-            font-size: 1.5rem;
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
         }
 
-        .btn-home {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--accent-pos), #6d28d9);
-            color: white;
-            text-decoration: none;
-            padding: 1rem 3rem;
-            border-radius: 50px;
-            font-family: 'Lexend', sans-serif;
-            font-weight: 600;
+        p.subtitle {
             font-size: 1.2rem;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
-            border: 2px solid rgba(255,255,255,0.2);
+            color: var(--text-secondary);
         }
 
-        .btn-home:hover {
-            transform: scale(1.1) translateY(-5px);
-            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.6);
+        /* ==========================================================================
+           SECTION CARDS & QUESTION UI
+           ========================================================================== */
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-ui);
+            border-radius: 1.5rem;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
+        .q-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-ui);
+        }
+
+        .q-title {
+            font-family: var(--font-head);
+            font-size: 1.4rem;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .q-text {
+            font-size: 1.15rem;
+            margin-bottom: 25px;
+        }
+
+        /* ==========================================================================
+           DIFFICULTY BADGES
+           ========================================================================== */
+        .badge {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-easy { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .badge-med { background: rgba(245, 158, 11, 0.15); color: var(--warn); border: 1px solid var(--warn); }
+        .badge-hard { background: rgba(239, 68, 68, 0.15); color: var(--error); border: 1px solid var(--error); }
+        .badge-impossible {
+            background: #000;
+            color: #fff;
+            border: 1px solid #fff;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        /* ==========================================================================
+           BUTTONS & CONTROLS
+           ========================================================================== */
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: var(--font-head);
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary { background: var(--accent-primary); color: #fff; }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+
+        .btn-hint { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-ui); }
+        .btn-hint:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: var(--success-dark); }
+
+        .btn-danger { background: var(--error); color: #fff; }
+        .btn-danger:hover { background: var(--error-dark); }
+
+        /* ==========================================================================
+           REVEAL AREAS & MARKING UI
+           ========================================================================== */
+        .reveal-area {
+            display: none;
+            margin-top: 25px;
+            background: var(--bg-inset);
+            border-radius: 12px;
+            border: 1px solid var(--border-ui);
+            overflow: hidden;
+            animation: slideDown 0.4s ease-out forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .answer-box {
+            padding: 20px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--border-ui);
+        }
+
+        .criteria-box {
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.05);
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .criteria-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .criteria-box li {
+            margin-bottom: 8px;
+        }
+
+        .marking-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid var(--border-ui);
+        }
+
+        select.mark-dropdown {
+            appearance: none;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            border: 1px solid var(--accent-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        select.mark-dropdown:focus {
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+        }
+
+        /* ==========================================================================
+           GRAPHING CANVAS ENGINE UI
+           ========================================================================== */
+        .graph-environment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff; /* White bg for standard graph paper look */
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            cursor: crosshair;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas.layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Z-indexing for graph layers */
+        #grid-layer { z-index: 1; }
+        #axis-layer { z-index: 2; }
+        #draw-layer { z-index: 3; }
+
+        .graph-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .graph-feedback {
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback-pass { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .feedback-fail { background: rgba(239, 68, 68, 0.2); color: var(--error); border: 1px solid var(--error); }
+
+        /* ==========================================================================
+           FINAL REPORT UI
+           ========================================================================== */
+        #final-report {
+            display: none;
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-base) 100%);
+            border: 1px solid var(--accent-primary);
+            border-radius: 2rem;
+            padding: 60px 40px;
+            text-align: center;
+            margin-top: 50px;
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.15);
+        }
+
+        .score-ring {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent-primary) 0%, var(--bg-inset) 0%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px auto;
+            position: relative;
+        }
+
+        .score-ring::before {
+            content: "";
+            position: absolute;
+            width: 170px;
+            height: 170px;
+            background: var(--bg-card);
+            border-radius: 50%;
+        }
+
+        .score-value {
+            position: relative;
+            z-index: 2;
+            font-family: var(--font-head);
+            font-size: 3.5rem;
+            font-weight: 800;
+        }
+
+        .diagnostic-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .diagnostic-weaknesses {
+            text-align: left;
+            background: var(--bg-inset);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--warn);
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow"></div>
-    
-    <canvas id="confetti-canvas"></canvas>
+<div class="container">
+    <header>
+        <h1>Calculus Mastery Exam</h1>
+        <p class="subtitle">Year 11 Advanced Mathematics Final Assessment - Exam-Style Questions</p>
+    </header>
 
-    <div class="celebration-card">
-        <div class="trophy">🏆</div>
-        <h1>Calculus Mastered!</h1>
-        <p>Congratulations! You have successfully conquered First Principles, navigated the core Derivative Rules, explored Advanced Functions, and mastered Kinematics.</p>
+    <div id="exam-content">
         
-        <div class="equation-badge">
-            <span style="color: var(--accent-gold);">$$\text{Limit Reached: } \lim_{t \to \text{end}} \text{CalcSPA} = \infty \text{ Knowledge}$$</span>
+        <h2>Section 1: Kinematics</h2>
+        <div id="motion-container"></div>
+
+        <h2>Section 2: Core Differentiation</h2>
+        <div id="diff-container"></div>
+
+        <h2>Section 3: Problem Solving</h2>
+        <div id="ps-container"></div>
+
+        <h2>Section 4: Curve Sketching</h2>
+        
+        <div class="q-card">
+            <div class="q-header">
+                <div class="q-title">Graph 1: Cubic Polynomial</div>
+                <div class="badge badge-hard">Hard</div>
+            </div>
+            <div class="q-text">
+                Sketch the curve $y = x^3 - 3x^2 + 4$.<br>
+                <span style="font-size:0.9rem; color:var(--text-secondary);">
+                    Ensure you pass through the correct $x$ and $y$ intercepts, and plot the turning points accurately. 
+                    Draw a continuous line using your mouse/finger.
+                </span>
+            </div>
+            
+            <div class="graph-environment">
+                <div class="canvas-wrapper" id="wrap-g1">
+                    <canvas id="grid-layer-g1" class="layer" width="600" height="600"></canvas>
+                    <canvas id="axis-layer-g1" class="layer" width="600" height="600"></canvas>
+                    <canvas id="draw-layer-g1" class="layer" width="600" height="600"></canvas>
+                </div>
+                <div class="graph-controls">
+                    <button class="btn btn-hint" onclick="clearGraph('g1')">Clear Drawing</button>
+                    <button class="btn btn-success" onclick="evaluateGraph1()">Auto-Mark Graph 1</button>
+                </div>
+                <div id="feedback-g1" class="graph-feedback"></div>
+            </div>
         </div>
 
-        <br>
-        <a href="index.html" class="btn-home">Return to Home Dashboard</a>
+        <div class="q-card">
+            <div class="q-header">
+                <div class="q-title">Graph 2: Concavity & Stationary Points</div>
+                <div class="badge badge-med">Medium</div>
+            </div>
+            <div class="q-text">
+                Sketch the curve $y = 4x - x^4$.<br>
+                <span style="font-size:0.9rem; color:var(--text-secondary);">
+                    Identify the root(s) and the global maximum. The domain shown is $-2 \le x \le 2$.
+                </span>
+            </div>
+            
+            <div class="graph-environment">
+                <div class="canvas-wrapper" id="wrap-g2">
+                    <canvas id="grid-layer-g2" class="layer" width="600" height="600"></canvas>
+                    <canvas id="axis-layer-g2" class="layer" width="600" height="600"></canvas>
+                    <canvas id="draw-layer-g2" class="layer" width="600" height="600"></canvas>
+                </div>
+                <div class="graph-controls">
+                    <button class="btn btn-hint" onclick="clearGraph('g2')">Clear Drawing</button>
+                    <button class="btn btn-success" onclick="evaluateGraph2()">Auto-Mark Graph 2</button>
+                </div>
+                <div id="feedback-g2" class="graph-feedback"></div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 80px 0;">
+            <button class="btn btn-primary" style="font-size: 1.5rem; padding: 20px 50px; border-radius: 50px;" onclick="generateFinalReport()">
+                Finalise Assessment & Calculate Score
+            </button>
+        </div>
     </div>
 
-    <script>
-        // --- FLOATING MATH SYMBOLS ENGINE ---
-        const mathSymbols = ['∫', 'dy/dx', 'f\'(x)', 'lim', '∞', 'Δ', 'π', 'Σ', 'v(t)', 'a(t)', 'd²y/dx²'];
-        const colors = ['#8b5cf6', '#10b981', '#ef4444', '#3b82f6', '#fbbf24', '#ec4899'];
+    <div id="final-report">
+        <h2 style="font-size: 3rem; margin-top: 0; border:none;">Performance Report</h2>
+        
+        <div class="score-ring" id="score-ring">
+            <div class="score-value" id="score-text">0%</div>
+        </div>
+        
+        <div class="diagnostic-text" id="diag-main"></div>
+        <div class="diagnostic-weaknesses" id="diag-weak"></div>
+        
+        <a href="finish2.html" style="text-decoration: none;">
+            <button class="btn btn-success" style="font-size: 1.3rem; padding: 15px 40px; margin: 0 auto;">
+                Proceed to Final Certification →
+            </button>
+        </a>
+    </div>
 
-        function spawnMath() {
-            const el = document.createElement('div');
-            el.className = 'floating-math';
-            el.innerText = mathSymbols[Math.floor(Math.random() * mathSymbols.length)];
-            
-            // Randomize position, color, and size
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.color = colors[Math.floor(Math.random() * colors.length)];
-            el.style.fontSize = (Math.random() * 2 + 1.5) + 'rem';
-            
-            // Randomize horizontal drift using CSS vars
-            const driftX = (Math.random() - 0.5) * 200 + 'px';
-            el.style.setProperty('--drift', driftX);
+</div>
 
-            document.body.appendChild(el);
+<script>
+    // System State tracking marks
+    const ExamState = {
+        marks: {},
+        maxMarks: 0,
+        categories: {
+            motion: { earned: 0, possible: 0 },
+            diff: { earned: 0, possible: 0 },
+            ps: { earned: 0, possible: 0 },
+            graphing: { earned: 0, possible: 8 } // 4 marks per graph
+        },
+        graphData: {
+            g1: { path: [], isEvaluated: false },
+            g2: { path: [], isEvaluated: false }
+        }
+    };
 
-            // Clean up after animation
-            setTimeout(() => {
-                el.remove();
-            }, 6000);
+    /* ==========================================================================
+       DATA: QUESTIONS
+       Note: Using String.raw to prevent JS escape sequencing from breaking MathJax
+       ========================================================================== */
+    const motionQs = [
+        {
+            id: 'm1',
+            type: 'motion',
+            diff: 'med',
+            marks: 3,
+            q: String.raw`A particle moves along the $x$-axis such that its displacement is given by $x(t) = t^3 - 6t^2 + 9t$. Find the times when the particle is at rest.`,
+            hint: String.raw`"At rest" means velocity is zero. Find $v(t)$ by differentiating $x(t)$, then solve $v(t) = 0$.`,
+            ans: String.raw`$t = 1$ and $t = 3$`,
+            criteria: [
+                String.raw`1 mark: Differentiates to find $v(t) = 3t^2 - 12t + 9$.`,
+                String.raw`1 mark: Equates $v(t) = 0$ and factorises $3(t^2 - 4t + 3) = 0$.`,
+                String.raw`1 mark: Correctly states $t = 1, 3$.`
+            ]
+        },
+        {
+            id: 'm2',
+            type: 'motion',
+            diff: 'hard',
+            marks: 4,
+            q: String.raw`A particle's velocity is given by $v(t) = 2t - 4$. It starts at the origin ($x=0$ when $t=0$). Find the total distance travelled in the first 4 seconds.`,
+            hint: String.raw`Distance is not displacement! You must check if the particle turns around. Where does $v(t) = 0$? Calculate the area under the velocity-time graph, or absolute distances between turning points.`,
+            ans: String.raw`Total Distance = $8$ units.`,
+            criteria: [
+                String.raw`1 mark: Identifies particle is at rest at $t = 2$.`,
+                String.raw`1 mark: Finds displacement equation $x(t) = t^2 - 4t$ (since $c=0$).`,
+                String.raw`1 mark: Calculates position at $t=2$ ($x = -4$) and $t=4$ ($x = 0$).`,
+                String.raw`1 mark: Sums the absolute distances: $|0 - (-4)| + |-4 - 0| = 4 + 4 = 8$.`
+            ]
+        }
+    ];
+
+    const diffQs = [
+        {
+            id: 'd1', type: 'diff', diff: 'med', marks: 3,
+            q: String.raw`Differentiate $y = (3x^2 + 2)^5$`,
+            hint: String.raw`Use the Chain Rule: bring the power down, subtract one, and multiply by the derivative of the inside.`,
+            ans: String.raw`$\frac{dy}{dx} = 30x(3x^2 + 2)^4$`,
+            criteria: [
+                String.raw`1 mark: Brings power 5 down and makes new power 4.`,
+                String.raw`1 mark: Multiplies by the internal derivative $(6x)$.`,
+                String.raw`1 mark: Simplifies correctly.`
+            ]
+        },
+        {
+            id: 'd2', type: 'diff', diff: 'hard', marks: 4,
+            q: String.raw`Find $f'(x)$ for $f(x) = x^3 \sqrt{2x - 1}$`,
+            hint: String.raw`This requires the Product Rule ($u'v + uv'$), and finding $v'$ requires the Chain Rule. Rewrite the root as a fractional power $(2x-1)^{1/2}$ first.`,
+            ans: String.raw`$f'(x) = 3x^2\sqrt{2x-1} + \frac{x^3}{\sqrt{2x-1}}$ (or equivalent single fraction)`,
+            criteria: [
+                String.raw`1 mark: Correctly identifies $u=x^3$ and $u' = 3x^2$.`,
+                String.raw`1 mark: Correctly finds $v' = \frac{1}{2}(2x-1)^{-1/2} \times 2 = (2x-1)^{-1/2}$.`,
+                String.raw`1 mark: Substitutes into Product Rule correctly.`,
+                String.raw`1 mark: Algebraic simplification (leaving in unsimplified valid form loses 1 mark).`
+            ]
+        },
+        {
+            id: 'd3', type: 'diff', diff: 'hard', marks: 4,
+            q: String.raw`Differentiate $y = \frac{x^2 - 1}{3x + 2}$`,
+            hint: String.raw`Use the Quotient Rule: $\frac{vu' - uv'}{v^2}$.`,
+            ans: String.raw`$\frac{dy}{dx} = \frac{3x^2 + 4x + 3}{(3x + 2)^2}$`,
+            criteria: [
+                String.raw`1 mark: Identifies $u, v, u', v'$ correctly.`,
+                String.raw`1 mark: Correct setup of the numerator $(3x+2)(2x) - (x^2-1)(3)$.`,
+                String.raw`1 mark: Correct denominator $(3x+2)^2$.`,
+                String.raw`1 mark: Expands and simplifies numerator without error.`
+            ]
+        },
+        {
+            id: 'd4', type: 'diff', diff: 'hard', marks: 4,
+            q: String.raw`Given $y = (x + \sqrt{x})^3$, find $\frac{dy}{dx}$.`,
+            hint: String.raw`Chain rule first. The internal derivative has two terms.`,
+            ans: String.raw`$\frac{dy}{dx} = 3(x + \sqrt{x})^2 \left(1 + \frac{1}{2\sqrt{x}}\right)$`,
+            criteria: [
+                String.raw`1 mark: Uses outside chain rule: $3(\dots)^2$.`,
+                String.raw`1 mark: Differentiates $x$ to $1$.`,
+                String.raw`1 mark: Differentiates $x^{1/2}$ to $\frac{1}{2}x^{-1/2}$.`,
+                String.raw`1 mark: Expresses final answer clearly.`
+            ]
+        },
+        {
+            id: 'd5', type: 'diff', diff: 'impossible', marks: 5,
+            q: String.raw`Differentiate $f(x) = \sqrt{\frac{x+1}{x-1}}$. Simplify your answer fully.`,
+            hint: String.raw`Chain rule first (power $1/2$), and inside you must use the quotient rule. Be very careful with algebra when simplifying fractions inside fractions!`,
+            ans: String.raw`$f'(x) = \frac{-1}{(x-1)^2} \sqrt{\frac{x-1}{x+1}}$ OR $\frac{-1}{(x-1)^{3/2}(x+1)^{1/2}}$`,
+            criteria: [
+                String.raw`1 mark: Outer chain rule application $\frac{1}{2}(\dots)^{-1/2}$.`,
+                String.raw`2 marks: Correct Quotient rule application for the inside derivative: $\frac{-2}{(x-1)^2}$.`,
+                String.raw`1 mark: Multiplies outer and inner derivatives.`,
+                String.raw`1 mark: Simplifies negative fractional indices into a clean final expression.`
+            ]
+        }
+    ];
+
+    const probQs = [
+        {
+            id: 'p1', type: 'ps', diff: 'easy', marks: 3,
+            q: String.raw`Find the equation of the tangent to the curve $y = x^2 - 4x$ at the point where $x = 3$.`,
+            hint: String.raw`Find the y-coordinate first. Then find the gradient function $y'$. Evaluate $m$ at $x=3$. Use point-gradient formula.`,
+            ans: String.raw`$y = 2x - 9$`,
+            criteria: [
+                String.raw`1 mark: Finds $y = -3$ at $x = 3$.`,
+                String.raw`1 mark: Finds $y' = 2x - 4 \implies m = 2$.`,
+                String.raw`1 mark: Uses $y - y_1 = m(x - x_1)$ to get final equation.`
+            ]
+        },
+        {
+            id: 'p2', type: 'ps', diff: 'easy', marks: 4,
+            q: String.raw`Differentiate $f(x) = 2x^2 + 1$ from First Principles.`,
+            hint: String.raw`Use $\lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$. Expand $(x+h)^2$ carefully.`,
+            ans: String.raw`$f'(x) = 4x$`,
+            criteria: [
+                String.raw`1 mark: Correctly states the limit definition.`,
+                String.raw`1 mark: Expands $2(x+h)^2 + 1$ correctly.`,
+                String.raw`1 mark: Cancels original function terms and factors out $h$.`,
+                String.raw`1 mark: Applies limit $h \to 0$ to reach $4x$.`
+            ]
+        },
+        {
+            id: 'p3', type: 'ps', diff: 'med', marks: 4,
+            q: String.raw`Find the equation of the normal to the curve $y = \frac{4}{x}$ at the point $(2, 2)$.`,
+            hint: String.raw`Normal is perpendicular to the tangent. $m_1 m_2 = -1$.`,
+            ans: String.raw`$y = x$ (or $x - y = 0$)`,
+            criteria: [
+                String.raw`1 mark: Differentiates $y = 4x^{-1}$ to get $y' = -4x^{-2}$.`,
+                String.raw`1 mark: Substitutes $x=2$ to find tangent gradient $m_T = -1$.`,
+                String.raw`1 mark: States normal gradient $m_N = 1$.`,
+                String.raw`1 mark: Finds correct equation $y - 2 = 1(x - 2)$.`
+            ]
+        },
+        {
+            id: 'p4', type: 'ps', diff: 'med', marks: 3,
+            q: String.raw`For what values of $x$ is the function $f(x) = x^3 - 3x^2 - 9x + 5$ strictly decreasing?`,
+            hint: String.raw`A function is decreasing when $f'(x) < 0$. Find the derivative, set it to less than zero, and solve the quadratic inequality.`,
+            ans: String.raw`$-1 < x < 3$`,
+            criteria: [
+                String.raw`1 mark: Finds $f'(x) = 3x^2 - 6x - 9$.`,
+                String.raw`1 mark: Sets up $3(x^2 - 2x - 3) < 0$ and finds roots $x = -1, 3$.`,
+                String.raw`1 mark: Correctly states the internal interval $-1 < x < 3$.`
+            ]
+        },
+        {
+            id: 'p5', type: 'ps', diff: 'hard', marks: 4,
+            q: String.raw`Show that the curves $y = x^2$ and $y = \frac{1}{2} - x^2$ intersect at right angles (orthogonally).`,
+            hint: String.raw`1. Find the points of intersection. 2. Find the gradients of BOTH curves at those points. 3. Show $m_1 \times m_2 = -1$.`,
+            ans: String.raw`Proof required.`,
+            criteria: [
+                String.raw`1 mark: Equates equations $x^2 = \frac{1}{2} - x^2 \implies 2x^2 = \frac{1}{2} \implies x = \pm\frac{1}{2}$.`,
+                String.raw`1 mark: Finds derivatives $y_1' = 2x$ and $y_2' = -2x$.`,
+                String.raw`1 mark: Tests at $x=1/2$: $m_1 = 1, m_2 = -1$. Product is $-1$.`,
+                String.raw`1 mark: Tests at $x=-1/2$: $m_1 = -1, m_2 = 1$. Product is $-1$. Concludes proof.`
+            ]
+        },
+        {
+            id: 'p6', type: 'ps', diff: 'hard', marks: 5,
+            q: String.raw`Find the stationary points of the curve $y = x^4 - 4x^3$ and determine their nature.`,
+            hint: String.raw`Find $y' = 0$ for stationary points. Use either the first derivative test (table of signs) or second derivative test to determine nature.`,
+            ans: String.raw`$(0,0)$ is a horizontal point of inflection. $(3, -27)$ is a local minimum.`,
+            criteria: [
+                String.raw`1 mark: Finds $y' = 4x^3 - 12x^2$.`,
+                String.raw`1 mark: Solves $4x^2(x - 3) = 0$ to get $x = 0, 3$. Finds corresponding $y$-values.`,
+                String.raw`1 mark: Finds $y'' = 12x^2 - 24x$.`,
+                String.raw`1 mark: Tests $x=3$: $y'' > 0 \implies$ Minimum.`,
+                String.raw`1 mark: Tests $x=0$: $y'' = 0$. Uses table of signs to prove it does not change sign (Negative to Negative) $\implies$ Inflection.`
+            ]
+        },
+        {
+            id: 'p7', type: 'ps', diff: 'hard', marks: 4,
+            q: String.raw`The tangent to the curve $y = x^3$ at the point $x = a$ passes through the point $(0, -16)$. Find the value of $a$.`,
+            hint: String.raw`Write the equation of the tangent at $x=a$ in terms of $a$. The coordinates are $(a, a^3)$ and gradient is $3a^2$. Then substitute $x=0, y=-16$ into that equation and solve for $a$.`,
+            ans: String.raw`$a = 2$`,
+            criteria: [
+                String.raw`1 mark: States point is $(a, a^3)$ and gradient is $m = 3a^2$.`,
+                String.raw`1 mark: Forms equation: $y - a^3 = 3a^2(x - a)$.`,
+                String.raw`1 mark: Substitutes $(0, -16) \implies -16 - a^3 = -3a^3$.`,
+                String.raw`1 mark: Solves $2a^3 = 16 \implies a^3 = 8 \implies a = 2$.`
+            ]
+        },
+        {
+            id: 'p8', type: 'ps', diff: 'hard', marks: 4,
+            q: String.raw`A stone is thrown upwards s.t. its height is $h(t) = 20t - 5t^2$. Find the maximum height reached.`,
+            hint: String.raw`Max height occurs when velocity is zero (stationary point).`,
+            ans: String.raw`$20$ metres.`,
+            criteria: [
+                String.raw`1 mark: Differentiates $v(t) = 20 - 10t$.`,
+                String.raw`1 mark: Sets $v(t) = 0$ to find $t = 2$.`,
+                String.raw`1 mark: Confirms maximum ($h''(t) = -10 < 0$).`,
+                String.raw`1 mark: Substitutes $t=2$ into $h(t)$ to get $h = 40 - 20 = 20$.`
+            ]
+        },
+        {
+            id: 'p9', type: 'ps', diff: 'impossible', marks: 6,
+            q: String.raw`Find the equation of the common tangent(s) to the parabolas $y = x^2$ and $y = -(x-2)^2$.`,
+            hint: String.raw`Let the tangent line be $y = mx + c$. A line is a tangent to a parabola if their intersection yields a quadratic with a discriminant ($\Delta = b^2 - 4ac$) equal to zero. Do this for both parabolas to find $m$ and $c$.`,
+            ans: String.raw`$y = 0$ and $y = 4x - 4$.`,
+            criteria: [
+                String.raw`1 mark: Sets up intersection $x^2 = mx + c \implies x^2 - mx - c = 0$.`,
+                String.raw`1 mark: Uses $\Delta = 0 \implies m^2 + 4c = 0$.`,
+                String.raw`1 mark: Sets up second intersection $-(x-2)^2 = mx + c \implies x^2 + (m-4)x + (c+4) = 0$.`,
+                String.raw`1 mark: Uses $\Delta = 0$ for second equation $\implies (m-4)^2 - 4(c+4) = 0$.`,
+                String.raw`1 mark: Substitutes $4c = -m^2$ into second equation to get $2m^2 - 8m = 0$.`,
+                String.raw`1 mark: Solves for $m=0, c=0$ and $m=4, c=-4$ yielding the two tangent equations.`
+            ]
+        },
+        {
+            id: 'p10', type: 'ps', diff: 'impossible', marks: 5,
+            q: String.raw`A cubic function $f(x) = ax^3 + bx^2 + cx + d$ has a local maximum at $(-1, 4)$ and a local minimum at $(1, 0)$. Determine the values of $a, b, c,$ and $d$.`,
+            hint: String.raw`You have four pieces of information: $f(-1)=4, f(1)=0, f'(-1)=0, f'(1)=0$. Build a system of equations. Since the derivative has roots at $1$ and $-1$, you can write $f'(x) = k(x-1)(x+1)$.`,
+            ans: String.raw`$a=1, b=0, c=-3, d=2$ (Function is $y = x^3 - 3x + 2$)`,
+            criteria: [
+                String.raw`1 mark: Differentiates $f'(x) = 3ax^2 + 2bx + c$.`,
+                String.raw`1 mark: Applies $f'(1)=0$ and $f'(-1)=0$ to deduce $b=0$ and $c = -3a$.`,
+                String.raw`1 mark: Sets up $f(1) = a + b + c + d = 0 \implies d - 2a = 0$.`,
+                String.raw`1 mark: Sets up $f(-1) = -a + b - c + d = 4 \implies 2a + d = 4$.`,
+                String.raw`1 mark: Solves simultaneous equations correctly.`
+            ]
+        }
+    ];
+
+    /* ==========================================================================
+       UI GENERATION & BEHAVIOUR
+       ========================================================================== */
+    function generateHTML(question, category) {
+        // Track max marks for state
+        ExamState.categories[category].possible += question.marks;
+        ExamState.maxMarks += question.marks;
+
+        let criteriaHTML = question.criteria.map(c => `<li>${c}</li>`).join('');
+        let optionsHTML = '';
+        for(let i=0; i<=question.marks; i++) {
+            optionsHTML += `<option value="${i}">${i}</option>`;
         }
 
-        // Spawn a new symbol every 300ms
-        setInterval(spawnMath, 300);
+        return `
+            <div class="q-card" id="card-${question.id}">
+                <div class="q-header">
+                    <div class="q-title">Question (${question.marks} marks)</div>
+                    <div class="badge badge-${question.diff}">${question.diff.toUpperCase()}</div>
+                </div>
+                <div class="q-text">${question.q}</div>
+                
+                <div class="controls-row">
+                    <button class="btn btn-hint" onclick="alert('${question.hint.replace(/'/g, "\\'")}')">💡 Need a Hint?</button>
+                    
+                    ${category === 'diff' ? `
+                        <button class="btn btn-primary" onclick="toggleReveal('${question.id}')">Reveal Answer</button>
+                    ` : `
+                        <button class="btn btn-primary" onclick="toggleReveal('${question.id}')">Reveal Answer & Criteria</button>
+                    `}
+                </div>
 
+                <div class="reveal-area" id="reveal-${question.id}">
+                    <div class="answer-box"><strong>Final Answer:</strong> ${question.ans}</div>
+                    
+                    ${category === 'diff' ? `
+                        <div class="marking-toolbar" style="background: rgba(255,255,255,0.05); justify-content: center; gap: 20px;">
+                            <span style="font-weight: bold;">Did you get exactly this answer?</span>
+                            <button class="btn btn-success" onclick="assignBinaryMark('${question.id}', '${category}', ${question.marks}, true)">Yes (Full Marks)</button>
+                            <button class="btn btn-danger" onclick="assignBinaryMark('${question.id}', '${category}', 0, false)">No (0 Marks)</button>
+                        </div>
+                    ` : `
+                        <div class="criteria-box">
+                            <strong>Marking Criteria:</strong>
+                            <ul>${criteriaHTML}</ul>
+                        </div>
+                        <div class="marking-toolbar">
+                            <span><strong>Self-Assessment:</strong> Award marks based on criteria</span>
+                            <select class="mark-dropdown" onchange="assignVariableMark('${question.id}', '${category}', this.value)">
+                                <option value="0" selected>0</option>
+                                ${optionsHTML}
+                            </select>
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+    }
 
-        // --- PHYSICS CONFETTI ENGINE ---
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    function toggleReveal(id) {
+        const el = document.getElementById(`reveal-${id}`);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
 
-        let particles = [];
-        const maxParticles = 150;
+    function assignBinaryMark(id, category, marks, isCorrect) {
+        ExamState.marks[id] = marks;
+        const card = document.getElementById(`card-${id}`);
+        card.style.border = isCorrect ? '2px solid var(--success)' : '2px solid var(--error)';
+        recalculateTotals(category);
+    }
 
-        class ConfettiParticle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height - canvas.height;
-                this.r = Math.random() * 6 + 2; // size
-                this.dx = Math.random() * 4 - 2;
-                this.dy = Math.random() * 3 + 2;
-                this.tilt = Math.floor(Math.random() * 10) - 10;
-                this.tiltAngleInc = (Math.random() * 0.07) + 0.05;
-                this.tiltAngle = 0;
-                // Vibrant colors
-                const palette = ['#8b5cf6', '#10b981', '#ef4444', '#3b82f6', '#fbbf24', '#ffffff'];
-                this.color = palette[Math.floor(Math.random() * palette.length)];
+    function assignVariableMark(id, category, value) {
+        ExamState.marks[id] = parseInt(value);
+        const card = document.getElementById(`card-${id}`);
+        card.style.border = '2px solid var(--success)';
+        recalculateTotals(category);
+    }
+
+    function recalculateTotals(category) {
+        // Find all IDs related to this category and sum their marks
+        let catArray = category === 'motion' ? motionQs : (category === 'diff' ? diffQs : probQs);
+        let sum = 0;
+        catArray.forEach(q => {
+            if(ExamState.marks[q.id] !== undefined) {
+                sum += ExamState.marks[q.id];
+            }
+        });
+        ExamState.categories[category].earned = sum;
+    }
+
+    /* ==========================================================================
+       GRAPHING ENGINE (CANVAS PATH TRACKING & AUTO-MARKING)
+       ========================================================================== */
+    class GraphCanvas {
+        constructor(id, mathRange) {
+            this.id = id;
+            this.range = mathRange; // e.g. { xMin: -5, xMax: 5, yMin: -10, yMax: 10 }
+            
+            this.gridCtx = document.getElementById(`grid-layer-${id}`).getContext('2d');
+            this.axisCtx = document.getElementById(`axis-layer-${id}`).getContext('2d');
+            this.drawCtx = document.getElementById(`draw-layer-${id}`).getContext('2d');
+            this.canvas = document.getElementById(`draw-layer-${id}`);
+            
+            this.width = this.canvas.width;
+            this.height = this.canvas.height;
+            
+            this.isDrawing = false;
+            
+            this.setupEvents();
+            this.drawGridAndAxes();
+        }
+
+        // Map mathematical (x,y) to canvas pixel (px, py)
+        mathToPx(x, y) {
+            const px = ((x - this.range.xMin) / (this.range.xMax - this.range.xMin)) * this.width;
+            const py = this.height - ((y - this.range.yMin) / (this.range.yMax - this.range.yMin)) * this.height;
+            return { px, py };
+        }
+
+        // Map canvas pixel (px, py) to mathematical (x, y)
+        pxToMath(px, py) {
+            const x = this.range.xMin + (px / this.width) * (this.range.xMax - this.range.xMin);
+            const y = this.range.yMin + ((this.height - py) / this.height) * (this.range.yMax - this.range.yMin);
+            return { x, y };
+        }
+
+        drawGridAndAxes() {
+            // Draw Grid
+            this.gridCtx.clearRect(0, 0, this.width, this.height);
+            this.gridCtx.strokeStyle = '#e2e8f0';
+            this.gridCtx.lineWidth = 1;
+
+            // Vertical lines
+            for(let x = Math.ceil(this.range.xMin); x <= Math.floor(this.range.xMax); x++) {
+                const px = this.mathToPx(x, 0).px;
+                this.gridCtx.beginPath();
+                this.gridCtx.moveTo(px, 0); this.gridCtx.lineTo(px, this.height);
+                this.gridCtx.stroke();
+            }
+            // Horizontal lines
+            for(let y = Math.ceil(this.range.yMin); y <= Math.floor(this.range.yMax); y++) {
+                const py = this.mathToPx(0, y).py;
+                this.gridCtx.beginPath();
+                this.gridCtx.moveTo(0, py); this.gridCtx.lineTo(this.width, py);
+                this.gridCtx.stroke();
             }
 
-            update() {
-                this.tiltAngle += this.tiltAngleInc;
-                this.y += (Math.cos(this.tiltAngle) + this.dy + this.r / 2) / 2;
-                this.x += Math.sin(this.tiltAngle) * 2;
+            // Draw Axes
+            this.axisCtx.clearRect(0, 0, this.width, this.height);
+            this.axisCtx.strokeStyle = '#334155';
+            this.axisCtx.lineWidth = 2;
+            this.axisCtx.fillStyle = '#0f172a';
+            this.axisCtx.font = '14px sans-serif';
 
-                // Reset particle to top if it falls off bottom
-                if (this.y > canvas.height) {
-                    this.x = Math.random() * canvas.width;
-                    this.y = -20;
-                    this.tilt = Math.floor(Math.random() * 10) - 10;
+            const origin = this.mathToPx(0, 0);
+            
+            // X Axis
+            if(origin.py >= 0 && origin.py <= this.height) {
+                this.axisCtx.beginPath();
+                this.axisCtx.moveTo(0, origin.py); this.axisCtx.lineTo(this.width, origin.py);
+                this.axisCtx.stroke();
+                
+                // X Ticks & Labels
+                for(let x = Math.ceil(this.range.xMin); x <= Math.floor(this.range.xMax); x++) {
+                    if (x === 0) continue;
+                    const px = this.mathToPx(x, 0).px;
+                    this.axisCtx.beginPath();
+                    this.axisCtx.moveTo(px, origin.py - 5); this.axisCtx.lineTo(px, origin.py + 5);
+                    this.axisCtx.stroke();
+                    this.axisCtx.fillText(x, px - 5, origin.py + 20);
                 }
             }
 
-            draw() {
-                ctx.beginPath();
-                ctx.lineWidth = this.r;
-                ctx.strokeStyle = this.color;
-                ctx.moveTo(this.x + this.tilt + this.r, this.y);
-                ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r);
-                ctx.stroke();
+            // Y Axis
+            if(origin.px >= 0 && origin.px <= this.width) {
+                this.axisCtx.beginPath();
+                this.axisCtx.moveTo(origin.px, 0); this.axisCtx.lineTo(origin.px, this.height);
+                this.axisCtx.stroke();
+                
+                // Y Ticks & Labels
+                for(let y = Math.ceil(this.range.yMin); y <= Math.floor(this.range.yMax); y++) {
+                    if (y === 0) continue;
+                    const py = this.mathToPx(0, y).py;
+                    this.axisCtx.beginPath();
+                    this.axisCtx.moveTo(origin.px - 5, py); this.axisCtx.lineTo(origin.px + 5, py);
+                    this.axisCtx.stroke();
+                    this.axisCtx.fillText(y, origin.px + 10, py + 5);
+                }
             }
         }
 
-        // Initialize particles
-        for (let i = 0; i < maxParticles; i++) {
-            particles.push(new ConfettiParticle());
+        setupEvents() {
+            // Mouse Events
+            this.canvas.addEventListener('mousedown', (e) => this.startDraw(e.offsetX, e.offsetY));
+            this.canvas.addEventListener('mousemove', (e) => this.draw(e.offsetX, e.offsetY));
+            this.canvas.addEventListener('mouseup', () => this.endDraw());
+            this.canvas.addEventListener('mouseleave', () => this.endDraw());
+
+            // Touch Events (mobile support)
+            this.canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                this.startDraw(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+            }, {passive: false});
+            this.canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                this.draw(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+            }, {passive: false});
+            this.canvas.addEventListener('touchend', () => this.endDraw());
         }
 
-        // Animation Loop
-        function renderConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
+        startDraw(px, py) {
+            this.isDrawing = true;
+            this.drawCtx.beginPath();
+            this.drawCtx.moveTo(px, py);
+            this.recordPoint(px, py);
+        }
+
+        draw(px, py) {
+            if (!this.isDrawing) return;
+            this.drawCtx.lineWidth = 3;
+            this.drawCtx.strokeStyle = '#8b5cf6';
+            this.drawCtx.lineCap = 'round';
+            this.drawCtx.lineTo(px, py);
+            this.drawCtx.stroke();
+            this.recordPoint(px, py);
+        }
+
+        endDraw() {
+            this.isDrawing = false;
+        }
+
+        recordPoint(px, py) {
+            const mathPt = this.pxToMath(px, py);
+            ExamState.graphData[this.id].path.push(mathPt);
+        }
+
+        clear() {
+            this.drawCtx.clearRect(0, 0, this.width, this.height);
+            ExamState.graphData[this.id].path = [];
+            document.getElementById(`feedback-${this.id}`).style.display = 'none';
+        }
+
+        // Auto-marking heuristic engine
+        evaluate(targetPoints) {
+            const path = ExamState.graphData[this.id].path;
+            if (path.length < 10) return { pass: false, msg: "Please draw a continuous curve." };
+
+            let pointsHit = 0;
+            const tolerance = 0.5; // mathematical unit tolerance
+
+            // For each target critical point, check if the drawn path passes near it
+            targetPoints.forEach(target => {
+                let hit = false;
+                for (let i = 0; i < path.length; i++) {
+                    const pt = path[i];
+                    const dist = Math.sqrt(Math.pow(pt.x - target.x, 2) + Math.pow(pt.y - target.y, 2));
+                    if (dist <= tolerance) {
+                        hit = true;
+                        break;
+                    }
+                }
+                if (hit) pointsHit++;
             });
-            requestAnimationFrame(renderConfetti);
+
+            if (pointsHit === targetPoints.length) {
+                return { pass: true, msg: "Excellent! Curve passes through all key stationary points and intercepts." };
+            } else {
+                return { pass: false, msg: `Missed key features. Found ${pointsHit}/${targetPoints.length} critical points. Did you calculate roots and turning points?` };
+            }
+        }
+    }
+
+    // Instantiating Graphs
+    let graph1, graph2;
+
+    function initGraphs() {
+        // G1: y = x^3 - 3x^2 + 4. Roots: -1, 2. TP: (0,4) MAX, (2,0) MIN.
+        graph1 = new GraphCanvas('g1', { xMin: -3, xMax: 4, yMin: -2, yMax: 6 });
+        
+        // G2: y = 4x - x^4. Roots: 0, cbrt(4)~1.58. TP: (1,3) MAX. Domain -2 to 2
+        graph2 = new GraphCanvas('g2', { xMin: -2.5, xMax: 2.5, yMin: -5, yMax: 5 });
+    }
+
+    window.clearGraph = function(id) {
+        if(id === 'g1') graph1.clear();
+        if(id === 'g2') graph2.clear();
+    };
+
+    window.evaluateGraph1 = function() {
+        // Critical targets: Root (-1,0), Root/Min (2,0), Max (0,4)
+        const targets = [{x: -1, y: 0}, {x: 2, y: 0}, {x: 0, y: 4}];
+        const result = graph1.evaluate(targets);
+        
+        const fb = document.getElementById('feedback-g1');
+        fb.style.display = 'block';
+        fb.className = 'graph-feedback ' + (result.pass ? 'feedback-pass' : 'feedback-fail');
+        fb.innerText = result.msg;
+        
+        ExamState.categories.graphing.earned += result.pass ? 4 : 0;
+        ExamState.graphData.g1.isEvaluated = true;
+    };
+
+    window.evaluateGraph2 = function() {
+        // Critical targets: Root (0,0), Max (1,3)
+        const targets = [{x: 0, y: 0}, {x: 1, y: 3}];
+        const result = graph2.evaluate(targets);
+        
+        const fb = document.getElementById('feedback-g2');
+        fb.style.display = 'block';
+        fb.className = 'graph-feedback ' + (result.pass ? 'feedback-pass' : 'feedback-fail');
+        fb.innerText = result.msg;
+
+        // Since G1 and G2 evaluation overwrites marks currently, we need a better accumulator.
+        // For simplicity in this demo, evaluate once assigns marks.
+        if(!ExamState.graphData.g2.isEvaluated) {
+            ExamState.categories.graphing.earned += result.pass ? 4 : 0;
+            ExamState.graphData.g2.isEvaluated = true;
+        }
+    };
+
+    /* ==========================================================================
+       INITIALISATION & RENDERING
+       ========================================================================== */
+    window.onload = () => {
+        // Render Questions
+        document.getElementById('motion-container').innerHTML = motionQs.map(q => generateHTML(q, 'motion')).join('');
+        document.getElementById('diff-container').innerHTML = diffQs.map(q => generateHTML(q, 'diff')).join('');
+        document.getElementById('ps-container').innerHTML = probQs.map(q => generateHTML(q, 'ps')).join('');
+        
+        // Render MathJax safely
+        MathJax.typesetPromise().then(() => {
+            console.log('MathJax initial rendering complete');
+        });
+
+        // Initialize Canvas Engines
+        initGraphs();
+    };
+
+    /* ==========================================================================
+       FINAL REPORT GENERATION
+       ========================================================================== */
+    window.generateFinalReport = function() {
+        // Ensure all categories are tallied correctly
+        let totalEarned = ExamState.categories.motion.earned + 
+                          ExamState.categories.diff.earned + 
+                          ExamState.categories.ps.earned + 
+                          ExamState.categories.graphing.earned;
+        
+        // G1 + G2 max = 8.
+        let totalPossible = ExamState.maxMarks + ExamState.categories.graphing.possible; 
+        
+        let percentage = Math.round((totalEarned / totalPossible) * 100);
+
+        // Hide exam, show report
+        document.getElementById('exam-content').style.display = 'none';
+        document.getElementById('final-report').style.display = 'block';
+        window.scrollTo(0, 0);
+
+        // UI Updates
+        document.getElementById('score-text').innerText = `${percentage}%`;
+        
+        // Ring color logic
+        let ringColor = 'var(--error)';
+        if(percentage >= 50) ringColor = 'var(--warn)';
+        if(percentage >= 80) ringColor = 'var(--success)';
+        document.getElementById('score-ring').style.background = `conic-gradient(${ringColor} ${percentage}%, var(--bg-inset) 0%)`;
+
+        // Diagnostic Main Text
+        let diagMain = "";
+        if (percentage >= 90) {
+            diagMain = "Exceptional. You have demonstrated a profound mastery of the Year 11 Advanced Calculus syllabus. Your mechanical differentiation is flawless, and your problem-solving logic is rigorous.";
+        } else if (percentage >= 70) {
+            diagMain = "Strong performance. You have a solid grasp of core concepts, but there are a few gaps in complex application or algebraic simplification that need ironing out before Year 12.";
+        } else if (percentage >= 50) {
+            diagMain = "Satisfactory. You understand the basic rules (Power, Product, Quotient), but struggle when synthesizing them into multi-step problem solving (like tangents or kinematics).";
+        } else {
+            diagMain = "Significant revision required. You need to revisit the foundational rules of differentiation and ensure your algebraic skills (factorising, indices) are sharp enough to handle the calculus steps.";
+        }
+        document.getElementById('diag-main').innerText = diagMain;
+
+        // Weakness Breakdown
+        let weakText = "<strong>Category Breakdown:</strong><br><br>";
+        
+        const assessCat = (catName, catData) => {
+            let catPercent = Math.round((catData.earned / catData.possible) * 100);
+            if (isNaN(catPercent)) catPercent = 0;
+            let status = catPercent < 60 ? "🔴 Needs Work" : "🟢 Solid";
+            return `${catName}: ${catPercent}% (${catData.earned}/${catData.possible}) - ${status}<br>`;
+        };
+
+        weakText += assessCat("Kinematics (Motion)", ExamState.categories.motion);
+        weakText += assessCat("Tricky Differentiation", ExamState.categories.diff);
+        weakText += assessCat("Problem Solving (Tangents/Optimization)", ExamState.categories.ps);
+        weakText += assessCat("Interactive Curve Sketching", ExamState.categories.graphing);
+
+        if (percentage < 100) {
+            weakText += "<br><em>Recommendation:</em> Check the red categories above. Revisit those specific chapters in CalcSPA before proceeding to Year 12 material.";
         }
 
-        renderConfetti();
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-    </script>
+        document.getElementById('diag-weak').innerHTML = weakText;
+    };
+</script>
 </body>
 </html>

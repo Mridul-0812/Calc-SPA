@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculus Advanced Mastery | 24K Touch Edition</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Great+Vibes&family=Inter:wght@300;400;500;700&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. CORE VARIABLES & MASTER THEME 
+           ========================================================================== */
+        :root {
+            --bg-deep-space: #070b19;
+            --bg-nebula-core: #0f172a;
+            
+            --blue-base: #1e3a8a;
+            --blue-dark: #172554;
+            --blue-light: #60a5fa;
+            
+            --gold-light: #fff7b0;
+            --gold-base: #ffd700;
+            --gold-deep: #daa520;
+            --gold-dark: #b8860b;
+            --gold-shadow: rgba(218, 165, 32, 0.6);
+            
+            --text-pure: #ffffff;
+            --text-silver: #f1f5f9;
+            --text-muted: #94a3b8;
+
+            --touch-intensity: 0;
+        }
+
+        /* ==========================================================================
+           2. GLOBAL RESETS
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-deep-space);
+            background: radial-gradient(circle at center, var(--bg-nebula-core) 0%, var(--bg-deep-space) 100%);
+            color: var(--text-pure);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            overflow-y: auto; 
+            padding: 80px 20px; 
+            perspective: 2500px;
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep-space); }
+        ::-webkit-scrollbar-thumb { background: var(--blue-base); border-radius: 5px; transition: background 0.3s; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-base); }
+
+        /* ==========================================================================
+           3. CANVAS LAYERS 
+           ========================================================================== */
+        canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        #starfield-layer { z-index: 1; opacity: 0.7; }
+        #fireworks-layer { z-index: 2; mix-blend-mode: screen; }
+        #math-symbols-layer { z-index: 3; }
+        #confetti-layer { z-index: 100; }
+
+        /* ==========================================================================
+           4. 3D GLASSMORPHISM CERTIFICATE CONTAINER
+           ========================================================================== */
+        .cert-master-container {
+            position: relative;
+            z-index: 50;
+            width: 850px;
+            max-width: 100%;
+            margin: auto;
+            transform-style: preserve-3d;
+            animation: floatMajestic 8s ease-in-out infinite;
+        }
+
+        @keyframes floatMajestic {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(2deg); }
+        }
+
+        .certificate-card {
+            position: relative;
+            border-radius: 16px;
+            padding: 70px 80px; /* Slightly reduced padding to give content room */
+            text-align: center;
+            transform-style: preserve-3d;
+            will-change: transform;
+            
+            /* PERFORMANCE FIX: Static shadow only. No dynamic variables painted here. */
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        /* PERFORMANCE FIX: Crossfade layers handle the heavy lifting via simple opacity */
+        .cert-bg-blue, .cert-bg-gold {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            z-index: -2;
+            pointer-events: none;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            will-change: opacity;
+        }
+
+        .cert-bg-blue {
+            background: linear-gradient(145deg, rgba(23, 37, 84, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .cert-bg-gold {
+            background: linear-gradient(145deg, rgba(60, 45, 10, 0.9) 0%, rgba(25, 20, 5, 0.95) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.6);
+            opacity: var(--touch-intensity); 
+            box-shadow: 
+                inset 0 0 0 2px rgba(255, 255, 255, 0.3),
+                inset 0 0 80px rgba(218, 165, 32, 0.3);
+            transition: opacity 0.1s ease-out; /* Smooth hardware-accelerated fade */
+        }
+
+        .dynamic-glare {
+            position: absolute;
+            top: -100%; left: -100%;
+            width: 300%; height: 300%;
+            background: radial-gradient(
+                circle at center,
+                rgba(255, 215, 0, 0.4) 0%,
+                rgba(255, 255, 255, 0.1) 20%,
+                transparent 60%
+            );
+            transform: translateZ(0);
+            pointer-events: none;
+            opacity: var(--touch-intensity);
+            mix-blend-mode: screen;
+            z-index: 10;
+            will-change: transform, opacity;
+        }
+
+        .adaptive-border-frame {
+            position: absolute;
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .adaptive-border-frame::after {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border: 1px solid var(--gold-base);
+            border-radius: 8px;
+            opacity: var(--touch-intensity);
+            box-shadow: 0 0 20px var(--gold-shadow);
+            transition: opacity 0.1s ease-out;
+        }
+
+        .corner-ornament {
+            position: absolute; width: 40px; height: 40px; 
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+        .corner-ornament::before {
+            content: ''; position: absolute; top: -2px; left: -2px; width: 100%; height: 100%;
+            border: inherit; border-color: var(--gold-base);
+            opacity: var(--touch-intensity);
+            transition: opacity 0.1s ease-out;
+        }
+        .corner-top-left { top: -3px; left: -3px; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
+        .corner-bottom-right { bottom: -3px; right: -3px; border-left: none; border-top: none; border-bottom-right-radius: 8px; }
+
+        /* ==========================================================================
+           5. TYPOGRAPHY 
+           ========================================================================== */
+        .fade-in-element { opacity: 0; animation: smoothReveal 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .st-1 { animation-delay: 0.3s; } .st-2 { animation-delay: 0.6s; }
+        .st-3 { animation-delay: 0.9s; } .st-4 { animation-delay: 1.2s; }
+        .st-5 { animation-delay: 1.5s; }
+
+        @keyframes smoothReveal {
+            0% { opacity: 0; transform: translateY(20px) translateZ(20px); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0) translateZ(20px); filter: blur(0); }
+        }
+
+        .subtitle-header {
+            font-family: 'Cinzel', serif; color: var(--text-silver); font-size: 1.1rem;
+            letter-spacing: 8px; text-transform: uppercase; margin-bottom: 25px; transform: translateZ(30px);
+        }
+
+        .main-title {
+            font-family: 'Cinzel', serif; font-size: 4rem; font-weight: 900; margin-bottom: 30px;
+            background: linear-gradient(to right, var(--text-pure) 0%, var(--blue-light) 50%, var(--text-pure) 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transform: translateZ(50px); line-height: 1.1; position: relative;
+        }
+
+        .main-title::after {
+            content: 'Differential Calculus'; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to right, var(--gold-deep) 0%, var(--gold-light) 25%, var(--gold-base) 50%, var(--gold-light) 75%, var(--gold-deep) 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: var(--touch-intensity); animation: shimmerGold 5s linear infinite; transition: opacity 0.1s ease-out;
+        }
+
+        @keyframes shimmerGold { to { background-position: 200% center; } }
+
+        .body-text {
+            font-size: 1.25rem; color: var(--text-silver); line-height: 1.9; margin-bottom: 40px;
+            padding: 0 40px; transform: translateZ(25px); font-weight: 300; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .student-name-calligraphy {
+            font-family: 'Great Vibes', cursive; font-size: 5.5rem; color: var(--text-pure); margin: 30px 0;
+            text-shadow: 0 0 20px rgba(255,255,255,0.4); transform: translateZ(60px); position: relative;
+        }
+        
+        .student-name-calligraphy::after {
+            content: 'Dedicated Scholar'; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            color: var(--gold-light); text-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+            opacity: var(--touch-intensity); transition: opacity 0.1s ease-out;
+        }
+
+        /* ==========================================================================
+           6. THE QUIRKY DIFFERENTIATION BOX (LAYOUT FIXES)
+           ========================================================================== */
+        .quirky-math-box {
+            display: flex; /* LAYOUT FIX: Changed from inline-flex */
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 25px; /* LAYOUT FIX: Reduced padding */
+            border-radius: 12px;
+            margin: 10px auto 50px auto;
+            width: 100%;
+            max-width: 620px; /* LAYOUT FIX: Contain width */
+            box-sizing: border-box; /* LAYOUT FIX: Keep padding inside width */
+            transform: translateZ(45px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .quirky-math-box::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: inherit;
+            border: 1px solid var(--gold-base); box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(218, 165, 32, 0.2);
+            opacity: var(--touch-intensity); pointer-events: none; transition: opacity 0.1s ease-out;
+        }
+
+        .math-content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap; /* LAYOUT FIX: Allow wrapping on small screens */
+            gap: 12px;
+            color: var(--text-pure);
+            font-family: 'Fira Code', 'Inter', monospace;
+            font-size: 1.3rem; /* LAYOUT FIX: Reduced font size so it fits perfectly */
+            font-weight: 600;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .adaptive-text { position: relative; }
+        .adaptive-text::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0;
+            color: var(--gold-base); opacity: var(--touch-intensity); white-space: nowrap; transition: opacity 0.1s ease-out;
+        }
+
+        .css-fraction { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; font-size: 1.1rem; margin: 0 5px; }
+        .css-num { border-bottom: 2px solid rgba(255,255,255,0.5); padding: 0 5px 2px 5px; position: relative; }
+        .css-num::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; border-bottom: 2px solid var(--gold-base);
+            opacity: var(--touch-intensity); transition: opacity 0.1s ease-out;
+        }
+        .css-den { padding: 2px 5px 0 5px; }
+
+        .math-operator { color: var(--text-silver); }
+        .math-variable { font-style: italic; }
+        
+        .math-infinity { font-size: 1.8rem; color: #60a5fa; text-shadow: 0 0 15px rgba(96, 165, 250, 0.6); position: relative; display: flex; align-items: center; }
+        .math-infinity::after {
+            content: '∞'; position: absolute; top: 0; left: 0; color: #ec4899; text-shadow: 0 0 20px rgba(236, 72, 153, 0.8);
+            opacity: var(--touch-intensity); transition: opacity 0.1s ease-out;
+        }
+
+        /* ==========================================================================
+           7. FOOTER 
+           ========================================================================== */
+        .certificate-footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-top: 30px; transform: translateZ(35px); padding: 0 20px;
+        }
+
+        .signee-block { text-align: center; width: 220px; }
+
+        .signee-script {
+            font-family: 'Great Vibes', cursive; font-size: 3rem; color: var(--text-pure);
+            border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 8px; margin-bottom: 8px; transform: rotate(-3deg); position: relative;
+        }
+        .signee-script::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; right: 0; color: var(--gold-light); border-bottom: 1px solid var(--gold-base);
+            padding-bottom: 8px; opacity: var(--touch-intensity); transition: opacity 0.1s ease-out;
+        }
+
+        .signee-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+
+        .gold-seal-wrapper { position: relative; width: 140px; height: 140px; transform: translateZ(80px); perspective: 500px; }
+        .gold-seal-svg { width: 100%; height: 100%; animation: rotateSeal 20s linear infinite; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); }
+
+        @keyframes rotateSeal { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ==========================================================================
+           8. RESPONSIVE DESIGN 
+           ========================================================================== */
+        @media (max-width: 900px) {
+            .certificate-card { padding: 40px 20px; }
+            .main-title { font-size: 2.5rem; }
+            .student-name-calligraphy { font-size: 3.5rem; }
+            .body-text { font-size: 1rem; padding: 0 10px; }
+            .certificate-footer { flex-direction: column; align-items: center; gap: 40px; }
+            .gold-seal-wrapper { order: -1; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starfield-layer"></canvas>
+    <canvas id="fireworks-layer"></canvas>
+    <canvas id="math-symbols-layer"></canvas>
+    <canvas id="confetti-layer"></canvas>
+
+    <main class="cert-master-container" id="interactive-cert">
+        <div class="certificate-card" id="cert-surface">
+            
+            <div class="cert-bg-blue"></div>
+            <div class="cert-bg-gold"></div>
+            
+            <div class="dynamic-glare" id="cert-glare"></div>
+            
+            <div class="adaptive-border-frame">
+                <div class="corner-ornament corner-top-left"></div>
+                <div class="corner-ornament corner-bottom-right"></div>
+            </div>
+            
+            <div class="subtitle-header fade-in-element st-1">Official Certification of Mastery</div>
+            <h1 class="main-title fade-in-element st-2">Differential Calculus</h1>
+            
+            <div class="body-text fade-in-element st-3">
+                This document hereby certifies that<br>
+                <div class="student-name-calligraphy">Dedicated Scholar</div>
+                has successfully demonstrated exceptional proficiency, rigorous logical deduction, and comprehensive mastery over the Year 11 Advanced Mathematics Differential Calculus Syllabus.
+            </div>
+
+            <div class="quirky-math-box fade-in-element st-4">
+                <div class="math-content-wrapper">
+                    <span class="adaptive-text" data-text="f'">f'</span>
+                    <span class="math-operator">(</span>
+                    <span class="math-variable adaptive-text" data-text="Knowledge">Knowledge</span>
+                    <span class="math-operator">)</span>
+                    
+                    <span class="math-operator" style="margin: 0 8px;">=</span>
+                    
+                    <div class="css-fraction" style="font-size: 0.9rem;">
+                        <span class="adaptive-text" data-text="lim" style="font-style: italic;">lim</span>
+                        <span class="adaptive-text" data-text="Δt→0" style="font-size: 0.7rem; margin-top: -2px;">Δt→0</span>
+                    </div>
+
+                    <span class="math-operator">[</span>
+                    <div class="css-fraction">
+                        <span class="css-num math-variable adaptive-text" data-text="Genius">Genius</span>
+                        <span class="css-den adaptive-text" data-text="Δt">Δt</span>
+                    </div>
+                    <span class="math-operator">]</span>
+
+                    <span class="math-operator" style="margin: 0 8px;">→</span>
+                    <span class="math-infinity">∞</span>
+                </div>
+            </div>
+
+            <div class="certificate-footer fade-in-element st-5">
+                <div class="signee-block">
+                    <div class="signee-script" data-text="M. Gupta">M. Gupta</div>
+                    <div class="signee-title">Head of Mathematics</div>
+                </div>
+
+                <div class="gold-seal-wrapper">
+                    <svg class="gold-seal-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#93c5fd" />
+                                <stop offset="50%" stop-color="#3b82f6" />
+                                <stop offset="100%" stop-color="#1e3a8a" />
+                            </linearGradient>
+                            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fff7b0" />
+                                <stop offset="25%" stop-color="#ffd700" />
+                                <stop offset="50%" stop-color="#daa520" />
+                                <stop offset="75%" stop-color="#b8860b" />
+                                <stop offset="100%" stop-color="#ffd700" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <path d="M50 1 L55 9 L64 7 L67 15 L76 16 L76 25 L84 29 L81 37 L89 42 L83 50 L89 58 L81 63 L84 71 L76 75 L76 84 L67 85 L64 93 L55 91 L50 99 L45 91 L36 93 L33 85 L24 84 L24 75 L16 71 L19 63 L11 58 L17 50 L11 42 L19 37 L16 29 L24 25 L24 16 L33 15 L36 7 L45 9 Z" fill="url(#blueGradient)"/>
+                        <path d="M50 1 L55 9 L64 7 L67 15 L76 16 L76 25 L84 29 L81 37 L89 42 L83 50 L89 58 L81 63 L84 71 L76 75 L76 84 L67 85 L64 93 L55 91 L50 99 L45 91 L36 93 L33 85 L24 84 L24 75 L16 71 L19 63 L11 58 L17 50 L11 42 L19 37 L16 29 L24 25 L24 16 L33 15 L36 7 L45 9 Z" fill="url(#goldGradient)" style="opacity: var(--touch-intensity); transition: opacity 0.1s ease-out;"/>
+                        
+                        <circle cx="50" cy="50" r="38" fill="#0f172a" />
+                        <circle cx="50" cy="50" r="34" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="3,3" style="opacity: 0.5;"/>
+                        
+                        <text x="50" y="46" font-family="Cinzel" font-size="14" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">CALC</text>
+                        <text x="50" y="62" font-family="Cinzel" font-size="14" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">SPA</text>
+                        
+                        <g style="opacity: var(--touch-intensity); transition: opacity 0.1s ease-out;">
+                            <text x="50" y="46" font-family="Cinzel" font-size="14" font-weight="900" fill="url(#goldGradient)" text-anchor="middle" letter-spacing="1">CALC</text>
+                            <text x="50" y="62" font-family="Cinzel" font-size="14" font-weight="900" fill="url(#goldGradient)" text-anchor="middle" letter-spacing="1">SPA</text>
+                            <polygon points="50,20 52,25 57,25 53,28 54,33 50,30 46,33 47,28 43,25 48,25" fill="url(#goldGradient)"/>
+                            <polygon points="50,80 52,75 57,75 53,72 54,67 50,70 46,67 47,72 43,75 48,75" fill="url(#goldGradient)"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="signee-block">
+                    <div class="signee-script" data-text="L. Newton">L. Newton</div>
+                    <div class="signee-title">Derivative Engine</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const MathUtils = {
+            randomRange: (min, max) => Math.random() * (max - min) + min,
+            randomInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+        };
+
+        function resizeCanvases() {
+            document.querySelectorAll('canvas').forEach(canvas => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
+
+        const certContainer = document.getElementById('interactive-cert');
+        const certSurface = document.getElementById('cert-surface');
+        const glare = document.getElementById('cert-glare');
+
+        let tRotX = 0, tRotY = 0, tGlareX = 0, tGlareY = 0, tInteraction = 0;
+        let cRotX = 0, cRotY = 0, cGlareX = 0, cGlareY = 0, cInteraction = 0;
+
+        function calculateInteraction(clientX, clientY) {
+            const rect = certContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const isInteracting = (
+                clientX > rect.left - 50 && clientX < rect.right + 50 &&
+                clientY > rect.top - 50 && clientY < rect.bottom + 50
+            );
+
+            if (isInteracting) {
+                tRotX = ((clientY - centerY) / (rect.height / 2)) * -12; 
+                tRotY = ((clientX - centerX) / (rect.width / 2)) * 12;
+                tGlareX = clientX - rect.left;
+                tGlareY = clientY - rect.top;
+                tInteraction = 1; 
+            } else {
+                tRotX = 0; tRotY = 0; tInteraction = 0; 
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => calculateInteraction(e.clientX, e.clientY));
+        document.addEventListener('mouseleave', () => { tInteraction = 0; tRotX = 0; tRotY = 0; });
+        document.addEventListener('touchstart', (e) => calculateInteraction(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+        document.addEventListener('touchmove', (e) => calculateInteraction(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+        document.addEventListener('touchend', () => { tInteraction = 0; tRotX = 0; tRotY = 0; });
+
+        function renderInteractiveEngine() {
+            const lerp = 0.08; 
+            cRotX += (tRotX - cRotX) * lerp;
+            cRotY += (tRotY - cRotY) * lerp;
+            cGlareX += (tGlareX - cGlareX) * lerp;
+            cGlareY += (tGlareY - cGlareY) * lerp;
+            
+            const interactionLerp = tInteraction > cInteraction ? 0.15 : 0.05;
+            cInteraction += (tInteraction - cInteraction) * interactionLerp;
+
+            certSurface.style.transform = `rotateX(${cRotX}deg) rotateY(${cRotY}deg)`;
+            glare.style.transform = `translate(${cGlareX * 0.4}px, ${cGlareY * 0.4}px) translate(-50%, -50%)`;
+            
+            // Limit DOM updates to avoid lag
+            if (Math.abs(tInteraction - cInteraction) > 0.01 || cInteraction > 0) {
+                certSurface.style.setProperty('--touch-intensity', cInteraction.toFixed(3));
+            }
+
+            requestAnimationFrame(renderInteractiveEngine);
+        }
+        renderInteractiveEngine();
+
+        // -------------------------
+        // CANVAS ENGINES
+        // -------------------------
+        const starCtx = document.getElementById('starfield-layer').getContext('2d');
+        class Star {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = MathUtils.randomRange(0, window.innerWidth);
+                this.y = MathUtils.randomRange(0, window.innerHeight);
+                this.size = MathUtils.randomRange(0.5, 2.5);
+                this.baseAlpha = MathUtils.randomRange(0.1, 0.6);
+                this.time = MathUtils.randomRange(0, 100);
+            }
+            update() {
+                this.time += 0.02;
+                this.alpha = Math.max(0, this.baseAlpha + Math.sin(this.time) * 0.4);
+                this.y -= 0.1 * this.size;
+                if (this.y < -10) this.y = window.innerHeight + 10;
+            }
+            draw(ctx) {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200, 220, 255, ${this.alpha})`; ctx.fill();
+            }
+        }
+        const stars = Array.from({ length: 150 }, () => new Star());
+
+        const symCtx = document.getElementById('math-symbols-layer').getContext('2d');
+        const symbols = ["f'(x)", "dy/dx", "lim", "Δy/Δx", "d/dt", "d²y/dx²", "∫", "∞", "δ", "∇"];
+        class FloatingSymbol {
+            constructor() { this.init(true); }
+            init(randomY = false) {
+                this.text = symbols[MathUtils.randomInt(0, symbols.length - 1)];
+                this.x = MathUtils.randomRange(0, window.innerWidth);
+                this.y = randomY ? MathUtils.randomRange(0, window.innerHeight) : window.innerHeight + 100;
+                this.velY = MathUtils.randomRange(-0.4, -1.0);
+                this.rotation = MathUtils.randomRange(0, Math.PI * 2);
+                this.size = MathUtils.randomInt(25, 45);
+            }
+            update() {
+                this.y += this.velY; this.rotation += 0.005;
+                if (this.y < -50) this.init();
+            }
+            draw(ctx) {
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+                ctx.font = `bold ${this.size}px 'Fira Code', monospace`;
+                ctx.fillStyle = 'rgba(96, 165, 250, 0.15)'; ctx.fillText(this.text, 0, 0); ctx.restore();
+            }
+        }
+        const floaters = Array.from({ length: 25 }, () => new FloatingSymbol());
+
+        const confCtx = document.getElementById('confetti-layer').getContext('2d');
+        const fwCtx = document.getElementById('fireworks-layer').getContext('2d');
+        const colors = ['#ffd700', '#ffeb3b', '#3b82f6', '#60a5fa', '#ffffff'];
+        let confetti = [], rockets = [], particles = [];
+
+        class Confetti {
+            constructor(x, y, burst = false) {
+                this.x = x || MathUtils.randomRange(0, window.innerWidth);
+                this.y = y || MathUtils.randomRange(-500, -50);
+                this.w = MathUtils.randomRange(8, 14); this.h = MathUtils.randomRange(10, 20);
+                if (burst) {
+                    const a = MathUtils.randomRange(0, Math.PI * 2), s = MathUtils.randomRange(10, 30);
+                    this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s;
+                } else {
+                    this.vx = MathUtils.randomRange(-1.5, 1.5); this.vy = MathUtils.randomRange(2, 5);
+                }
+                this.color = colors[MathUtils.randomInt(0, colors.length - 1)];
+                this.rx = Math.random(); this.ry = Math.random(); this.rz = Math.random();
+            }
+            update() {
+                this.vx *= 0.95; this.vy += 0.15;
+                if (this.vy > 10) this.vy = 10;
+                this.x += this.vx; this.y += this.vy;
+                this.rx += 0.1; this.ry += 0.1; this.rz += 0.05;
+            }
+            draw(ctx) {
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rz);
+                ctx.scale(Math.abs(Math.cos(this.ry)), Math.abs(Math.cos(this.rx)));
+                ctx.fillStyle = this.color; ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h); ctx.restore();
+            }
+        }
+
+        class Rocket {
+            constructor() {
+                this.x = MathUtils.randomRange(window.innerWidth * 0.2, window.innerWidth * 0.8);
+                this.y = window.innerHeight; this.ty = MathUtils.randomRange(window.innerHeight * 0.1, window.innerHeight * 0.4);
+                this.vx = 0; this.vy = MathUtils.randomRange(-15, -22);
+                this.color = colors[MathUtils.randomInt(0, colors.length - 1)];
+                this.trail = []; this.exploded = false;
+            }
+            update() {
+                this.trail.push({x: this.x, y: this.y}); if(this.trail.length > 5) this.trail.shift();
+                this.y += this.vy; this.vy += 0.2;
+                if(this.vy >= 0 || this.y <= this.ty) {
+                    this.exploded = true;
+                    for(let i=0; i<80; i++) particles.push(new Particle(this.x, this.y, this.color));
+                    if(Math.random()>0.5) for(let i=0; i<40; i++) confetti.push(new Confetti(this.x, this.y, true));
+                }
+            }
+            draw(ctx) {
+                if(this.trail.length < 2) return;
+                ctx.beginPath(); ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                for(let i=1; i<this.trail.length; i++) ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                ctx.strokeStyle = this.color; ctx.lineWidth = 2; ctx.stroke();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.color = Math.random() > 0.8 ? '#fff' : color;
+                const a = MathUtils.randomRange(0, Math.PI * 2), s = MathUtils.randomRange(2, 15);
+                this.vx = Math.cos(a)*s; this.vy = Math.sin(a)*s;
+                this.alpha = 1; this.size = MathUtils.randomRange(1, 3);
+            }
+            update() {
+                this.vx *= 0.92; this.vy *= 0.92; this.vy += 0.1;
+                this.x += this.vx; this.y += this.vy; this.alpha -= 0.02;
+            }
+            draw(ctx) {
+                ctx.globalAlpha = Math.max(0, this.alpha); ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color; ctx.fill(); ctx.globalAlpha = 1;
+            }
+        }
+
+        for(let i=0; i<100; i++) confetti.push(new Confetti());
+
+        function animateBg() {
+            starCtx.clearRect(0,0,starCtx.canvas.width,starCtx.canvas.height);
+            symCtx.clearRect(0,0,symCtx.canvas.width,symCtx.canvas.height);
+            stars.forEach(s => { s.update(); s.draw(starCtx); });
+            floaters.forEach(f => { f.update(); f.draw(symCtx); });
+            
+            confCtx.clearRect(0,0,confCtx.canvas.width,confCtx.canvas.height);
+            for(let i = confetti.length-1; i>=0; i--) {
+                confetti[i].update(); confetti[i].draw(confCtx);
+                if(confetti[i].y > window.innerHeight + 50) {
+                    confetti.splice(i,1); if(confetti.length < 100) confetti.push(new Confetti(null, -50, false));
+                }
+            }
+
+            fwCtx.globalCompositeOperation = 'destination-out';
+            fwCtx.fillStyle = 'rgba(0,0,0,0.2)'; fwCtx.fillRect(0,0,fwCtx.canvas.width,fwCtx.canvas.height);
+            fwCtx.globalCompositeOperation = 'lighter';
+            
+            for(let i = rockets.length-1; i>=0; i--) { rockets[i].update(); rockets[i].draw(fwCtx); if(rockets[i].exploded) rockets.splice(i,1); }
+            for(let i = particles.length-1; i>=0; i--) { particles[i].update(); particles[i].draw(fwCtx); if(particles[i].alpha<=0) particles.splice(i,1); }
+            
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        function launchFw() { rockets.push(new Rocket()); setTimeout(launchFw, MathUtils.randomInt(1500, 4000)); }
+        window.onload = () => { setTimeout(()=>rockets.push(new Rocket()), 500); setTimeout(launchFw, 2000); };
+    </script>
+</body>
+</html>
